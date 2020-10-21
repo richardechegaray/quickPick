@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">QuickPick</string>
+    <string name="welcome_message">Welcome!\nWhat do you want to do?</string>
+    <string name="sessions_header">Sessions</string>
+    <string name="lists_header">Lists</string>
+    <string name="join_session_text">Join Session</string>
+    <string name="create_session_text">Create Session</string>
+    <string name="view_old_sessions_text">View Old Sessions</string>
+    <string name="view_edit_lists_text">View/Edit Lists</string>
+    <string name="create_new_list_text">Create New List</string>
+    <string name="enter_session_id_title">Enter Session ID</string>
+    <string name="login_text">Login with Facebook</string>
 </resources>
