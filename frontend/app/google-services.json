@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "33687989732",
+    "firebase_url": "https://quickpick-7f20f.firebaseio.com",
+    "project_id": "quickpick-7f20f",
+    "storage_bucket": "quickpick-7f20f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:33687989732:android:fa9f9d47e75cb07f332bf1",
+        "android_client_info": {
+          "package_name": "com.quickpick"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "33687989732-pnqj03u2adsiolf5fbvinp7iumis5qt1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKHLugauuXeeXtulRCoGfVJgl1IdKi3vs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "33687989732-pnqj03u2adsiolf5fbvinp7iumis5qt1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
