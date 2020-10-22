@@ -70,11 +70,9 @@ public class LoginActivity extends AppCompatActivity {
 //                            return;
 //                        }
 //
-//                        // Get new FCM registration token
-//
 //                        String firebaseToken = task.getResult();
 //                        Log.d("FirebaseToken", firebaseToken);
-//                        LoginAPI loginApi = RetrofitAPIBuilder.getApi(LoginAPI.class);
+//                        LoginApi loginApi = RetrofitApiBuilder.getApi(LoginAPI.class);
 //                        Call<Boolean> loginCall = loginApi.login(new LoginPayload(facebookToken, firebaseToken));
 //                        loginCall.enqueue(new Callback<Boolean>() {
 //                            @Override

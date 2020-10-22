@@ -3,7 +3,7 @@ package com.quickpick.apis;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitAPIBuilder {
+public class RetrofitApiBuilder {
 
     private static final String SERVER_URL = "http://ec2-13-52-219-93.us-west-1.compute.amazonaws.com";
 

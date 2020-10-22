@@ -9,7 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button createNewList, viewEditLists, joinSession, viewOldSessions, createSession;
+    private Button createNewList;
+    private Button viewEditLists;
+    private Button joinSession;
+    private Button viewOldSessions;
+    private Button createSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
