@@ -2,7 +2,6 @@ package com.quickpick;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,17 +25,12 @@ public class LoginActivity extends AppCompatActivity {
         // Check token prior to inflating layout, in case we are already logged in
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken != null && !accessToken.isExpired()) {
-            navigateToMainActivity();
+            callLogin(accessToken.getToken());
         }
         setContentView(R.layout.activity_login);
 
         // TODO: Delete this when facebook login is required
-        findViewById(R.id.temp_bypass_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                navigateToMainActivity();
-            }
-        });
+        findViewById(R.id.temp_bypass_button).setOnClickListener(view -> navigateToMainActivity());
 
         facebookLoginButton = findViewById(R.id.login_button);
 
@@ -49,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         facebookLoginButton.registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                navigateToMainActivity();
+                callLogin(loginResult.getAccessToken().getToken());
             }
 
             @Override
@@ -62,6 +56,40 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void callLogin(String facebookToken) {
+        // Get FirebaseToken first, then on completion, call the login API
+//        TODO: Uncomment to get FirebaseToken when FCMClient is merged
+//        FirebaseMessaging.getInstance().getToken()
+//                .addOnCompleteListener(new OnCompleteListener<String>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<String> task) {
+//                        if (!task.isSuccessful()) {
+//                            Log.w("FirebaseToken", "Fetching FCM registration token failed", task.getException());
+//                            return;
+//                        }
+//
+//                        // Get new FCM registration token
+//
+//                        String firebaseToken = task.getResult();
+//                        Log.d("FirebaseToken", firebaseToken);
+//                        LoginAPI loginApi = RetrofitAPIBuilder.getApi(LoginAPI.class);
+//                        Call<Boolean> loginCall = loginApi.login(new LoginPayload(facebookToken, firebaseToken));
+//                        loginCall.enqueue(new Callback<Boolean>() {
+//                            @Override
+//                            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+//                                navigateToMainActivity();
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Call<Boolean> call, Throwable t) {
+//                                Log.d("Login", call.request().toString(), t);
+//                                Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
+//                            }
+//                        });
+//                    }
+//                });
     }
 
     private void navigateToMainActivity() {
