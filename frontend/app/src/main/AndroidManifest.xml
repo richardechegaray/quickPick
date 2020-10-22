@@ -21,6 +21,7 @@
         <activity android:name=".ViewOldSessionsActivity" />
         <activity android:name=".CreateNewListActivity" />
         <activity android:name=".MainActivity"/>
+        <activity android:name=".SwipeActivity"/>
 
     </application>
 
