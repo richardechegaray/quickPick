@@ -1,25 +1,78 @@
 package com.quickpick;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 public class LoginActivity extends AppCompatActivity {
+
+    private LoginButton facebookLoginButton;
+
+    private CallbackManager facebookCallbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Check token prior to inflating layout, in case we are already logged in
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && !accessToken.isExpired()) {
+            navigateToMainActivity();
+        }
         setContentView(R.layout.activity_login);
 
-        findViewById(R.id.login_button).setOnClickListener(new View.OnClickListener() {
+        // TODO: Delete this when facebook login is required
+        findViewById(R.id.temp_bypass_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Don't allow navigation back to LoginActivity via back button
-                startActivity(new Intent(LoginActivity.this, MainActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                navigateToMainActivity();
             }
         });
+
+        facebookLoginButton = findViewById(R.id.login_button);
+
+        facebookCallbackManager = CallbackManager.Factory.create();
+        registerFBButtonCallback();
+    }
+
+    private void registerFBButtonCallback() {
+        facebookLoginButton.setPermissions("email");
+        facebookLoginButton.registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                navigateToMainActivity();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(getBaseContext(), "We need FB login to work!", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void navigateToMainActivity() {
+        // Set flags to not allow navigation back to LoginActivity via back button
+        startActivity(new Intent(LoginActivity.this, MainActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        facebookCallbackManager.onActivityResult(requestCode, resultCode, data); // passes result to FB SDK
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
