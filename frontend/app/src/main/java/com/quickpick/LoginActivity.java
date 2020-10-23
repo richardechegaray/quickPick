@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                Toast.makeText(getBaseContext(), "We need FB login to work!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "We need Facebook login to work!", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -59,35 +59,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void callLogin(String facebookToken) {
-        // Get FirebaseToken first, then on completion, call the login API
-//        TODO: Uncomment to get FirebaseToken when FCMClient is merged
-//        FirebaseMessaging.getInstance().getToken()
-//                .addOnCompleteListener(new OnCompleteListener<String>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<String> task) {
-//                        if (!task.isSuccessful()) {
-//                            Log.w("FirebaseToken", "Fetching FCM registration token failed", task.getException());
-//                            return;
-//                        }
-//
-//                        String firebaseToken = task.getResult();
-//                        Log.d("FirebaseToken", firebaseToken);
-//                        LoginApi loginApi = RetrofitApiBuilder.getApi(LoginAPI.class);
-//                        Call<Boolean> loginCall = loginApi.login(new LoginPayload(facebookToken, firebaseToken));
-//                        loginCall.enqueue(new Callback<Boolean>() {
-//                            @Override
-//                            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
-//                                navigateToMainActivity();
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Call<Boolean> call, Throwable t) {
-//                                Log.d("Login", call.request().toString(), t);
-//                                Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
-//                            }
-//                        });
-//                    }
-//                });
+        LoginApi loginApi = RetrofitApiBuilder.getApi(LoginApi.class);
+        Call<Boolean> loginCall = loginApi.login(new LoginPayload(facebookToken, "")); // TODO: retrieve FirebaseToken when integrated
+        loginCall.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                navigateToMainActivity();
+            }
+
+            @Override
+            public void onFailure(Call<Boolean> call, Throwable t) {
+                Log.d("Login", call.request().toString(), t);
+                Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void navigateToMainActivity() {
