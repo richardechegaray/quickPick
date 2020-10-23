@@ -1,17 +1,19 @@
 package com.quickpick;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-
 public class MainActivity extends AppCompatActivity {
 
-    private Button createNewList, viewEditLists, joinSession, viewOldSessions, createSession;
+    private Button createNewList;
+    private Button viewEditLists;
+    private Button joinSession;
+    private Button viewOldSessions;
+    private Button createSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,44 +33,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        createNewList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), CreateNewListActivity.class));
-            }
-        });
+        createNewList.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), CreateNewListActivity.class))
+        );
 
-        viewEditLists.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class));
-            }
-        });
+        viewEditLists.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class))
+        );
 
-        joinSession.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        joinSession.setOnClickListener(view ->
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(getString(R.string.enter_session_id_title))
                         .setTitle(getString(R.string.enter_session_id_title))
                         .create()
-                        .show();
-            }
-        });
+                        .show());
 
-        viewOldSessions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), ViewOldSessionsActivity.class));
-            }
-        });
+        viewOldSessions.setOnClickListener(view ->
 
-        createSession.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), SessionActivity.class));
-            }
-        });
+                startActivity(new Intent(getBaseContext(), ViewOldSessionsActivity.class))
+        );
 
+        createSession.setOnClickListener(view ->
+
+                startActivity(new Intent(getBaseContext(), SessionActivity.class))
+        );
     }
 }
