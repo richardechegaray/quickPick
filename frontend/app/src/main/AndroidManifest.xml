@@ -27,7 +27,8 @@
         <activity android:name=".ViewEditListsActivity" />
         <activity android:name=".ViewOldSessionsActivity" />
         <activity android:name=".CreateNewListActivity" />
-        <activity android:name=".MainActivity"/>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".SwipeActivity" />
         <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">

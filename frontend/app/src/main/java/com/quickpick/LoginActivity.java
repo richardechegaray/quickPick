@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-                Toast.makeText(getBaseContext(), "We need FB login to work!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(), "We need Facebook login to work!", Toast.LENGTH_LONG).show();
             }
 
             @Override

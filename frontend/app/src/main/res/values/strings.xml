@@ -14,4 +14,10 @@
     <string name="session_id_edit_text_hint">Session ID</string>
     <string name="dialog_join_button_text">Join</string>
     <string name="dialog_cancel_button_text">Cancel</string>
+    <string name="session_type_text">Select a session type:</string>
+    <string name="sports_session_text">Sports:</string>
+    <string name="food_session_text">Foods:</string>
+    <string name="movie_session_text">Movies:</string>
+    <string name="start_swiping_text">START SWIPIN:</string>
+    <string name="start_swiping_button">Start Swiping!</string>
 </resources>
