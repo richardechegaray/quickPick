@@ -1,6 +1,8 @@
 package com.quickpick.payloads;
 
-public class ParticipantPayload {
+import java.io.Serializable;
+
+public class ParticipantPayload implements Serializable {
 
     private String name;
 

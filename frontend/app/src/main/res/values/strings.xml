@@ -11,4 +11,7 @@
     <string name="enter_session_id_title">Enter Session ID</string>
     <string name="facebook_app_id">822865601801621</string>
     <string name="fb_login_protocol_scheme">fb822865601801621</string>
+    <string name="session_id_edit_text_hint">Session ID</string>
+    <string name="dialog_join_button_text">Join</string>
+    <string name="dialog_cancel_button_text">Cancel</string>
 </resources>
