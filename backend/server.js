@@ -2,55 +2,46 @@
 const PORT = 8081;
 const DB = "db"
 const LISTS_COLLECTION = "lists"
-const mongourl = "mongodb://localhost:27017/";
 const SESSION_COLLECTION = "sessions"
+const USER_COLLECTION = "users"
+const mongourl = "mongodb://localhost:27017/";
 
-const { json } = require('express');
+//Initialize Firebase
+var admin = require("firebase-admin");
+// Path to secret
+var serviceAccount = require("./quickpick-7f20f-firebase-adminsdk-hvb4p-96107c2f64.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://quickpick-7f20f.firebaseio.com"
+  });
+
 //Initialize express
+const { json } = require('express');
 const express = require('express');
 const app = express();
 app.use(express.json()) // for parsing application/json
 
-
+//Random string helper
 function randomString(length, chars) {
     var result = '';
     for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
     return result;
 }
 
+
 //Initialize mongodb and mongoose
 var MongoClient = require('mongodb').MongoClient;
 MongoClient.connect(mongourl, function(err, db){
     if(err) throw err;
 
+    //--------User requests
+    //TODO: Check if user exists, if he does then update firebase token and if it doesnt then create the user
+    app.post('login', function(req, res){
 
-    //--------List requests
-    //Get a specific list with ID
-    /*app.get('/list/:id', function (req, res) {
-        var query = {"id_": req.params.id_}
     });
 
-    //Create a new list
-    app.post('/list', function (req, res) {
-        //Check if list exists with the same name and user
-        if(db.getCollectionNames().indexOf(json(req.body).userName + '-' + json(req.body).listName) == -1){
-            res.status(403).send({'message': 'List already exists', 'status': 'Failed'});
-        }
-        else{
-            db.createCollection(json(req.body).user + '-' + json(req.body).listName, function(err, res){
-                if (err) throw err;
-                res.status(201).send({'message': 'Collection successfully made', 'status': 'Success');
-            })
-        }
-
-        }
-    });*/
-    
-    //Delete an existing list
-    /*app.delete('/list/:id', function (req, res) {
-        res.send('hello world');
-    });*/
-
+    //--------List requests
     //Get the lists a user has access to
     //TODO: FB authentication
     app.get('/lists', function (req, res) {
@@ -61,7 +52,6 @@ MongoClient.connect(mongourl, function(err, db){
             }
         })
     });
-
 
     //--------Session requests
     //Get session
@@ -104,7 +94,7 @@ MongoClient.connect(mongourl, function(err, db){
     //Adds a user to a session
     //TODO: FB authentication to find user??, Firebase notification to notify people
     app.post('/session/:id', function (req, res) {
-        db.collection(SESSION_COLLECTION).find({"id": req.params.id, "pin": json(req.body).pin}).toArray(function(err, result){
+        db.collection(SESSION_COLLECTION).find({"pin": req.params.id}).toArray(function(err, result){
             if(err) res.status(400).send({"ok": false});
             else{
                 //result.participants.push(json(req.body).) 
@@ -112,19 +102,14 @@ MongoClient.connect(mongourl, function(err, db){
         })
     });
 
-    //Update the list for a session
-    /*app.put('/session/:id', function(req, res) {
-        res.send('herllo world');
-    });*/
-
     //Starts and runs a session
     //TODO: FB authentication, check if user is creator of session, push firebase notification to all devices that it started
-    app.put('session/:id/start', function(req, res){
+    app.put('session/:id', function(req, res){
         db.collection(SESSION_COLLECTION).find({"id": req.params.id}).toArray(function(err, result){
             if(err) res.status(400).send({"ok": false});
             else{ 
                 result.status = "running";
-            }
+                
         })
     });
 
