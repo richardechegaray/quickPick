@@ -10,4 +10,11 @@
     <string name="create_new_list_text">Create New List</string>
     <string name="enter_session_id_title">Enter Session ID</string>
     <string name="login_text">Login with Facebook</string>
+    <string name="session_type_text">Select a session type:</string>
+    <string name="sports_session_text">Sports:</string>
+    <string name="food_session_text">Foods:</string>
+    <string name="movie_session_text">Movies:</string>
+    <string name="start_swiping_text">START SWIPIN:</string>
+    <string name="start_swiping_button">Start Swiping!</string>
+
 </resources>
