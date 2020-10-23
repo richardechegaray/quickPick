@@ -3,12 +3,10 @@ package com.quickpick;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -41,12 +39,8 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        startSwipingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
-            }
-        });
+        startSwipingButton.setOnClickListener(view ->
+                startActivity(new Intent(getApplicationContext(), SwipeActivity.class)));
     }
 
     @Override
@@ -55,12 +49,8 @@ public class SessionActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT));
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(SessionViewModel.class);
-        model.getSessionInfo().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                sessionKeyView.setText(s);
-            }
-        });
+        model.getSessionInfo().observe(this, newText ->
+                sessionKeyView.setText(newText));
     }
 
     @Override
