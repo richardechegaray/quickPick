@@ -11,4 +11,10 @@
     <string name="enter_session_id_title">Enter Session ID</string>
     <string name="facebook_app_id">822865601801621</string>
     <string name="fb_login_protocol_scheme">fb822865601801621</string>
+    <string name="session_type_text">Select a session type:</string>
+    <string name="sports_session_text">Sports:</string>
+    <string name="food_session_text">Foods:</string>
+    <string name="movie_session_text">Movies:</string>
+    <string name="start_swiping_text">START SWIPIN:</string>
+    <string name="start_swiping_button">Start Swiping!</string>
 </resources>
