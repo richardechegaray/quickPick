@@ -9,18 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SwipeActivity extends AppCompatActivity {
 
-    private Button foods, movies, sports;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipe);
-
     }
 
-    private void registerButtons() {
-    }
-
-    private void setOnClickListeners() {
-    }
 }

@@ -1,6 +1,5 @@
 package com.quickpick;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -10,7 +9,7 @@ import android.widget.Button;
 
 public class SessionActivity extends AppCompatActivity {
 
-    private Button foods, movies, sports;
+    private Button startSwipingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,30 +21,14 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void registerButtons() {
-        foods = findViewById(R.id.food_button);
-        movies = findViewById(R.id.movie_button);
-        sports = findViewById(R.id.sport_button);
+        startSwipingButton = findViewById(R.id.start_swiping_button);
     }
 
     private void setOnClickListeners() {
-        foods.setOnClickListener(new View.OnClickListener() {
+        startSwipingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
-            }
-        });
-
-        movies.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
-            }
-        });
-
-        sports.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), SwipeActivity.class));
             }
         });
 
