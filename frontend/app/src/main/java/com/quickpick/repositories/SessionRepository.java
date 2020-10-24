@@ -4,7 +4,7 @@ import android.util.Log;
 
 import androidx.core.util.Consumer;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
 
 import com.quickpick.apis.RetrofitApiBuilder;
 import com.quickpick.apis.SessionApi;
@@ -21,13 +21,15 @@ public class SessionRepository {
 
     private static final String SESSION_DEBUG = "SESSION";
 
+    private static final SessionRepository SESSION_REPOSITORY = new SessionRepository();
+
     private final SessionApi sessionApi;
 
-    private static final SessionRepository SESSION_REPOSITORY = new SessionRepository();
-    private MutableLiveData<SessionPayload> session;
+    private final MediatorLiveData<SessionPayload> session;
 
     private SessionRepository() {
         sessionApi = RetrofitApiBuilder.getApi(SessionApi.class);
+        session = new MediatorLiveData<>();
     }
 
     public static SessionRepository getInstance() {
@@ -38,8 +40,12 @@ public class SessionRepository {
         return session;
     }
 
-    public void setSessionInfo(LiveData<SessionPayload> session) {
-        this.session.setValue(session.getValue());
+    public void addSessionSource(LiveData<SessionPayload> source) {
+        session.addSource(source, session::setValue);
+    }
+
+    public void removeSessionSource(LiveData<SessionPayload> source) {
+        session.removeSource(source);
     }
 
     public void createSession(Consumer<SessionPayload> consumer, String facebookToken) {

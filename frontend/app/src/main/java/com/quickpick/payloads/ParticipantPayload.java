@@ -8,4 +8,7 @@ public class ParticipantPayload implements Serializable {
 
     private String id;
 
+    public String getName() {
+        return name;
+    }
 }
