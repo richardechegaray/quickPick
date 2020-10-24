@@ -1,21 +1,21 @@
 var axios = require('axios');
 
 module.exports = {
+    /* Verifies the token passed in the request's facebookToken field */
     checkFB: function(req, res, next) {
         let fb_token = req.body.facebookToken;
-        console.log("AUTH-MIDDLEWARE: Token is: " + fb_token);
         let url = `https://graph.facebook.com/debug_token?input_token=${fb_token}&access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`
+        
+        /* Pass the token to the Facebook endpoint */
         axios.get(url)
         .then(fb_response => {
             if (fb_response.data.data.is_valid) {
-                console.log("AUTH-MIDDLEWARE: Token is valid!");
                 res.locals.id = fb_response.data.data.user_id
-                console.log(res.locals);
-                // console.log(res.locals.id);
+                /* Run the protected function on the endpoint */
                 next();
             }
             else {
-                console.log("AUTH-MIDDLEWARE: Invalid token!");
+                /* Bad token, reject access to the endpoint */ 
                 res.status(401);
                 res.json({ "message": "Invalid token!",
                                 "ok": false });
@@ -23,7 +23,7 @@ module.exports = {
             
         })
         .catch(error => {
-            console.log("AUTH-MIDDLEWARE: Auth Error!");
+            /* Validation Error occured (likely a bad parameter) */
             res.status(401);
             res.json({"message": "FB request returned an error",
                            "ok": false });
