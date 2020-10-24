@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitApiBuilder {
 
-    private static final String SERVER_URL = "http://ec2-13-52-219-93.us-west-1.compute.amazonaws.com";
+    private static final String SERVER_URL = "http://52.52.51.125:8081/";
 
     private static final Retrofit retrofit = new Retrofit.Builder().baseUrl(SERVER_URL)
             .addConverterFactory(GsonConverterFactory.create())
