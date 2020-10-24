@@ -14,6 +14,8 @@ public class SessionPayload implements Serializable {
 
     private List<ParticipantPayload> participants;
 
+    private ListPayload list;
+
     public String getPin() {
         return pin;
     }
