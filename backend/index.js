@@ -9,43 +9,40 @@ var dburl = 'mongodb://localhost:27017';
 
 app.use(express.json());
 
-app.get("/", function(req, res) {
-    res.json({ "message": 'Ello sir',
-                    "ok": true });
-})
 app.post("/login", auth.checkFB, function(req, res, next) {
-
     MongoClient.connect(dburl, function(err, client) {
-        let db = client.db("quickpick")
-        console.log(db.collection('users').find());
-        if (db.collection('users').find() //{ "id": String(res.locals.id)}, {id: 1}
-            .count() > 0) {
-            console.log("User already exists in database. Will not create.")
+        let db = client.db("quickpick");
+        /* Check users collection for document with matching FB id */ 
+        db.collection("users").findOne({id: String(res.locals.id)})
+        .then((mydoc) => {
+            /* If a user in the DB has a matching id */
+            if (mydoc != null) {
             res.json({ "message": "Successfully verified existing user",
                             "ok": true });
-        }
-        else {
-            console.log("User does not exist in database. Creating...")
-            // Get user's name
-            let url = `https://graph.facebook.com/v8.0/${res.locals.id}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`
-            axios.get(url)
-            .then(fb_response => {
-                console.log(fb_response.data);
-                let name = fb_response.data.name;
-            
-                // Create new user
-                db.collection('users').insertOne(
-                    { 
-                        "id": String(res.locals.id), 
-                        "name": String(name)
-                    });
-                res.json({ "message": "Created a new user",
-                                "ok": true });
-            })
-            .catch(err => {
-                console.log(err);
-            })
-        }
+            }
+            else {
+                /* Get user's name */
+                let url = `https://graph.facebook.com/v8.0/${res.locals.id}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`
+                axios.get(url)
+                .then(fb_response => {
+                    /* Create new user */
+                    db.collection('users').insertOne(
+                        { 
+                            "id": String(res.locals.id), 
+                            "name": String(fb_response.data.name)
+                        });
+                    res.json({ "message": "Successfully created a new user",
+                                    "ok": true });
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500);
+            res.json({
+                "message": "Error during authentication",
+                     "ok": false })
+        });
     })
 });
 
