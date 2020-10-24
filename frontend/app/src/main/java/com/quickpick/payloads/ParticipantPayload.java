@@ -8,6 +8,4 @@ public class ParticipantPayload implements Serializable {
 
     private String id;
 
-    public ParticipantPayload() {
-    }
 }
