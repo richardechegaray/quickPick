@@ -20,4 +20,5 @@
     <string name="movie_session_text">Movies:</string>
     <string name="start_swiping_text">START SWIPIN:</string>
     <string name="start_swiping_button">Start Swiping!</string>
+    <string name="session_code_string_format">Session Code: %s</string>
 </resources>

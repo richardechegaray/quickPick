@@ -1,7 +1,7 @@
 package com.quickpick.apis;
 
-import com.quickpick.payloads.BasicResponsePayload;
-import com.quickpick.payloads.LoginPayload;
+import com.quickpick.payloads.BasicResponse;
+import com.quickpick.payloads.LoginRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -10,5 +10,5 @@ import retrofit2.http.POST;
 public interface LoginApi {
 
     @POST("login")
-    Call<BasicResponsePayload> login(@Body LoginPayload loginPayload);
+    Call<BasicResponse> login(@Body LoginRequest loginRequest);
 }

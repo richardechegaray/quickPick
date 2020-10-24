@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
-import com.quickpick.payloads.SessionPayload;
 import com.quickpick.repositories.SessionRepository;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,11 +59,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(getBaseContext(), ViewOldSessionsActivity.class))
         );
 
-        createSession.setOnClickListener(view -> {
-            SessionPayload payload = new SessionPayload();
-            navigateToSessionActivity(payload);
-            // TODO: Update this to do a POST to the server to create the session
-        });
+        createSession.setOnClickListener(view ->
+                SessionRepository.getInstance().createSession(this::navigateToSessionActivity, facebookAccessToken)
+        );
     }
 
     private void showAlertDialog() {
@@ -89,7 +86,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void navigateToSessionActivity(SessionPayload payload) {
-        startActivity(new Intent(getBaseContext(), SessionActivity.class).putExtra("session", payload));
+    private void navigateToSessionActivity() {
+        // Should not be able to navigate back to the session activity
+        startActivity(new Intent(getBaseContext(), SessionActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
     }
 }
