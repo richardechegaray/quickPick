@@ -29,7 +29,8 @@ app.post("/login", auth.checkFB, function(req, res, next) {
                     db.collection('users').insertOne(
                         { 
                             "id": String(res.locals.id), 
-                            "name": String(fb_response.data.name)
+                            "name": String(fb_response.data.name),
+                            "firebaseToken": String(req.body.firebaseToken)
                         });
                     res.json({ "message": "Successfully created a new user",
                                     "ok": true });
