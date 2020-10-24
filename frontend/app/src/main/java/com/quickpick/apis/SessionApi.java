@@ -1,5 +1,6 @@
 package com.quickpick.apis;
 
+import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.FacebookTokenRequest;
 import com.quickpick.payloads.SessionPayload;
@@ -19,4 +20,7 @@ public interface SessionApi {
 
     @POST("session")
     Call<SessionPayload> createSession(@Body CreateSessionRequest request);
+
+    @POST("session/{sessionId}/run")
+    Call<BasicResponse> startSession(@Path("sessionId") String sessionId, @Body FacebookTokenRequest request);
 }

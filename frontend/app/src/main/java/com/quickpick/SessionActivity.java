@@ -16,6 +16,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.AccessToken;
 import com.quickpick.payloads.ParticipantPayload;
 import com.quickpick.receivers.SessionReceiver;
 import com.quickpick.repositories.SessionRepository;
@@ -36,10 +37,20 @@ public class SessionActivity extends AppCompatActivity {
 
     private SessionReceiver receiver;
 
+    private String facebookAccessToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
+
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken == null || accessToken.isExpired()) {
+            startActivity(new Intent(getBaseContext(), LoginActivity.class));
+            finish();
+            return;
+        }
+        facebookAccessToken = accessToken.getToken();
 
         receiver = new SessionReceiver();
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
@@ -70,7 +81,8 @@ public class SessionActivity extends AppCompatActivity {
 
     private void setOnClickListeners() {
         startSwipingButton.setOnClickListener(view ->
-                startActivity(new Intent(getApplicationContext(), SwipeActivity.class)));
+                SessionRepository.getInstance().startSession(
+                        basicResponse -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class)), facebookAccessToken));
     }
 
     @Override

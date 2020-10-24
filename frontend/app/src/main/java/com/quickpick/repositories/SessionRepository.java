@@ -8,9 +8,12 @@ import androidx.lifecycle.MediatorLiveData;
 
 import com.quickpick.apis.RetrofitApiBuilder;
 import com.quickpick.apis.SessionApi;
+import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.FacebookTokenRequest;
 import com.quickpick.payloads.SessionPayload;
+
+import java.util.Optional;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,35 +54,44 @@ public class SessionRepository {
     public void createSession(Consumer<SessionPayload> consumer, String facebookToken) {
         // TODO: Remove hard-coded limit of 6 on party size
         Call<SessionPayload> createSessionCall = sessionApi.createSession(new CreateSessionRequest(facebookToken, 6));
-        createSessionCall.enqueue(new SessionRepositoryCallback(consumer));
+        createSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
+            session.setValue(responsePayload);
+            consumer.accept(responsePayload);
+        }));
     }
 
-    public void joinSession(Consumer<SessionPayload> consumer, String sessionId, String
-            facebookToken) {
+    public void joinSession(Consumer<SessionPayload> consumer, String sessionId, String facebookToken) {
         Call<SessionPayload> joinSessionCall = sessionApi.joinSession(sessionId, new FacebookTokenRequest(facebookToken));
-        joinSessionCall.enqueue(new SessionRepositoryCallback(consumer));
+        joinSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
+            session.setValue(responsePayload);
+            consumer.accept(responsePayload);
+        }));
     }
 
-    private class SessionRepositoryCallback implements Callback<SessionPayload> {
-        private final Consumer<SessionPayload> onSuccessCallback;
+    public void startSession(Consumer<BasicResponse> consumer, String facebookToken) {
+        Call<BasicResponse> startSessionCall = sessionApi.startSession(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new FacebookTokenRequest(facebookToken));
+        startSessionCall.enqueue(new SessionRepositoryCallback<>(consumer));
+    }
 
-        SessionRepositoryCallback(Consumer<SessionPayload> onSuccessCallback) {
+    private static class SessionRepositoryCallback<T> implements Callback<T> {
+        private final Consumer<T> onSuccessCallback;
+
+        SessionRepositoryCallback(Consumer<T> onSuccessCallback) {
             this.onSuccessCallback = onSuccessCallback;
         }
 
         @Override
         @EverythingIsNonNull
-        public void onResponse(Call<SessionPayload> call, Response<SessionPayload> response) {
+        public void onResponse(Call<T> call, Response<T> response) {
             Log.d(SESSION_DEBUG, response.toString());
             if (response.isSuccessful()) {
-                session.setValue(response.body());
                 onSuccessCallback.accept(response.body());
             }
         }
 
         @Override
         @EverythingIsNonNull
-        public void onFailure(Call<SessionPayload> call, Throwable t) {
+        public void onFailure(Call<T> call, Throwable t) {
             Log.d(SESSION_DEBUG, call.request().toString(), t);
         }
     }
