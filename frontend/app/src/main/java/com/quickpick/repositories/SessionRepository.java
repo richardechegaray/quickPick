@@ -4,10 +4,12 @@ import android.util.Log;
 
 import androidx.core.util.Consumer;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.quickpick.apis.RetrofitApiBuilder;
 import com.quickpick.apis.SessionApi;
-import com.quickpick.payloads.FacebookTokenPayload;
+import com.quickpick.payloads.CreateSessionRequest;
+import com.quickpick.payloads.FacebookTokenRequest;
 import com.quickpick.payloads.SessionPayload;
 
 import retrofit2.Call;
@@ -17,13 +19,12 @@ import retrofit2.internal.EverythingIsNonNull;
 
 public class SessionRepository {
 
-    private LiveData<String> sessionInfo;
+    private static final String SESSION_DEBUG = "SESSION";
 
     private final SessionApi sessionApi;
 
     private static final SessionRepository SESSION_REPOSITORY = new SessionRepository();
-
-    private static final String SESSION = "SESSION";
+    private MutableLiveData<SessionPayload> session;
 
     private SessionRepository() {
         sessionApi = RetrofitApiBuilder.getApi(SessionApi.class);
@@ -33,31 +34,47 @@ public class SessionRepository {
         return SESSION_REPOSITORY;
     }
 
-    public LiveData<String> getSessionInfo() {
-        return sessionInfo;
+    public LiveData<SessionPayload> getSession() {
+        return session;
     }
 
-    public void setSessionInfo(LiveData<String> sessionInfo) {
-        this.sessionInfo = sessionInfo;
+    public void setSessionInfo(LiveData<SessionPayload> session) {
+        this.session.setValue(session.getValue());
     }
 
-    public void joinSession(Consumer<SessionPayload> consumer, String sessionId, String facebookToken) {
-        Call<SessionPayload> joinSessionCall = sessionApi.joinSession(sessionId, new FacebookTokenPayload(facebookToken));
-        joinSessionCall.enqueue(new Callback<SessionPayload>() {
-            @Override
-            @EverythingIsNonNull
-            public void onResponse(Call<SessionPayload> call, Response<SessionPayload> response) {
-                Log.d(SESSION, response.toString());
-                if (response.isSuccessful()) {
-                    consumer.accept(response.body());
-                }
-            }
+    public void createSession(Consumer<SessionPayload> consumer, String facebookToken) {
+        // TODO: Remove hard-coded limit of 6 on party size
+        Call<SessionPayload> createSessionCall = sessionApi.createSession(new CreateSessionRequest(facebookToken, 6));
+        createSessionCall.enqueue(new SessionRepositoryCallback(consumer));
+    }
 
-            @Override
-            @EverythingIsNonNull
-            public void onFailure(Call<SessionPayload> call, Throwable t) {
-                Log.d(SESSION, call.request().toString(), t);
+    public void joinSession(Consumer<SessionPayload> consumer, String sessionId, String
+            facebookToken) {
+        Call<SessionPayload> joinSessionCall = sessionApi.joinSession(sessionId, new FacebookTokenRequest(facebookToken));
+        joinSessionCall.enqueue(new SessionRepositoryCallback(consumer));
+    }
+
+    private class SessionRepositoryCallback implements Callback<SessionPayload> {
+        private final Consumer<SessionPayload> onSuccessCallback;
+
+        SessionRepositoryCallback(Consumer<SessionPayload> onSuccessCallback) {
+            this.onSuccessCallback = onSuccessCallback;
+        }
+
+        @Override
+        @EverythingIsNonNull
+        public void onResponse(Call<SessionPayload> call, Response<SessionPayload> response) {
+            Log.d(SESSION_DEBUG, response.toString());
+            if (response.isSuccessful()) {
+                session.setValue(response.body());
+                onSuccessCallback.accept(response.body());
             }
-        });
+        }
+
+        @Override
+        @EverythingIsNonNull
+        public void onFailure(Call<SessionPayload> call, Throwable t) {
+            Log.d(SESSION_DEBUG, call.request().toString(), t);
+        }
     }
 }

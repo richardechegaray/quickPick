@@ -8,16 +8,20 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.quickpick.payloads.SessionPayload;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+
+    private static final String FIREBASE_MESSAGING_SERVICE_DEBUG = "FIREBASE_MESSAGING_SERVICE";
 
     public static final String SESSION_INTENT = "SESSION_CODE";
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
-        Log.d("UNIQUE_TAG", "Received message from " + remoteMessage.getFrom());
+        Log.d(FIREBASE_MESSAGING_SERVICE_DEBUG, "Received message from " + remoteMessage.getFrom());
         Intent intent = new Intent(SESSION_INTENT);
-        intent = intent.putExtra("SessionKey", remoteMessage.getData().get("SessionKey"));
+        // TODO: Use GSON to parse the remote data
+        intent = intent.putExtra(SessionPayload.INTENT_KEY, remoteMessage.getData().get("SessionKey"));
         LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
     }
 
@@ -32,7 +36,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(@NonNull String token) {
-        Log.d("UNIQUE_TAG", "Refreshed token: " + token);
+        Log.d(FIREBASE_MESSAGING_SERVICE_DEBUG, "Refreshed token: " + token);
         // TODO: Send this token to the server
     }
 

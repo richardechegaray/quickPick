@@ -3,16 +3,17 @@ package com.quickpick.viewmodels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.quickpick.payloads.SessionPayload;
 import com.quickpick.repositories.SessionRepository;
 
 public class SessionViewModel extends ViewModel {
-    private LiveData<String> sessionInfo;
+    private LiveData<SessionPayload> session;
 
-    public LiveData<String> getSessionInfo() {
-        if (sessionInfo == null) {
-            sessionInfo = SessionRepository.getInstance().getSessionInfo();
+    public LiveData<SessionPayload> getSession() {
+        if (session == null) {
+            session = SessionRepository.getInstance().getSession();
         }
-        return sessionInfo;
+        return session;
     }
 
 }

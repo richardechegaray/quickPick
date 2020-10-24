@@ -8,17 +8,21 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.quickpick.payloads.SessionPayload;
+
 public class SessionReceiver extends BroadcastReceiver {
 
-    private final MutableLiveData<String> data = new MutableLiveData<>();
+    private static final String SESSION_RECEIVER_DEBUG = "SESSION_RECEIVER";
 
-    public LiveData<String> getData() {
-        return data;
+    private final MutableLiveData<SessionPayload> session = new MutableLiveData<>();
+
+    public LiveData<SessionPayload> getSession() {
+        return session;
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("UNIQUE_TAG", "Received");
-        data.setValue(intent.getStringExtra("SessionKey"));
+        Log.d(SESSION_RECEIVER_DEBUG, "Received");
+        session.setValue((SessionPayload) intent.getSerializableExtra(SessionPayload.INTENT_KEY));
     }
 }

@@ -28,7 +28,7 @@ public class SessionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_session);
 
         receiver = new SessionReceiver();
-        SessionRepository.getInstance().setSessionInfo(receiver.getData());
+        SessionRepository.getInstance().setSessionInfo(receiver.getSession());
         registerViews();
         setOnClickListeners();
     }
@@ -49,8 +49,10 @@ public class SessionActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT));
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(SessionViewModel.class);
-        model.getSessionInfo().observe(this, newText ->
-                sessionKeyView.setText(newText));
+        model.getSession().observe(this, newSession ->
+        {
+            sessionKeyView.setText(newSession.getPin());
+        });
     }
 
     @Override
