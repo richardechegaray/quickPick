@@ -35,7 +35,7 @@ public class SessionActivity extends AppCompatActivity {
 
     private void registerViews() {
         startSwipingButton = findViewById(R.id.start_swiping_button);
-        sessionKeyView = findViewById(R.id.session_key_text_view);
+        sessionKeyView = findViewById(R.id.session_key_text);
     }
 
     private void setOnClickListeners() {

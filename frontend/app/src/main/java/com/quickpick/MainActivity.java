@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private Button joinSession;
     private Button viewOldSessions;
     private Button createSession;
+
     private String facebookAccessToken;
 
     @Override
@@ -72,13 +73,15 @@ public class MainActivity extends AppCompatActivity {
                 .setView(R.layout.dialog_join_session)
                 .create();
         dialog.show();
+
         EditText sessionCode = dialog.findViewById(R.id.session_code_edit_text);
         Button cancelButton = dialog.findViewById(R.id.dialog_cancel_button);
+        Button joinButton = dialog.findViewById(R.id.dialog_join_button);
+
         if (cancelButton != null) {
             cancelButton.setOnClickListener(button -> dialog.dismiss());
         }
-        Button joinButton = dialog.findViewById(R.id.dialog_join_button);
-        if (joinButton != null) {
+        if (joinButton != null && sessionCode != null) {
             joinButton.setOnClickListener(button -> {
                 SessionRepository.getInstance().joinSession(this::navigateToSessionActivity, sessionCode.getText().toString(), facebookAccessToken);
                 dialog.dismiss();
