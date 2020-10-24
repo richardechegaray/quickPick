@@ -51,26 +51,26 @@ public class SessionRepository {
         session.removeSource(source);
     }
 
-    public void createSession(Consumer<SessionPayload> consumer, String facebookToken) {
+    public void createSession(Runnable callback, String facebookToken) {
         // TODO: Remove hard-coded limit of 6 on party size
         Call<SessionPayload> createSessionCall = sessionApi.createSession(new CreateSessionRequest(facebookToken, 6));
         createSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
-            consumer.accept(responsePayload);
+            callback.run();
         }));
     }
 
-    public void joinSession(Consumer<SessionPayload> consumer, String sessionId, String facebookToken) {
+    public void joinSession(Runnable callback, String sessionId, String facebookToken) {
         Call<SessionPayload> joinSessionCall = sessionApi.joinSession(sessionId, new FacebookTokenRequest(facebookToken));
         joinSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
-            consumer.accept(responsePayload);
+            callback.run();
         }));
     }
 
-    public void startSession(Consumer<BasicResponse> consumer, String facebookToken) {
+    public void startSession(Runnable callback, String facebookToken) {
         Call<BasicResponse> startSessionCall = sessionApi.startSession(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new FacebookTokenRequest(facebookToken));
-        startSessionCall.enqueue(new SessionRepositoryCallback<>(consumer));
+        startSessionCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
     }
 
     private static class SessionRepositoryCallback<T> implements Callback<T> {

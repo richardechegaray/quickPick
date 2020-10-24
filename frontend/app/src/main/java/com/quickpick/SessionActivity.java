@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,13 +26,7 @@ import java.util.List;
 
 public class SessionActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
     private UserAdapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
-
-    private Button startSwipingButton;
-
-    private TextView sessionKeyView;
 
     private SessionReceiver receiver;
 
@@ -55,15 +48,10 @@ public class SessionActivity extends AppCompatActivity {
         receiver = new SessionReceiver();
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(SessionViewModel.class);
-        registerViews();
         setOnClickListeners();
+        setUpRecyclerView();
 
-        recyclerView = findViewById(R.id.user_recycler_view);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new UserAdapter(new ArrayList<>());
-        recyclerView.setAdapter(adapter);
+        TextView sessionKeyView = findViewById(R.id.session_key_text);
 
         model.getSession().observe(this, newSession ->
         {
@@ -74,15 +62,19 @@ public class SessionActivity extends AppCompatActivity {
 
     }
 
-    private void registerViews() {
-        startSwipingButton = findViewById(R.id.start_swiping_button);
-        sessionKeyView = findViewById(R.id.session_key_text);
+    private void setUpRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.user_recycler_view);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new UserAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
     }
 
     private void setOnClickListeners() {
-        startSwipingButton.setOnClickListener(view ->
+        findViewById(R.id.start_swiping_button).setOnClickListener(view ->
                 SessionRepository.getInstance().startSession(
-                        basicResponse -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class)), facebookAccessToken));
+                        () -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class)), facebookAccessToken));
     }
 
     @Override
@@ -136,6 +128,5 @@ public class SessionActivity extends AppCompatActivity {
                 this.textView = view.findViewById(R.id.user_name_text_view);
             }
         }
-
     }
 }
