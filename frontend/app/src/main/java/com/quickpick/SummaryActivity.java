@@ -41,38 +41,39 @@ public class SummaryActivity extends AppCompatActivity {
                 .get(SessionViewModel.class);
 
         model.getSession().observe(this, newSession -> {
-            List<ResultPayload> results =  newSession.getResults();
+            List<ResultPayload> results = newSession.getResults();
 
             if (results.size() > 0) {
                 ResultPayload firstPlace = results.get(0);
 
                 Glide.with(getApplicationContext()).load(firstPlace.getIdea().getImageUrl())
-                        .into((ImageView)findViewById(R.id.first_place_image));
-                ((TextView)findViewById(R.id.first_place_idea_text)).setText(firstPlace.getIdea().getName());
-                ((TextView)findViewById(R.id.first_place_idea_score)).setText(""+firstPlace.getScore());
+                        .into((ImageView) findViewById(R.id.first_place_image));
+                ((TextView) findViewById(R.id.first_place_idea_text)).setText(firstPlace.getIdea().getName());
+                ((TextView) findViewById(R.id.first_place_description)).setText(firstPlace.getIdea().getDescription());
+                ((TextView) findViewById(R.id.first_place_idea_score)).setText(String.valueOf(firstPlace.getScore()));
 
                 if (results.size() > 1) {
                     ResultPayload secondPlace = results.get(1);
 
-                    ((TextView)findViewById(R.id.second_place_idea)).setText(secondPlace.getIdea().getName());
-                    ((TextView)findViewById(R.id.second_place_idea_description)).setText(secondPlace.getIdea().getDescription());
-                    ((TextView)findViewById(R.id.second_place_idea_score)).setText(""+secondPlace.getScore());
+                    ((TextView) findViewById(R.id.second_place_idea)).setText(secondPlace.getIdea().getName());
+                    ((TextView) findViewById(R.id.second_place_idea_description)).setText(secondPlace.getIdea().getDescription());
+                    ((TextView) findViewById(R.id.second_place_idea_score)).setText(String.valueOf(secondPlace.getScore()));
 
                     if (results.size() > 2) {
                         ResultPayload thirdPlace = results.get(2);
 
-                        ((TextView)findViewById(R.id.third_place_idea)).setText(thirdPlace.getIdea().getName());
-                        ((TextView)findViewById(R.id.third_place_idea_description)).setText(thirdPlace.getIdea().getDescription());
-                        ((TextView)findViewById(R.id.third_place_idea_score)).setText(""+thirdPlace.getScore());
+                        ((TextView) findViewById(R.id.third_place_idea)).setText(thirdPlace.getIdea().getName());
+                        ((TextView) findViewById(R.id.third_place_idea_description)).setText(thirdPlace.getIdea().getDescription());
+                        ((TextView) findViewById(R.id.third_place_idea_score)).setText(String.valueOf(thirdPlace.getScore()));
                     }
                 }
             } else {
                 String waitingForResults = "https://lh3.googleusercontent.com/proxy/F5ZtRqXgWb9lreOCddeHo5DHts4A9LBJ1PxS7XjedRnSWT3gcCDpxFj8OPG6Gyh-vqdZWyRWdqTSj7lQRQvZkJpAB_D68MNQFRsL-wkodvvoltKqW-O2bfjZiX3lWleJ";
                 String waitingForResultText = "Waiting for results ...";
                 Glide.with(getApplicationContext()).load(waitingForResults)
-                        .into((ImageView)findViewById(R.id.first_place_image));
-                ((TextView)findViewById(R.id.first_place_idea_text)).setText(waitingForResultText);
-                ((TextView)findViewById(R.id.first_place_idea_score)).setText("");
+                        .into((ImageView) findViewById(R.id.first_place_image));
+                ((TextView) findViewById(R.id.first_place_idea_text)).setText(waitingForResultText);
+                ((TextView) findViewById(R.id.first_place_idea_score)).setText("");
             }
         });
     }
