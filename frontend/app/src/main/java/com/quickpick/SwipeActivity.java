@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.mindorks.placeholderview.SwipeDecor;
 import com.mindorks.placeholderview.SwipePlaceHolderView;
+import com.mindorks.placeholderview.listeners.ItemRemovedListener;
 import com.quickpick.payloads.IdeaPayload;
 import com.quickpick.viewmodels.IdeaCard;
 import com.quickpick.viewmodels.SessionViewModel;
@@ -39,9 +40,6 @@ public class SwipeActivity extends AppCompatActivity {
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(SessionViewModel.class);
 
-        int size = model.getSession().getValue().getList().getIdeas().size();
-        Log.d("SWIPE", "" + size);
-
         for(IdeaPayload idea : model.getSession().getValue().getList().getIdeas()){ //looping through all of our ideas
             mSwipeView.addView(new IdeaCard(idea, mContext, mSwipeView));
         }
@@ -49,6 +47,15 @@ public class SwipeActivity extends AppCompatActivity {
         findViewById(R.id.dislikeButton).setOnClickListener(view -> mSwipeView.doSwipe(false));
 
         findViewById(R.id.likeButton).setOnClickListener(view -> mSwipeView.doSwipe(true));
+
+        mSwipeView.addItemRemoveListener(count -> {
+            if (count == 0) {
+                // TODO: send post request
+                startActivity(new Intent(getApplicationContext(), SummaryActivity.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+            }
+        });
+
 
     }
 }

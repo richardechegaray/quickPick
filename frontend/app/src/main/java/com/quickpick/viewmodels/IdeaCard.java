@@ -48,9 +48,8 @@ public class IdeaCard {
     }
 
     @SwipeOut
-    private void onSwipedOut(){ //left swipe
+    private void onSwipedOut(){ //left swipe == accept
         Log.d("EVENT", "onSwipedOut");
-//        mSwipeView.addView(this);
     }
 
     @SwipeCancelState
