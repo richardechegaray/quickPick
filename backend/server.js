@@ -6,8 +6,6 @@ const SESSION_COLLECTION = "sessions"
 const USER_COLLECTION = "users"
 const mongourl = "mongodb://localhost:27017/";
 const dbname = "quickpick";
-
-
 /*
 ---------Initialization
 */
@@ -30,6 +28,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var MongoClient = require('mongodb').MongoClient;
 const client = new MongoClient(mongourl);
 
+//Import Axios and Auth module for Facebook authentication
+var axios = require('axios');
+var auth = require("./middleware/authentication");
+require('dotenv').config();
 
 /*
 ----------Helper functions
@@ -81,9 +83,41 @@ client.connect(function(err){
 
     //--------User requests
     //TODO: Check if user exists, if he does then update firebase token and if it doesnt then create the user
-    app.post('/login', function(req, res){
-
-    });
+    app.post("/login", auth.checkFB, function(req, res, next) {
+        let db = client.db("quickpick");
+        /* Check users collection for document with matching FB id */ 
+        db.collection("users").findOne({id: String(res.locals.id)})
+        .then((mydoc) => {
+            /* If a user in the DB has a matching id */
+            if (mydoc != null) {
+            res.json({ "message": "Successfully verified existing user",
+                            "ok": true });
+            }
+            else {
+                /* Get user's name */
+                let url = `https://graph.facebook.com/v8.0/${res.locals.id}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`
+                axios.get(url)
+                .then(fb_response => {
+                    /* Create new user */
+                    db.collection('users').insertOne(
+                        { 
+                            "id": String(res.locals.id), 
+                            "name": String(fb_response.data.name),
+                            "firebaseToken": String(req.body.firebaseToken)
+                        });
+                    res.json({ "message": "Successfully created a new user",
+                                    "ok": true });
+                })
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500);
+            res.json({
+                "message": "Error during authentication",
+                     "ok": false })
+        });
+    })
 
     //--------List requests
     //Get the lists a user has access to
