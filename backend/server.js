@@ -1,11 +1,3 @@
-//Constants
-const PORT = 8081;
-const DB = "db"
-const LISTS_COLLECTION = "lists"
-const SESSION_COLLECTION = "sessions"
-const USER_COLLECTION = "users"
-const mongourl = "mongodb://localhost:27017/";
-const dbname = "quickpick";
 /*
 ---------Initialization
 */
@@ -86,7 +78,7 @@ client.connect(function(err){
     app.post("/login", auth.checkFB, function(req, res, next) {
         let db = client.db("quickpick");
         /* Check users collection for document with matching FB id */ 
-        db.collection("users").findOne({id: String(res.locals.id)})
+        db.collection(USER_COLLECTION).findOne({id: String(res.locals.id)})
         .then((mydoc) => {
             /* If a user in the DB has a matching id */
             if (mydoc != null) {
@@ -155,11 +147,11 @@ client.connect(function(err){
             "pin": rString,
             "list": req.body.list, //{"name": "Movie Genres", "ideas": [{"name": "Horror"}, {'name': 'Comedy'}, {'name': 'Action'}]}, //TODO: not hardcoded list
             "status": "lobby",
-            "creator": 0, //TODO
+            "creator": String(res.locals.id),
             "complete": 0,
             "size": req.body.size,
             "results": [],
-            "participants": [],   
+            "participants": [{"name": }],   
         }
         //Create results array with 0 counts
         var resultArray = []
@@ -182,11 +174,18 @@ client.connect(function(err){
     app.post('/session/:id/choices', auth.checkFB, function (req, res) {
         var query = {pin: req.params.id}
         db.collection(SESSION_COLLECTION).find(query).toArray(function(err, foundSessions){
+            //See if user is in session
+            var isInSession = false;
+            for(i = 0; i< foundSessions[0].participants; i++){
+                if(String(res.locals.id) == foundSessions[i].participants.id){
+                    isInSession = true;
+                }
+            }
             if(err || foundSessions.length == 0){
                 res.status(400).send({"ok": false, "message": "Session doesn't exist"});
             }
-            else{
-                //Iterate through responses, and also session to find idea names that match
+            else if(isInSession){
+               //Iterate through responses, and also session to find idea names that match
                 for(i = 0; i < req.body.choices.length; i++){
                     for(j = 0; j < foundSessions[0].results.length; j++){
 
@@ -221,27 +220,30 @@ client.connect(function(err){
                 })
                 
             }
+            else{
+                res.status(400).send({"ok": false, "message": "User ID is not in the session"})
+            }
         })
     });
 
     //Adds a user to a session
     //TODO: FB authentication to find user??
-    app.post('/session/:id/:userid/:username', auth.checkFB, function (req, res) {
+    app.post('/session/:id', auth.checkFB, function (req, res) {
         /* Get session matching ID */
         db.collection(SESSION_COLLECTION).findOne({"pin": req.params.id})
         .then((session) => {
             
             /* Get user matching the token that was authenticated */
-            db.collection(USER_COLLECTION).findOne({"id": req.params.userid})
+            db.collection(USER_COLLECTION).findOne({"id": String(res.locals.id)})
             .then((user) => {
                 
                 /* Add the user if they aren't in the session yet */
                 var flag = false;
                 for(i = 0; i < session.participants.length;i++){
-                    if(session.participants[i].name == req.params.username) flag = true;
+                    if(user.name == session.participants[i]) flag = true;
                 }
                 if (!flag) {
-                    let newPerson = {"name": req.params.username, "id": req.params.userid};
+                    let newPerson = {"name": user.name, "id": String(res.locals.userid)};
                     let participants = session.participants;
                     participants.push(newPerson);
                     db.collection(SESSION_COLLECTION)
@@ -271,7 +273,12 @@ client.connect(function(err){
         var query = {pin: req.params.id}
         //Find session
         db.collection(SESSION_COLLECTION).find(query).toArray(function(err, session){
-            if(err) res.status(400).send({"ok": false, "message": "Session doesn't exist"});
+            if(err){ 
+                res.status(400).send({"ok": false, "message": "Session doesn't exist"});
+            }
+            else if(session[0].creator != String(res.locals.id)) {
+                res.status(400).send({"ok": false, "message": "User is not the creator"});
+            }
             else{ 
                 //Check if session is in lobby
                 if(result[0].status == "lobby") {
