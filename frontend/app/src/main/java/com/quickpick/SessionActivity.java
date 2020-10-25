@@ -55,6 +55,10 @@ public class SessionActivity extends AppCompatActivity {
 
         model.getSession().observe(this, newSession ->
         {
+            if ("running".equals(newSession.getStatus())) {
+                startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                return;
+            }
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
@@ -74,7 +78,8 @@ public class SessionActivity extends AppCompatActivity {
     private void setOnClickListeners() {
         findViewById(R.id.start_swiping_button).setOnClickListener(view ->
                 SessionRepository.getInstance().startSession(
-                        () -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class)), facebookAccessToken));
+                        () -> {
+                        }, facebookAccessToken));
     }
 
     @Override
