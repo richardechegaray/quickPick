@@ -21,6 +21,9 @@ public class SessionPayload implements Serializable {
     @Nullable
     private List<ParticipantPayload> participants;
 
+    @Nullable
+    private List<ResultPayload> results;
+
     private ListPayload list;
 
     public String getPin() {
@@ -33,6 +36,10 @@ public class SessionPayload implements Serializable {
 
     public List<ParticipantPayload> getParticipants() {
         return Collections.unmodifiableList(Optional.ofNullable(participants).orElse(new ArrayList<>()));
+    }
+
+    public List<ResultPayload> getResults() {
+        return Collections.unmodifiableList(Optional.ofNullable(results).orElse(new ArrayList<>()));
     }
 
 }
