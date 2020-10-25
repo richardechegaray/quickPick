@@ -1,4 +1,6 @@
 require('dotenv').config();
+// console.log(printme);
+// console.log(process.env)
 /*
 ---------Initialization
 */
@@ -39,22 +41,21 @@ function randomString(length, chars) {
 }
 
 //Helper function for sending firebase messages
-function sendFirebase(session){
-    //Get firebase tokens of everyone in the session
-    var registrationTokens = [];
-    for(i = 0; i < session.participants.length; i++){
-        db.collection(process.env.USER_COLLECTION).findOne({"id": session.participants[i].id}, function(err, res){
-            registrationTokens.push(res[0].firebaseToken)
-            })
-        }    
-    //Push messsage
-    const message = {
-        data: {"type":"session", "results": session},
-        tokens: registrationTokens
-    }
-    admin.messaging().sendMulticast(message)
-    .then((response) => { 
-        console.log(response.successCount + ' session end messages were sent');
+function sendFirebase(session, db){
+    let idList = session.participants.map(u => u.id);
+    db.collection(process.env.USER_COLLECTION)
+    .find({"id": {$in: idList} })
+    .project({"firebaseToken": true})
+    .toArray()
+    .then((tokens) => {
+        let msgData = {"type": "session", "session": JSON.stringify(session)};
+        let msg = { "data": msgData, 
+                    "tokens": tokens.map(t => t.firebaseToken)};
+        console.log(msg);
+        admin.messaging().sendMulticast(msg)
+        .then((response) => {
+            console.log(response.successCount + ' messages were sent successfully'); 
+        });
     })
 }
 
@@ -76,14 +77,27 @@ client.connect(function(err){
 
     //--------User requests
     app.post("/login", auth.checkFB, function(req, res, next) {
+        console.log("DEBUG: Post request to login");
         let db = client.db("quickpick");
         /* Check users collection for document with matching FB id */ 
         db.collection(process.env.USER_COLLECTION).findOne({id: String(res.locals.id)})
         .then((mydoc) => {
             /* If a user in the DB has a matching id */
             if (mydoc != null) {
-            res.json({ "message": "Successfully verified existing user",
-                            "ok": true });
+                if (req.body.firebaseToken != mydoc.firebaseToken) {
+                    db.collection(process.env.USER_COLLECTION)
+                    .updateOne(
+                        {id: String(res.locals.id)}, 
+                        {$set: { 'firebaseToken': String(req.body.firebaseToken)}})
+                    .then(() => {
+                        console.log("Verified user, updated FB token");
+                        res.json({ "ok": true});
+                    })
+                }
+                else {
+                    console.log("Verified user, FB token didn't need to be updated");
+                    res.json({ "ok": true});               
+                }
             }
             else {
                 /* Get user's name */
@@ -100,6 +114,9 @@ client.connect(function(err){
                     res.json({ "message": "Successfully created a new user",
                                     "ok": true });
                 })
+                .catch(err => {
+                    console.log(err);
+                })
             }
         })
         .catch(err => {
@@ -114,6 +131,7 @@ client.connect(function(err){
     //--------List requests
     //Get the lists a user has access to
     app.get('/lists', auth.checkFB, function (req, res) {
+        console.log("DEBUG: Get request to lists");
         db.collection(process.env.LISTS_COLLECTION).find({}).toArray(function(err, result){
             if(err) res.status(400).send({"ok": false, "message": "Couldn't retrieve lists"});
             else {
@@ -125,33 +143,36 @@ client.connect(function(err){
     //--------Session requests
     //Get session
     app.get('/session:id', auth.checkFB, function (req, res) {
+        console.log("DEBUG: Get request to /session/" + req.params.id);
         var o_id = new mongo.ObjectID(req.params.id);
 
         db.collection(process.env.SESSION_COLLECTION).find({_id : o_id}).toArray(function(err, result){
             if (err) res.status(400).send({"ok": false, "message": "Session doesn't exist"});
-            else res.status(200).send({"session": result.ops, "ok": true});
+            else res.status(200).send(result[0]);
         })
     });
 
     //Create new session
     app.post('/session', auth.checkFB, function (req, res) {
+        console.log("DEBUG: Post request to /session");
         var rString = randomString(5, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         var count;
         //TODO: Iterate through sessions until we have a unique pin
        
         var name = "";
-        db.collection(process.env.USER_COLLECTION).find({"id": String(res.locals.id)}).toArray(function(err,res){
-            if(err || res.length != 1){
-                res.status(400).send({"ok": false, "message": "UserID Invalid / User has not logged in before"})
-            }
-            else{
-                name = res[0].name;
-            }
-        })
+        db.collection(process.env.USER_COLLECTION).findOne({"id": String(res.locals.id)})
+            .then((user) => {
+                if (user != null) {
+                    name = user.name;
+                }
+                else {
+                    res.status(400).send({"ok": false, "message": "UserID Invalid / User has not logged in before"});
+                }
+            
         //Create session object
         var session= {
             "pin": rString,
-            "list": req.body.list, //{"name": "Movie Genres", "ideas": [{"name": "Horror"}, {'name': 'Comedy'}, {'name': 'Action'}]}, //TODO: not hardcoded list
+            "list":/* req.body.list,*/ {"name": "Movie Genres", "ideas": [{"name": "Horror"}, {'name': 'Comedy'}, {'name': 'Action'}]}, //TODO: not hardcoded list
             "status": "lobby",
             "creator": String(res.locals.id),
             "complete": 0,
@@ -162,33 +183,33 @@ client.connect(function(err){
         //Create results array with 0 counts
         var resultArray = []
         for(i = 0; i < session.list.ideas.length; i++){
-            var ideaname = session.list.ideas[i].name;
-            var jsonVar = {}
-            jsonVar[ideaname] = 0;
+            var jsonVar = {"idea": session.list.ideas[i],"score": 0}
             resultArray.push(jsonVar);
         }
         session.results = resultArray;       
         db.collection(process.env.SESSION_COLLECTION).insertOne(session, function(err, result) {
             if (err) res.status(400).send({ok: false, "message": "Session couldn't be inserted into DB"});
-            else res.status(201).send({"ok":true, "session": session});
+            else res.status(201).send(session);
           }); 
-        
+        });
     });
 
     //Endpoint to receive user choices for a session
-    //TODO: FB Authentication and firebase tokens
+    //TODO: Error handling
     app.post('/session/:id/choices', auth.checkFB, function (req, res) {
-        var query = {pin: req.params.id}
+        console.log("DEBUG: post request to /session/" + req.params.id + "/choices");
+        var query = {"pin": req.params.id}
         db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function(err, foundSessions){
+
             //See if user is in session
             var isInSession = false;
-            for(i = 0; i< foundSessions[0].participants; i++){
-                if(String(res.locals.id) == foundSessions[i].participants.id){
+            for(i = 0; i< foundSessions[0].participants.length; i++){
+                if(String(res.locals.id) == foundSessions[0].participants[i].id){
                     isInSession = true;
                 }
             }
             if(err || foundSessions.length == 0){
-                res.status(400).send({"ok": false, "message": "Session doesn't exist"});
+                res.status(401).send({"ok": false, "message": "Session doesn't exist"});
             }
             else if(isInSession){
                //Iterate through responses, and also session to find idea names that match
@@ -204,10 +225,10 @@ client.connect(function(err){
                 }
                 //Push firebase notification if everyone has submitted their results
                 var newComplete = foundSessions[0].complete + 1;
-                if(newComplete == foundSessions[0].size){
+                if(newComplete == foundSessions[0].participants.length){
                     foundSessions[0].status = "complete"
                     foundSessions[0] = sortSession(foundSessions[0]);
-                    //sendFirebase(foundSessions[0]);
+                    sendFirebase(foundSessions[0],db);
                     //Include the updated session status to the database update
                     var newvalues = {$set: {results: foundSessions[0].results, complete: newComplete, status: "complete"}}
                 }
@@ -218,7 +239,7 @@ client.connect(function(err){
                 
                 //Update database with new values
                 db.collection(process.env.SESSION_COLLECTION).updateOne(query, newvalues, function(err,result){
-                    if (err) res.status(400).send({"ok": false, "message": "Couldn't update session with values"});
+                    if (err) res.status(402).send({"ok": false, "message": "Couldn't update session with values"});
                     else{
                         console.log(foundSessions[0]);
                         res.status(200).send({ok: true});
@@ -227,44 +248,51 @@ client.connect(function(err){
                 
             }
             else{
-                res.status(400).send({"ok": false, "message": "User ID is not in the session"})
+                res.status(403).send({"ok": false, "message": "User ID is not in the session"})
             }
         })
     });
 
     //Adds a user to a session
+    //TODO: Error handling in case id does not exist
     app.post('/session/:id', auth.checkFB, function (req, res) {
+        console.log("DEBUG: Post request to /session/" + req.params.id);
         /* Get session matching ID */
         db.collection(process.env.SESSION_COLLECTION).findOne({"pin": req.params.id})
         .then((session) => {
-            
-            /* Get user matching the token that was authenticated */
-            db.collection(process.env.USER_COLLECTION).findOne({"id": String(res.locals.id)})
-            .then((user) => {
-                
-                /* Add the user if they aren't in the session yet */
-                var flag = false;
-                for(i = 0; i < session.participants.length;i++){
-                    if(user.name == session.participants[i]) flag = true;
-                }
-                if (!flag) {
-                    let newPerson = {"name": user.name, "id": String(res.locals.userid)};
-                    let participants = session.participants;
-                    participants.push(newPerson);
-                    db.collection(process.env.SESSION_COLLECTION)
-                    .updateOne({"pin": req.params.id}, {$set: {"participants": participants}})
-                    .then(() => {
-                        /* Update copy of session to be returned */
-                        console.log(session);
-                        /* Push firebase message to each user in the session */
-                        sendFirebase(session);
-                        res.status(201).send({"ok": true})
-                    });
-                }
-                else {
-                    res.status(400).send({"ok": false});
-                }
-            });
+            if (session == null) {
+                console.log("No session exists with ID: " + req.params.id);
+                res.status(400).send({"ok": false});
+            }
+            else {
+                /* Get user matching the token that was authenticated */
+                db.collection(process.env.USER_COLLECTION).findOne({"id": String(res.locals.id)})
+                .then((user) => {
+                    
+                    /* Add the user if they aren't in the session yet */
+                    var flag = false;
+                    for(i = 0; i < session.participants.length;i++){
+                        if(user.name == session.participants[i]) flag = true;
+                    }
+                    if (!flag) {
+                        let newPerson = {"name": user.name, "id": String(res.locals.id)};
+                        let participants = session.participants;
+                        participants.push(newPerson);
+                        db.collection(process.env.SESSION_COLLECTION)
+                        .updateOne({"pin": req.params.id}, {$set: {"participants": participants}})
+                        .then(() => {
+                            /* Update copy of session to be returned */
+                            console.log(session);
+                            /* Push firebase message to each user in the session */
+                            sendFirebase(session, db);
+                            res.status(201).send({"ok": true})
+                        });
+                    }
+                    else {
+                        res.status(400).send({"ok": false});
+                    }
+                });
+            }
         })
         .catch(err => {
             console.log(err);
@@ -274,11 +302,13 @@ client.connect(function(err){
 
     //Starts and runs a session
     //TODO: FB authentication, check if user is creator of session
-    app.put('session/:id', auth.checkFB, function(req, res){
-        var query = {pin: req.params.id}
+    app.post('/session/:id/run', auth.checkFB, function(req, res){
+        console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
+        var query = {"pin": req.params.id}
         //Find session
         db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function(err, session){
             if(err){ 
+                console.log(err);
                 res.status(400).send({"ok": false, "message": "Session doesn't exist"});
             }
             else if(session[0].creator != String(res.locals.id)) {
@@ -286,7 +316,7 @@ client.connect(function(err){
             }
             else{ 
                 //Check if session is in lobby
-                if(result[0].status == "lobby") {
+                if(session[0].status == "lobby") {
                     var newvalues = {$set: {status: "running"}}
                     //Update session database
                     db.collection(process.env.SESSION_COLLECTION).updateOne(query, newvalues, function(err,result){
@@ -295,7 +325,7 @@ client.connect(function(err){
                             //Respond to http request and send firebase notification
                             res.status(200).send({ok: true});
                             session[0].status = "running";
-                            sendFirebase(session[0]);
+                            sendFirebase(session[0], db);
                         }       
                     })
                 }
@@ -308,7 +338,7 @@ client.connect(function(err){
     });
 
     //-------Listen on port
-    
+
     var server = app.listen(process.env.PORT, function() {
         var host = server.address().address;
         var port = server.address().port;
