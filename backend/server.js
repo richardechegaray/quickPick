@@ -1,4 +1,4 @@
-require('dotenv');
+require('dotenv').config();
 /*
 ---------Initialization
 */
@@ -70,7 +70,6 @@ function sortSession(session){
 /*
 --------Endpoints
 */
-console.log(process.env)
 client.connect(function(err){
     if(err) throw err;
     const db = client.db(process.env.DBNAME)
@@ -79,7 +78,7 @@ client.connect(function(err){
     app.post("/login", auth.checkFB, function(req, res, next) {
         let db = client.db("quickpick");
         /* Check users collection for document with matching FB id */ 
-        db.collection(USER_COLLECTION).findOne({id: String(res.locals.id)})
+        db.collection(process.env.USER_COLLECTION).findOne({id: String(res.locals.id)})
         .then((mydoc) => {
             /* If a user in the DB has a matching id */
             if (mydoc != null) {
@@ -309,6 +308,7 @@ client.connect(function(err){
     });
 
     //-------Listen on port
+    
     var server = app.listen(process.env.PORT, function() {
         var host = server.address().address;
         var port = server.address().port;
