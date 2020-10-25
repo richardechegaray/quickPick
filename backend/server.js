@@ -122,7 +122,7 @@ client.connect(function(err){
     //--------List requests
     //Get the lists a user has access to
     //TODO: FB authentication
-    app.get('/lists', function (req, res) {
+    app.get('/lists', auth.checkFB, function (req, res) {
         db.collection(LISTS_COLLECTION).find({}).toArray(function(err, result){
             if(err) res.status(400).send({"ok": false, "message": "Couldn't retrieve lists"});
             else {
@@ -134,7 +134,7 @@ client.connect(function(err){
     //--------Session requests
     //Get session
     //TODO: FB Authentication
-    app.get('/session:id', function (req, res) {
+    app.get('/session:id', auth.checkFB, function (req, res) {
         var o_id = new mongo.ObjectID(req.params.id);
 
         db.collection(SESSION_COLLECTION).find({_id : o_id}).toArray(function(err, result){
@@ -145,7 +145,7 @@ client.connect(function(err){
 
     //Create new session
     //TODO: FB Authentication, add creator to participants
-    app.post('/session', function (req, res) {
+    app.post('/session', auth.checkFB, function (req, res) {
         var rString = randomString(5, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         var count;
         //TODO: Iterate through sessions until we have a unique pin
@@ -179,7 +179,7 @@ client.connect(function(err){
 
     //Endpoint to receive user choices for a session
     //TODO: FB Authentication and firebase tokens
-    app.post('/session/:id/choices', function (req, res) {
+    app.post('/session/:id/choices', auth.checkFB, function (req, res) {
         var query = {pin: req.params.id}
         db.collection(SESSION_COLLECTION).find(query).toArray(function(err, foundSessions){
             if(err || foundSessions.length == 0){
@@ -226,7 +226,7 @@ client.connect(function(err){
 
     //Adds a user to a session
     //TODO: FB authentication to find user??
-    app.post('/session/:id/:userid/:username', function (req, res) {
+    app.post('/session/:id/:userid/:username', auth.checkFB, function (req, res) {
         /* Get session matching ID */
         db.collection(SESSION_COLLECTION).findOne({"pin": req.params.id})
         .then((session) => {
@@ -267,7 +267,7 @@ client.connect(function(err){
 
     //Starts and runs a session
     //TODO: FB authentication, check if user is creator of session
-    app.put('session/:id', function(req, res){
+    app.put('session/:id', auth.checkFB, function(req, res){
         var query = {pin: req.params.id}
         //Find session
         db.collection(SESSION_COLLECTION).find(query).toArray(function(err, session){
