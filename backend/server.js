@@ -70,12 +70,12 @@ function sortSession(session){
 /*
 --------Endpoints
 */
+console.log(process.env)
 client.connect(function(err){
     if(err) throw err;
     const db = client.db(process.env.DBNAME)
 
     //--------User requests
-    //TODO: Check if user exists, if he does then update firebase token and if it doesnt then create the user
     app.post("/login", auth.checkFB, function(req, res, next) {
         let db = client.db("quickpick");
         /* Check users collection for document with matching FB id */ 
@@ -114,7 +114,6 @@ client.connect(function(err){
 
     //--------List requests
     //Get the lists a user has access to
-    //TODO: FB authentication
     app.get('/lists', auth.checkFB, function (req, res) {
         db.collection(process.env.LISTS_COLLECTION).find({}).toArray(function(err, result){
             if(err) res.status(400).send({"ok": false, "message": "Couldn't retrieve lists"});
@@ -126,7 +125,6 @@ client.connect(function(err){
 
     //--------Session requests
     //Get session
-    //TODO: FB Authentication
     app.get('/session:id', auth.checkFB, function (req, res) {
         var o_id = new mongo.ObjectID(req.params.id);
 
@@ -137,12 +135,20 @@ client.connect(function(err){
     });
 
     //Create new session
-    //TODO: FB Authentication, add creator to participants
     app.post('/session', auth.checkFB, function (req, res) {
         var rString = randomString(5, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         var count;
         //TODO: Iterate through sessions until we have a unique pin
        
+        var name = "";
+        db.collection(process.env.USER_COLLECTION).find({"id": String(res.locals.id)}).toArray(function(err,res){
+            if(err || res.length != 1){
+                res.status(400).send({"ok": false, "message": "UserID Invalid / User has not logged in before"})
+            }
+            else{
+                name = res[0].name;
+            }
+        })
         //Create session object
         var session= {
             "pin": rString,
@@ -152,7 +158,7 @@ client.connect(function(err){
             "complete": 0,
             "size": req.body.size,
             "results": [],
-            "participants": [{"name": }],   
+            "participants": [{"name": name, "id": String(res.locals.id)}],   
         }
         //Create results array with 0 counts
         var resultArray = []
@@ -182,7 +188,6 @@ client.connect(function(err){
                     isInSession = true;
                 }
             }
-        db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function(err, foundSessions){
             if(err || foundSessions.length == 0){
                 res.status(400).send({"ok": false, "message": "Session doesn't exist"});
             }
@@ -229,7 +234,6 @@ client.connect(function(err){
     });
 
     //Adds a user to a session
-    //TODO: FB authentication to find user??
     app.post('/session/:id', auth.checkFB, function (req, res) {
         /* Get session matching ID */
         db.collection(process.env.SESSION_COLLECTION).findOne({"pin": req.params.id})
