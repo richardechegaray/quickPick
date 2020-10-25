@@ -25,4 +25,5 @@
     <string name="like_button_attribute_text">like button</string>
     <string name="reject_text">Reject</string>
     <string name="accept_text">Accept</string>
+    <string name="description_of_idea_text">description of idea</string>
 </resources>
