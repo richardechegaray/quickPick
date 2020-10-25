@@ -17,8 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.quickpick.apis.LoginApi;
 import com.quickpick.apis.RetrofitApiBuilder;
-import com.quickpick.payloads.BasicResponsePayload;
-import com.quickpick.payloads.LoginPayload;
+import com.quickpick.payloads.BasicResponse;
+import com.quickpick.payloads.LoginRequest;
 
 import okhttp3.internal.annotations.EverythingIsNonNull;
 import retrofit2.Call;
@@ -94,11 +94,11 @@ public class LoginActivity extends AppCompatActivity {
         String firebaseToken = firebaseTokenTask.getResult();
         LoginApi loginApi = RetrofitApiBuilder.getApi(LoginApi.class);
         Log.d(LOGIN, String.format("facebookToken: %s, firebaseToken: %s", facebookToken, firebaseToken));
-        Call<BasicResponsePayload> loginCall = loginApi.login(new LoginPayload(facebookToken, firebaseToken));
-        loginCall.enqueue(new Callback<BasicResponsePayload>() {
+        Call<BasicResponse> loginCall = loginApi.login(new LoginRequest(facebookToken, firebaseToken));
+        loginCall.enqueue(new Callback<BasicResponse>() {
             @Override
             @EverythingIsNonNull
-            public void onResponse(Call<BasicResponsePayload> call, Response<BasicResponsePayload> response) {
+            public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {
                 Log.d(LOGIN, response.toString());
                 if (response.isSuccessful()) {
                     navigateToMainActivity();
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             @EverythingIsNonNull
-            public void onFailure(Call<BasicResponsePayload> call, Throwable t) {
+            public void onFailure(Call<BasicResponse> call, Throwable t) {
                 Log.d(LOGIN, call.request().toString(), t);
                 Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
             }
