@@ -21,17 +21,15 @@ import com.quickpick.payloads.IdeaPayload;
 @Layout(R.layout.swipe_card_view)
 public class IdeaCard {
 
-    @View(R.id.ideaImage)
-    private ImageView ideaImage;
-
-    @View(R.id.ideaText)
-    private TextView ideaText;
-
-    @View(R.id.ideaDescriptionText)
-    private TextView ideaDescriptionText;
-
     private final Context mContext;
     private final IdeaPayload mIdea;
+    @View(R.id.idea_image)
+    private ImageView ideaImage;
+    @View(R.id.idea_text)
+    private TextView ideaText;
+    @View(R.id.idea_description)
+    private TextView ideaDescriptionText;
+
     private ChoicePayload mChoice;
 
     public IdeaCard(IdeaPayload idea, Context context) {

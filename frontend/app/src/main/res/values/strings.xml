@@ -26,4 +26,5 @@
     <string name="reject_text">Reject</string>
     <string name="accept_text">Accept</string>
     <string name="description_of_idea_text">description of idea</string>
+    <string name="return_to_main_activity_button_text">Return to Main Menu</string>
 </resources>
