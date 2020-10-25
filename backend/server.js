@@ -18,10 +18,13 @@ admin.initializeApp({
   });
 
 //Initialize express
-const { json } = require('express');
-const express = require('express');
-const app = express();
-app.use(express.json()) // for parsing application/json
+const app = require('express')()
+const bodyParser = require('body-parser')
+const multer = require('multer') // v1.0.5
+const upload = multer() // for parsing multipart/form-data
+
+app.use(bodyParser.json()) // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //Random string helper
 function randomString(length, chars) {
@@ -59,7 +62,9 @@ client.connect(function(err){
     //Get session
     //TODO: FB Authentication
     app.get('/session:id', function (req, res) {
-        db.collection(SESSION_COLLECTION).find({"id": req.params.id}).toArray(function(err, result){
+        var o_id = new mongo.ObjectID(req.params.id);
+
+        db.collection(SESSION_COLLECTION).find({_id : o_id}).toArray(function(err, result){
             if (err) res.status(400).send({"ok": false});
             else res.status(200).send({"session": result.ops, "ok": true});
         })
@@ -70,38 +75,67 @@ client.connect(function(err){
     app.post('/session', function (req, res) {
         var rString = randomString(5, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         var count;
-        //Iterate through sessions until we have a unique pin
-        do{db.collection(SESSION_COLLECTION).find({"pin": rString}).toArray(function(err, result){
-                if(err) res.status(400).send({"ok": false});
-                count = result.length;
-            })
-        }while(count != 0)
-
+        //TODO: Iterate through sessions until we have a unique pin
+       
         //Create session object
         var session= {
             "pin": rString,
-            "list": json(req.body).list,
+            "list": {"name": "Movie Genres", "ideas": [{"name": "Horror"}, {'name': 'Comedy'}, {'name': 'Action'}]}, //TODO: not hardcoded list
             "status": "lobby",
-            "creator":   json(req.body).facebookToken, //TODO
+            "creator": 0, //TODO
             "complete": 0,
-            "size": json(req.body).size,
+            "size": req.body.size,
             "results": [],
             "participants": [],   
         }
-        for(i = 0; i < json(req.body).list.ideas.length; i++){
+        //Create results array with 0 counts
+        var resultArray = []
+        for(i = 0; i < session.list.ideas.length; i++){
+            var ideaname = session.list.ideas[i].name;
+            var jsonVar = {}
+            jsonVar[ideaname] = 0;
+            resultArray.push(jsonVar);
         }
-
+        session.results = resultArray;        
         res.status(201).send({"ok":true, "session": session});
     });
 
     //Endpoint to receive user choices for a session
     //TODO: FB Authentication, receive choices, check if done if it is then push firebase notification
     app.post('/session/:id/choices', function (req, res) {
-        db.collection(SESSION_COLLECTION).find({"pin": req.params.id}).toArray(function(err, result){
-            if(err) res.status(400).send({"ok": false});
+        var query = {pin: req.params.id}
+        db.collection(SESSION_COLLECTION).find(query).toArray(function(err, foundSessions){
+            if(err || foundSessions.length == 0){
+                res.status(400).send({"ok": false});
+            }
+            else{
+                //Iterate through responses, and also session to find idea names that match
+                for(i = 0; i < req.body.choices.length; i++){
+                    for(j = 0; j < foundSessions[0].results.length; j++){
 
-            for(i = 0; i < result.ops.choices.length; i++){
-                result.ops.choices[i]
+                        //If they match and the response is positive, then increment the record
+                        if(req.body.choices[i].idea.name == foundSessions[0].results[j].idea.name && req.body.choices[i].choice){
+                            var count = foundSessions[0].results[j].score + 1;
+                            console.log(count)
+                            foundSessions[0].results[j].score = count;
+                        }
+                    }
+                }
+
+                var newComplete = foundSessions[0].complete + 1;
+                var newvalues = {$set: {results: foundSessions[0].results, complete: newComplete}}
+                
+                //Update database with new values
+                db.collection(SESSION_COLLECTION).updateOne(query, newvalues, function(err,result){
+                    if (err) res.status(400).send({"ok": false});
+                    else{
+                        res.status(200).send({ok: true});
+                    }
+                })
+                //Push firebase notification if everyone has submitted their results
+                if(newComplete == foundSessions[0].size){
+                    //TODO: Firebase notification
+                }
             }
         })
     });
