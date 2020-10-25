@@ -23,8 +23,6 @@ admin.initializeApp({
 //Initialize express
 const app = require('express')()
 const bodyParser = require('body-parser')
-const multer = require('multer') // v1.0.5
-const upload = multer() // for parsing multipart/form-data
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -63,6 +61,14 @@ function sendFirebase(session){
     .then((response) => { 
         console.log(response.successCount + ' session end messages were sent');
     })
+}
+
+//Helper function for sorting a sessions results
+function sortSession(session){
+    var results = session.results;
+    results.sort(function(a,b){ return b.score - a.score})
+    session.results = results;
+    return session;
 }
 
 
@@ -161,20 +167,21 @@ client.connect(function(err){
                 var newComplete = foundSessions[0].complete + 1;
                 if(newComplete == foundSessions[0].size){
                     foundSessions[0].status = "complete"
-                    sendFirebase(foundSessions[0]);
+                    foundSessions[0] = sortSession(foundSessions[0]);
+                    //sendFirebase(foundSessions[0]);
                     //Include the updated session status to the database update
                     var newvalues = {$set: {results: foundSessions[0].results, complete: newComplete, status: "complete"}}
                 }
                 else{
                     var newvalues = {$set: {results: foundSessions[0].results, complete: newComplete}}
                 }
-                
-                
+                foundSessions[0].complete++;    
                 
                 //Update database with new values
                 db.collection(SESSION_COLLECTION).updateOne(query, newvalues, function(err,result){
                     if (err) res.status(400).send({"ok": false, "message": "Couldn't update session with values"});
                     else{
+                        console.log(foundSessions[0]);
                         res.status(200).send({ok: true});
                     }
                 })
