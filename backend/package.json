@@ -2,7 +2,7 @@
   "name": "quickpick_server",
   "version": "1.0.0",
   "description": "Server for quickpick application",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
