@@ -1,23 +1,30 @@
 package com.quickpick.payloads;
 
+import androidx.annotation.Nullable;
+
+import java.util.Optional;
+
 public class IdeaPayload {
 
-    private String name;
+    @Nullable
+    private final String name;
 
-    private String description;
+    @Nullable
+    private final String description;
 
-    private String imageUrl;
+    @Nullable
+    private final String imageUrl;
 
     public String getName() {
-        return name;
+        return Optional.ofNullable(name).orElse("");
     }
 
     public String getDescription() {
-        return description;
+        return Optional.ofNullable(description).orElse("");
     }
 
     public String getImageUrl() {
-        // TODO: get endpoint
+        // TODO: Return actual URL
         return "https://www.rover.com/blog/wp-content/uploads/2019/05/puppy-in-bowl.jpg";
     }
 
@@ -26,6 +33,5 @@ public class IdeaPayload {
         this.description = idea.description;
         this.imageUrl = idea.imageUrl;
     }
-
 
 }

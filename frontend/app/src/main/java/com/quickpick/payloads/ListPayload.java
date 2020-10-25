@@ -1,5 +1,7 @@
 package com.quickpick.payloads;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,7 @@ public class ListPayload {
 
     private String name;
 
+    @Nullable
     private List<IdeaPayload> ideas;
 
     public List<IdeaPayload> getIdeas() {

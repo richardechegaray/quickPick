@@ -72,13 +72,17 @@ public class SessionRepository {
     }
 
     public void startSession(Runnable callback, String facebookToken) {
-        Call<BasicResponse> startSessionCall = sessionApi.startSession(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new FacebookTokenRequest(facebookToken));
+        Call<BasicResponse> startSessionCall = sessionApi.startSession(getCurrentSessionId(), new FacebookTokenRequest(facebookToken));
         startSessionCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
     }
 
     public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
-        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new PostChoicesRequest(facebookToken, choices));
+        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(getCurrentSessionId(), new PostChoicesRequest(facebookToken, choices));
         postChoicesCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
+    }
+
+    private String getCurrentSessionId() {
+        return Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin();
     }
 
     private static class SessionRepositoryCallback<T> implements Callback<T> {

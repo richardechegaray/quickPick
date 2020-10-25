@@ -3,8 +3,6 @@ package com.quickpick;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.facebook.AccessToken;
 import com.mindorks.placeholderview.SwipeDecor;
 import com.mindorks.placeholderview.SwipePlaceHolderView;
-import com.mindorks.placeholderview.listeners.ItemRemovedListener;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.IdeaPayload;
 import com.quickpick.repositories.SessionRepository;
@@ -25,8 +22,6 @@ import java.util.stream.Collectors;
 
 public class SwipeActivity extends AppCompatActivity {
 
-    private SwipePlaceHolderView mSwipeView;
-    private Context mContext;
     private String facebookAccessToken;
 
     @Override
@@ -37,12 +32,17 @@ public class SwipeActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null || accessToken.isExpired()) {
             startActivity(new Intent(getBaseContext(), LoginActivity.class));
+            return;
         }
         facebookAccessToken = accessToken.getToken();
 
-        mSwipeView = (SwipePlaceHolderView)findViewById(R.id.swipeView);
-        mContext = getApplicationContext();
-        ArrayList<IdeaCard> ideaList = new ArrayList<IdeaCard>();
+        setUpSwipeView();
+    }
+
+    private void setUpSwipeView() {
+        SwipePlaceHolderView mSwipeView = findViewById(R.id.swipeView);
+        Context mContext = getApplicationContext();
+        ArrayList<IdeaCard> ideaList = new ArrayList<>();
 
         mSwipeView.getBuilder()
                 .setDisplayViewCount(3)
@@ -55,26 +55,23 @@ public class SwipeActivity extends AppCompatActivity {
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(SessionViewModel.class);
 
-        for(IdeaPayload idea : model.getSession().getValue().getList().getIdeas()){ //looping through all of our ideas
+        for (IdeaPayload idea : model.getSession().getValue().getList().getIdeas()) {
             IdeaCard ideaCard = new IdeaCard(idea, mContext);
             ideaList.add(ideaCard);
             mSwipeView.addView(ideaCard);
         }
 
         findViewById(R.id.dislikeButton).setOnClickListener(view -> mSwipeView.doSwipe(false));
-
         findViewById(R.id.likeButton).setOnClickListener(view -> mSwipeView.doSwipe(true));
 
         mSwipeView.addItemRemoveListener(count -> {
-
             if (count == 0) {
                 List<ChoicePayload> choices = ideaList.stream().map(IdeaCard::getChoice).collect(Collectors.toList());
-                SessionRepository.getInstance().postChoices(() -> {}, facebookAccessToken, choices);
+                SessionRepository.getInstance().postChoices(() -> {
+                }, facebookAccessToken, choices);
                 startActivity(new Intent(getApplicationContext(), SummaryActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             }
         });
-
-
     }
 }

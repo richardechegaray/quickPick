@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.mindorks.placeholderview.SwipePlaceHolderView;
 import com.mindorks.placeholderview.annotations.Layout;
 import com.mindorks.placeholderview.annotations.Resolve;
 import com.mindorks.placeholderview.annotations.View;
@@ -18,8 +17,6 @@ import com.mindorks.placeholderview.annotations.swipe.SwipeOutState;
 import com.quickpick.R;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.IdeaPayload;
-
-import java.util.List;
 
 @Layout(R.layout.swipe_card_view)
 public class IdeaCard {
@@ -33,8 +30,8 @@ public class IdeaCard {
     @View(R.id.ideaDescriptionText)
     private TextView ideaDescriptionText;
 
-    private Context mContext;
-    private IdeaPayload mIdea;
+    private final Context mContext;
+    private final IdeaPayload mIdea;
     private ChoicePayload mChoice;
 
     public IdeaCard(IdeaPayload idea, Context context) {
