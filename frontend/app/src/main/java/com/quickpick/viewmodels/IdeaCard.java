@@ -16,7 +16,10 @@ import com.mindorks.placeholderview.annotations.swipe.SwipeInState;
 import com.mindorks.placeholderview.annotations.swipe.SwipeOut;
 import com.mindorks.placeholderview.annotations.swipe.SwipeOutState;
 import com.quickpick.R;
+import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.IdeaPayload;
+
+import java.util.List;
 
 @Layout(R.layout.swipe_card_view)
 public class IdeaCard {
@@ -32,12 +35,15 @@ public class IdeaCard {
 
     private Context mContext;
     private IdeaPayload mIdea;
-    private SwipePlaceHolderView mSwipeView;
+    private ChoicePayload mChoice;
 
-    public IdeaCard(IdeaPayload idea, Context context, SwipePlaceHolderView swipeView) {
+    public IdeaCard(IdeaPayload idea, Context context) {
         mContext = context;
         mIdea = idea;
-        mSwipeView = swipeView;
+    }
+
+    public ChoicePayload getChoice() {
+        return mChoice;
     }
 
     @Resolve
@@ -48,8 +54,9 @@ public class IdeaCard {
     }
 
     @SwipeOut
-    private void onSwipedOut(){ //left swipe == accept
+    private void onSwipedOut(){ //left swipe == reject
         Log.d("EVENT", "onSwipedOut");
+        mChoice = new ChoicePayload(new IdeaPayload(mIdea), false);
     }
 
     @SwipeCancelState
@@ -60,6 +67,7 @@ public class IdeaCard {
     @SwipeIn
     private void onSwipeIn(){ //right swipe
         Log.d("EVENT", "onSwipedIn");
+        mChoice = new ChoicePayload(new IdeaPayload(mIdea), true);
     }
 
     @SwipeInState

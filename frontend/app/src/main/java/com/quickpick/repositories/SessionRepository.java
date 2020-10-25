@@ -9,10 +9,13 @@ import androidx.lifecycle.MediatorLiveData;
 import com.quickpick.apis.RetrofitApiBuilder;
 import com.quickpick.apis.SessionApi;
 import com.quickpick.payloads.BasicResponse;
+import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.FacebookTokenRequest;
+import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
 
+import java.util.List;
 import java.util.Optional;
 
 import retrofit2.Call;
@@ -71,6 +74,11 @@ public class SessionRepository {
     public void startSession(Runnable callback, String facebookToken) {
         Call<BasicResponse> startSessionCall = sessionApi.startSession(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new FacebookTokenRequest(facebookToken));
         startSessionCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
+    }
+
+    public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
+        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin(), new PostChoicesRequest(facebookToken, choices));
+        postChoicesCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
     }
 
     private static class SessionRepositoryCallback<T> implements Callback<T> {
