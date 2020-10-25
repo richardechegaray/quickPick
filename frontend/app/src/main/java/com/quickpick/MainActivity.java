@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null || accessToken.isExpired()) {
             startActivity(new Intent(getBaseContext(), LoginActivity.class));
+            return;
         }
         facebookAccessToken = accessToken.getToken();
 

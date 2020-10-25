@@ -42,4 +42,8 @@ public class SessionPayload implements Serializable {
         return Collections.unmodifiableList(Optional.ofNullable(results).orElse(new ArrayList<>()));
     }
 
+    public ListPayload getList() {
+        return Optional.ofNullable(list).orElse(new ListPayload());
+    }
+
 }

@@ -21,4 +21,9 @@
     <string name="start_swiping_text">START SWIPIN:</string>
     <string name="start_swiping_button">Start Swiping!</string>
     <string name="session_code_string_format">Session Code: %s</string>
+    <string name="dislike_button_attribute_text">dislike button</string>
+    <string name="like_button_attribute_text">like button</string>
+    <string name="reject_text">Reject</string>
+    <string name="accept_text">Accept</string>
+    <string name="description_of_idea_text">description of idea</string>
 </resources>
