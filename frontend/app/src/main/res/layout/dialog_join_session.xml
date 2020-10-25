@@ -5,14 +5,21 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/session_code_edit_text"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="no"
-        android:ems="10"
-        android:hint="@string/session_id_edit_text_hint"
-        android:inputType="textPersonName" />
+        android:gravity="center_horizontal"
+        android:hint="@string/session_id_edit_text_hint">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/session_code_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autofillHints="no"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
         style="?android:attr/buttonBarStyle"

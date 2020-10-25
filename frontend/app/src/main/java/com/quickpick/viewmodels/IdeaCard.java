@@ -29,6 +29,7 @@ public class IdeaCard {
     private TextView ideaText;
     @View(R.id.idea_description)
     private TextView ideaDescriptionText;
+
     private ChoicePayload mChoice;
 
     public IdeaCard(IdeaPayload idea, Context context) {
