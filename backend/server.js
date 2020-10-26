@@ -51,7 +51,6 @@ function sendFirebase(session, db){
         let msgData = {"type": "session", "session": JSON.stringify(session)};
         let msg = { "data": msgData, 
                     "tokens": tokens.map(t => t.firebaseToken)};
-        console.log(msg);
         admin.messaging().sendMulticast(msg)
         .then((response) => {
             console.log(response.successCount + ' messages were sent successfully'); 
@@ -172,7 +171,12 @@ client.connect(function(err){
         //Create session object
         var session= {
             "pin": rString,
-            "list":/* req.body.list,*/ {"name": "Movie Genres", "ideas": [{"name": "Horror"}, {'name': 'Comedy'}, {'name': 'Action'}]}, //TODO: not hardcoded list
+            "list":/* req.body.list,*/ {"name": "Movie Genres", "ideas": [{"name": "Horror", "description":"For those that want to tremble", "picture": "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image"}, 
+            {'name': 'Comedy', "description": "For those that want to laugh", "picture":"https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp"}, 
+            {'name': 'Action',"description": "For those that like explosions", "picture": "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp"}, 
+            {"name": "Crime", "description": "For those that want suspense", "picture": "https://i0.wp.com/decider.com/wp-content/uploads/2017/03/the-godfather.jpg?quality=80&strip=all&ssl=1"},
+            {"name": "Romance", "description":"For those that want to cry", "picture": "https://www.altfg.com/film/wp-content/uploads/images/robert-pattinson-kristen-stewart-edward-bella-kissing-eclipse.jpg.webp"}, 
+            {"name": "Christmas", "description": "For those who can't get enough of christmas", "picture": "https://d1qxviojg2h5lt.cloudfront.net/images/01DWJWFNMRRFQY2Z9JFEV7NEYS/thegrinch570.png"}]}, //TODO: not hardcoded list
             "status": "lobby",
             "creator": String(res.locals.id),
             "complete": 0,
@@ -241,7 +245,7 @@ client.connect(function(err){
                 db.collection(process.env.SESSION_COLLECTION).updateOne(query, newvalues, function(err,result){
                     if (err) res.status(402).send({"ok": false, "message": "Couldn't update session with values"});
                     else{
-                        console.log(foundSessions[0]);
+
                         res.status(200).send({ok: true});
                     }
                 })
@@ -264,6 +268,10 @@ client.connect(function(err){
                 console.log("No session exists with ID: " + req.params.id);
                 res.status(400).send({"ok": false});
             }
+            else if (session.status != "lobby") {
+                console.log("Session " + req.params.id + " is no longer accepting new participants");
+                res.status(400).send({"ok": false});
+            }
             else {
                 /* Get user matching the token that was authenticated */
                 db.collection(process.env.USER_COLLECTION).findOne({"id": String(res.locals.id)})
@@ -272,7 +280,7 @@ client.connect(function(err){
                     /* Add the user if they aren't in the session yet */
                     var flag = false;
                     for(i = 0; i < session.participants.length;i++){
-                        if(user.name == session.participants[i]) flag = true;
+                        if(user.id == session.participants[i].id) flag = true;
                     }
                     if (!flag) {
                         let newPerson = {"name": user.name, "id": String(res.locals.id)};
@@ -281,8 +289,6 @@ client.connect(function(err){
                         db.collection(process.env.SESSION_COLLECTION)
                         .updateOne({"pin": req.params.id}, {$set: {"participants": participants}})
                         .then(() => {
-                            /* Update copy of session to be returned */
-                            console.log(session);
                             /* Push firebase message to each user in the session */
                             sendFirebase(session, db);
                             res.status(201).send({"ok": true})
