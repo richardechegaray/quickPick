@@ -45,9 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_login);
 
-        // TODO: Delete this when facebook login is required
-        findViewById(R.id.temp_bypass_button).setOnClickListener(view -> navigateToMainActivity());
-
         facebookLoginButton = findViewById(R.id.login_button);
 
         facebookCallbackManager = CallbackManager.Factory.create();

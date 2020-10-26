@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QuickPick</string>
+    <string name="app_name">quickPick</string>
     <string name="welcome_message">Welcome!\nWhat do you want to do?</string>
     <string name="sessions_header">Sessions</string>
     <string name="lists_header">Lists</string>
@@ -18,7 +18,6 @@
     <string name="sports_session_text">Sports:</string>
     <string name="food_session_text">Foods:</string>
     <string name="movie_session_text">Movies:</string>
-    <string name="start_swiping_text">START SWIPIN:</string>
     <string name="start_swiping_button">Start Swiping!</string>
     <string name="session_code_string_format">Session Code: %s</string>
     <string name="dislike_button_attribute_text">dislike button</string>
@@ -27,4 +26,6 @@
     <string name="accept_text">Accept</string>
     <string name="description_of_idea_text">description of idea</string>
     <string name="return_to_main_activity_button_text">Return to Main Menu</string>
+    <string name="quick_text">quick</string>
+    <string name="pick_text">Pick</string>
 </resources>
