@@ -13,7 +13,7 @@ public class IdeaPayload {
     private final String description;
 
     @Nullable
-    private final String imageUrl;
+    private final String picture;
 
     public String getName() {
         return Optional.ofNullable(name).orElse("");
@@ -23,21 +23,20 @@ public class IdeaPayload {
         return Optional.ofNullable(description).orElse("");
     }
 
-    public String getImageUrl() {
-        // TODO: Return actual URL
-        return "https://www.rover.com/blog/wp-content/uploads/2019/05/puppy-in-bowl.jpg";
-    }
-
     public IdeaPayload() {
         name = "";
         description = "";
-        imageUrl = "";
+        picture = "";
     }
 
     public IdeaPayload(IdeaPayload idea) {
         this.name = idea.name;
         this.description = idea.description;
-        this.imageUrl = idea.imageUrl;
+        this.picture = idea.picture;
+    }
+
+    public String getPicture() {
+        return Optional.ofNullable(picture).orElse("");
     }
 
 }

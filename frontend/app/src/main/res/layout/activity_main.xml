@@ -33,21 +33,10 @@
             android:layout_height="match_parent">
 
             <Button
-                android:id="@+id/create_new_list_button"
+                android:id="@+id/create_session_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_new_list_text" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <Button
-                android:id="@+id/view_edit_lists_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/view_edit_lists_text" />
+                android:text="@string/create_session_text" />
 
         </TableRow>
 
@@ -79,12 +68,24 @@
             android:layout_height="match_parent">
 
             <Button
-                android:id="@+id/create_session_button"
+                android:id="@+id/create_new_list_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/create_session_text" />
+                android:text="@string/create_new_list_text" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Button
+                android:id="@+id/view_edit_lists_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_edit_lists_text" />
 
         </TableRow>
+
     </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

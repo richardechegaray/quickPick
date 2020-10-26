@@ -43,7 +43,7 @@ public class IdeaCard {
 
     @Resolve
     private void onResolved() {
-        Glide.with(mContext).load(mIdea.getImageUrl()).into(ideaImage);
+        Glide.with(mContext).load(mIdea.getPicture()).into(ideaImage);
         ideaText.setText(mIdea.getName());
         ideaDescriptionText.setText(mIdea.getDescription());
     }

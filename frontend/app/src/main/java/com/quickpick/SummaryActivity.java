@@ -46,7 +46,7 @@ public class SummaryActivity extends AppCompatActivity {
             if (results.size() > 0) {
                 ResultPayload firstPlace = results.get(0);
 
-                Glide.with(getApplicationContext()).load(firstPlace.getIdea().getImageUrl())
+                Glide.with(getApplicationContext()).load(firstPlace.getIdea().getPicture())
                         .into((ImageView) findViewById(R.id.first_place_image));
                 ((TextView) findViewById(R.id.first_place_idea_text)).setText(firstPlace.getIdea().getName());
                 ((TextView) findViewById(R.id.first_place_description)).setText(firstPlace.getIdea().getDescription());
