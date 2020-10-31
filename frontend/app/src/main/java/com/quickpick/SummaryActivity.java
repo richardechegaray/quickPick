@@ -31,7 +31,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         returnToMainMenu = findViewById(R.id.return_to_main_activity_button);
         returnToMainMenu.setOnClickListener(view ->
-                startActivity(new Intent(getApplicationContext(), MainActivity.class))
+                startActivity(new Intent(getApplicationContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
         );
 
 

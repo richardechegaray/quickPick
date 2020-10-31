@@ -26,6 +26,8 @@ public class SessionPayload implements Serializable {
 
     private ListPayload list;
 
+    private String creator;
+
     public String getPin() {
         return Optional.ofNullable(pin).orElse("");
     }
@@ -45,5 +47,10 @@ public class SessionPayload implements Serializable {
     public ListPayload getList() {
         return Optional.ofNullable(list).orElse(new ListPayload());
     }
+
+    public String getCreator() {
+        return Optional.ofNullable(creator).orElse("");
+    }
+
 
 }
