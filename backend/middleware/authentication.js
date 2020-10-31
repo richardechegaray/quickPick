@@ -1,5 +1,5 @@
-var axios = require('axios');
-require('dotenv').config();
+var axios = require("axios");
+require("dotenv").config();
 
 module.exports = {
     /* Verifies the token passed in the request's facebookToken field */
@@ -9,9 +9,9 @@ module.exports = {
         
         /* Pass the token to the Facebook endpoint */
         axios.get(url)
-        .then(fb_response => {
-            if (fb_response.data.data.is_valid) {
-                res.locals.id = fb_response.data.data.user_id;
+        .then(fbResponse => {
+            if (fbResponse.data.data.is_valid) {
+                res.locals.id = fbResponse.data.data.user_id;
                 /* Run the protected function on the endpoint */
                 next();
             }

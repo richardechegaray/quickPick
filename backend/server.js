@@ -43,12 +43,12 @@ function randomString(length, chars) {
 function sendFirebase(session, db) {
   let idList = session.participants.map((u) => u.id);
   db.collection(process.env.USER_COLLECTION)
-    .find({ id: { $in: idList } })
+    .find({ "id": { $in: idList } })
     .project({ firebaseToken: true })
     .toArray()
     .then((tokens) => {
-      let msgData = { type: "session", session: JSON.stringify(session) };
-      let msg = { data: msgData, tokens: tokens.map((t) => t.firebaseToken) };
+      let msgData = { "type": "session", "session": JSON.stringify(session) };
+      let msg = { "data": msgData, "tokens": tokens.map((t) => t.firebaseToken) };
       admin
         .messaging()
         .sendMulticast(msg)
@@ -85,23 +85,23 @@ client.connect(function (err) {
     let db = client.db("quickpick");
     /* Check users collection for document with matching FB id */
     db.collection(process.env.USER_COLLECTION)
-      .findOne({ id: String(res.locals.id) })
+      .findOne({ "id": String(res.locals.id) })
       .then((mydoc) => {
         /* If a user in the DB has a matching id */
         if (mydoc != null) {
           if (req.body.firebaseToken !== mydoc.firebaseToken) {
             db.collection(process.env.USER_COLLECTION)
               .updateOne(
-                { id: String(res.locals.id) },
+                { "id": String(res.locals.id) },
                 { $set: { firebaseToken: String(req.body.firebaseToken) } }
               )
               .then(() => {
                 console.log("Verified user, updated FB token");
-                res.json({ ok: true });
+                res.json({ "ok": true });
               });
           } else {
             console.log("Verified user, FB token didn't need to be updated");
-            res.json({ ok: true });
+            res.json({ "ok": true });
           }
         } else {
           /* Get user's name */
@@ -112,13 +112,13 @@ client.connect(function (err) {
             .then((fbResponse) => {
               /* Create new user */
               db.collection("users").insertOne({
-                id: String(res.locals.id),
-                name: String(fbResponse.data.name),
-                firebaseToken: String(req.body.firebaseToken),
+                "id": String(res.locals.id),
+                "name": String(fbResponse.data.name),
+                "firebaseToken": String(req.body.firebaseToken),
               });
               res.json({
-                message: "Successfully created a new user",
-                ok: true,
+                "message": "Successfully created a new user",
+                "ok": true,
               });
             })
             .catch((err) => {
@@ -130,8 +130,8 @@ client.connect(function (err) {
         console.log(err);
         res.status(500);
         res.json({
-          message: "Error during authentication",
-          ok: false,
+          "message": "Error during authentication",
+          "ok": false,
         });
       });
   });
@@ -146,7 +146,7 @@ client.connect(function (err) {
         if (err) {
           res
             .status(400)
-            .send({ ok: false, message: "Couldn't retrieve lists" });
+            .send({ "ok": false, "message": "Couldn't retrieve lists" });
         } else {
           res.status(200).send(result);
         }
@@ -163,7 +163,7 @@ client.connect(function (err) {
       .find({ _id: oId })
       .toArray(function (err, result) {
         if (err) {
-          res.status(400).send({ ok: false, message: "Session doesn't exist" });
+          res.status(400).send({ "ok": false, "message": "Session doesn't exist" });
         } else {
           res.status(200).send(result[0]);
         }
@@ -190,66 +190,69 @@ client.connect(function (err) {
           res
             .status(400)
             .send({
-              ok: false,
-              message: "UserID Invalid / User has not logged in before",
+              "ok": false,
+              "message": "UserID Invalid / User has not logged in before",
             });
         }
 
         //Create session object
         var session = {
-          pin: rString,
-          list: /* req.body.list,*/ {
-            name: "Movie Genres",
-            ideas: [
+          "pin": rString,
+          "list": /* req.body.list,*/ {
+            "name": "Movie Genres",
+            "ideas": [
               {
-                name: "Horror",
-                description: "For those that want to tremble",
-                picture:
+                "name": "Horror",
+                "description": "For those that want to tremble",
+                "picture":
                   "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image",
               },
               {
-                name: "Comedy",
-                description: "For those that want to laugh",
-                picture:
+                "name": "Comedy",
+                "description": "For those that want to laugh",
+                "picture":
                   "https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp",
               },
               {
-                name: "Action",
-                description: "For those that like explosions",
-                picture:
+                "name": "Action",
+                "description": "For those that like explosions",
+                "picture":
                   "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp",
               },
               {
-                name: "Crime",
-                description: "For those that want suspense",
-                picture:
+                "name": "Crime",
+                "description": "For those that want suspense",
+                "picture":
                   "https://i0.wp.com/decider.com/wp-content/uploads/2017/03/the-godfather.jpg?quality=80&strip=all&ssl=1",
               },
               {
-                name: "Romance",
-                description: "For those that want to cry",
-                picture:
+                "name": "Romance",
+                "description": "For those that want to cry",
+                "picture":
                   "https://www.altfg.com/film/wp-content/uploads/images/robert-pattinson-kristen-stewart-edward-bella-kissing-eclipse.jpg.webp",
               },
               {
-                name: "Christmas",
-                description: "For those who can't get enough of christmas",
-                picture:
+                "name": "Christmas",
+                "description": "For those who can't get enough of christmas",
+                "picture":
                   "https://d1qxviojg2h5lt.cloudfront.net/images/01DWJWFNMRRFQY2Z9JFEV7NEYS/thegrinch570.png",
               },
             ],
           }, //TODO: not hardcoded list
-          status: "lobby",
-          creator: String(res.locals.id),
-          complete: 0,
-          size: req.body.size,
-          results: [],
-          participants: [{ name: name, id: String(res.locals.id) }],
+          "status": "lobby",
+          "creator": String(res.locals.id),
+          "complete": 0,
+          "size": req.body.size,
+          "results": [],
+          "participants": [{ 
+            "name": name, 
+            "id": String(res.locals.id) 
+            }],
         };
         //Create results array with 0 counts
         var resultArray = [];
         for (var i = 0; i < session.list.ideas.length; i++) {
-          var jsonVar = { idea: session.list.ideas[i], score: 0 };
+          var jsonVar = { "idea": session.list.ideas[i], "score": 0 };
           resultArray.push(jsonVar);
         }
         session.results = resultArray;
@@ -307,12 +310,13 @@ client.connect(function (err) {
           }
           //Push firebase notification if everyone has submitted their results
           var newComplete = foundSessions[0].complete + 1;
+          var newvalues;
           if (newComplete === foundSessions[0].participants.length) {
             foundSessions[0].status = "complete";
             foundSessions[0] = sortSession(foundSessions[0]);
             sendFirebase(foundSessions[0], db);
             //Include the updated session status to the database update
-            var newvalues = {
+            newvalues = {
               $set: {
                 results: foundSessions[0].results,
                 complete: newComplete,
@@ -320,7 +324,7 @@ client.connect(function (err) {
               },
             };
           } else {
-            var newvalues = {
+            newvalues = {
               $set: {
                 results: foundSessions[0].results,
                 complete: newComplete,
@@ -389,7 +393,7 @@ client.connect(function (err) {
                 db.collection(process.env.SESSION_COLLECTION)
                   .updateOne(
                     { pin: req.params.id },
-                    { $set: { participants: participants } }
+                    { $set: { "participants": participants } }
                   )
                   .then(() => {
                     /* Push firebase message to each user in the session */
@@ -420,7 +424,7 @@ client.connect(function (err) {
         if (err) {
           console.log(err);
           res.status(400).send({ ok: false, message: "Session doesn't exist" });
-        } else if (session[0].creator != String(res.locals.id)) {
+        } else if (session[0].creator !== String(res.locals.id)) {
           res
             .status(400)
             .send({ ok: false, message: "User is not the creator" });
