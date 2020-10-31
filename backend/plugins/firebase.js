@@ -1,4 +1,4 @@
-const mongoUtil = require('../database/mongo');
+const mongoUtil = require("../database/mongo");
 const db = mongoUtil.getDb();
 
 // Initialize Firebase
@@ -12,8 +12,8 @@ admin.initializeApp({
 
 // Helper function for sending firebase messages
 module.exports = {
-    sendFirebase: function (session) {
-        const idList = session.participants.map(u => u.id);
+    sendFirebase: (session) => {
+        const idList = session.participants.map((u) => u.id);
         db.collection(process.env.USER_COLLECTION)
             .find({ "id": { $in: idList } })
             .project({ "firebaseToken": true })
@@ -22,12 +22,12 @@ module.exports = {
                 let msgData = { "type": "session", "session": JSON.stringify(session) };
                 let msg = {
                     "data": msgData,
-                    "tokens": tokens.map(t => t.firebaseToken)
+                    "tokens": tokens.map((t) => t.firebaseToken)
                 };
                 admin.messaging().sendMulticast(msg)
                     .then((response) => {
-                        console.log(response.successCount + ' messages were sent successfully');
+                        console.log(response.successCount + " messages were sent successfully");
                     });
             });
     }
-}
+};

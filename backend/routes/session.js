@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const mongoUtil = require('../database/mongo');
+const mongoUtil = require("../database/mongo");
 const db = mongoUtil.getDb();
 
 const auth = require("../middleware/authentication");
@@ -14,39 +14,45 @@ const firebaseUtil = require("../plugins/firebase");
 //Params: length, chars
 //Returns: string
 function randomString(length, chars) {
-    var result = '';
-    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+    var result = "";
+    for (var i = length; i > 0; --i) {
+        result += chars[Math.floor(Math.random() * chars.length)];
+    }
     return result;
 }
 
 //Helper function for sorting a sessions results
 function sortSession(session) {
     var results = session.results;
-    results.sort(function (a, b) { return b.score - a.score })
+    results.sort(function (a, b) { return b.score - a.score; })
     session.results = results;
     return session;
 }
 
 //--------Session requests
 //Get session
-router.get('/:id', auth.checkFB, function (req, res) {
-    console.log("DEBUG: Get request to /session/" + req.params.id);
-    var o_id = new mongo.ObjectID(req.params.id);
+router.get("/:pin", auth.checkFB, function (req, res) {
+    console.log("DEBUG: Get request to /session/" + req.params.pin);
+    let myPin = req.params.pin;
 
-    db.collection(process.env.SESSION_COLLECTION).find({ _id: o_id }).toArray(function (err, result) {
-        if (err) res.status(400).send({ "ok": false, "message": "Session doesn't exist" });
-        else res.status(200).send(result[0]);
-    })
+    db.collection(process.env.SESSION_COLLECTION).find({ "pin": myPin }).toArray(function (err, result) {
+        if (err) {
+            res.status(400).send({ "ok": false, "message": "Session doesn't exist" });
+        }
+        else { 
+            res.status(200).send(result[0]);
+        }
+    });
 });
 
 //Create new session
-router.post('/', auth.checkFB, function (req, res) {
+router.post("/", auth.checkFB, function (req, res) {
     console.log("DEBUG: Post request to /session");
-    var rString = randomString(5, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
-    var count;
+    let rString = randomString(5, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    let count;
     //TODO: Iterate through sessions until we have a unique pin
 
-    var name = "";
+    let name = "";
     db.collection(process.env.USER_COLLECTION).findOne({ "id": String(res.locals.id) })
         .then((user) => {
             if (user != null) {
@@ -57,7 +63,7 @@ router.post('/', auth.checkFB, function (req, res) {
             }
 
             //Create session object
-            var session = {
+            let session = {
                 "pin": rString,
                 "list":/* req.body.list,*/ {
                     "name": "Movie Genres", "ideas": [{ "name": "Horror", "description": "For those that want to tremble", "picture": "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image" },
@@ -72,62 +78,67 @@ router.post('/', auth.checkFB, function (req, res) {
                 "complete": 0,
                 "size": req.body.size,
                 "results": [],
-                "participants": [{ "name": name, "id": String(res.locals.id) }],
-            }
+                "participants": [{ name, "id": String(res.locals.id) }],
+            };
             //Create results array with 0 counts
-            var resultArray = []
-            for (i = 0; i < session.list.ideas.length; i++) {
-                var jsonVar = { "idea": session.list.ideas[i], "score": 0 }
+            let resultArray = [];
+            for (let i = 0; i < session.list.ideas.length; i++) {
+                let jsonVar = { "idea": session.list.ideas[i], "score": 0 };
                 resultArray.push(jsonVar);
             }
             session.results = resultArray;
             db.collection(process.env.SESSION_COLLECTION).insertOne(session, function (err, result) {
-                if (err) res.status(400).send({ ok: false, "message": "Session couldn't be inserted into DB" });
-                else res.status(201).send(session);
+                if (err) {
+                    res.status(400).send({ ok: false, "message": "Session couldn't be inserted into DB" });
+                }
+                else  { 
+                    res.status(201).send(session);
+                }
             });
         });
 });
 
 //Endpoint to receive user choices for a session
 //TODO: Error handling
-router.post('/:id/choices', auth.checkFB, function (req, res) {
+router.post("/:id/choices", auth.checkFB, function (req, res) {
     console.log("DEBUG: post request to /session/" + req.params.id + "/choices");
-    var query = { "pin": req.params.id }
+    var query = { "pin": req.params.id };
     db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function (err, foundSessions) {
 
         //See if user is in session
         var isInSession = false;
-        for (i = 0; i < foundSessions[0].participants.length; i++) {
-            if (String(res.locals.id) == foundSessions[0].participants[i].id) {
+        for (let i = 0; i < foundSessions[0].participants.length; i++) {
+            if (String(res.locals.id) === foundSessions[0].participants[i].id) {
                 isInSession = true;
             }
         }
-        if (err || foundSessions.length == 0) {
+        if (err || foundSessions.length === 0) {
             res.status(401).send({ "ok": false, "message": "Session doesn't exist" });
         }
         else if (isInSession) {
             //Iterate through responses, and also session to find idea names that match
-            for (i = 0; i < req.body.choices.length; i++) {
-                for (j = 0; j < foundSessions[0].results.length; j++) {
+            for (let i = 0; i < req.body.choices.length; i++) {
+                for (let j = 0; j < foundSessions[0].results.length; j++) {
 
                     //If they match and the response is positive, then increment the record
-                    if (req.body.choices[i].idea.name == foundSessions[0].results[j].idea.name && req.body.choices[i].choice) {
-                        var count = foundSessions[0].results[j].score + 1;
+                    if (req.body.choices[i].idea.name === foundSessions[0].results[j].idea.name && req.body.choices[i].choice) {
+                        let count = foundSessions[0].results[j].score + 1;
                         foundSessions[0].results[j].score = count;
                     }
                 }
             }
             //Push firebase notification if everyone has submitted their results
-            var newComplete = foundSessions[0].complete + 1;
-            if (newComplete == foundSessions[0].participants.length) {
-                foundSessions[0].status = "complete"
+            let newComplete = foundSessions[0].complete + 1;
+            let newValues;
+            if (newComplete === foundSessions[0].participants.length) {
+                foundSessions[0].status = "complete";
                 foundSessions[0] = sortSession(foundSessions[0]);
                 firebaseUtil.sendFirebase(foundSessions[0]);
                 //Include the updated session status to the database update
-                var newvalues = { $set: { results: foundSessions[0].results, complete: newComplete, status: "complete" } }
+                newValues = { $set: { results: foundSessions[0].results, complete: newComplete, status: "complete" } };
             }
             else {
-                var newvalues = { $set: { results: foundSessions[0].results, complete: newComplete } }
+                newValues = { $set: { results: foundSessions[0].results, complete: newComplete } };
             }
             foundSessions[0].complete++;
 
@@ -149,7 +160,7 @@ router.post('/:id/choices', auth.checkFB, function (req, res) {
 
 //Adds a user to a session
 //TODO: Error handling in case id does not exist
-router.post('/:id', auth.checkFB, function (req, res) {
+router.post("/:id", auth.checkFB, function (req, res) {
     console.log("DEBUG: Post request to /session/" + req.params.id);
     /* Get session matching ID */
     db.collection(process.env.SESSION_COLLECTION).findOne({ "pin": req.params.id })

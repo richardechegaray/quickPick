@@ -1,17 +1,15 @@
-const MongoClient = require('mongodb').MongoClient;
+const MongoClient = require("mongodb").MongoClient;
 
 var _db;
 
 module.exports = {
-
-    connectToServer: function (callback) {
+    connectToServer: (callback) => {
         MongoClient.connect(process.env.MONGOURL, { useNewUrlParser: true }, function (err, client) {
-            _db = client.db('quickpick');
+            _db = client.db("quickpick");
             return callback(err);
         });
     },
-
-    getDb: function () {
+    getDb: () => {
         return _db;
     }
 };
