@@ -310,7 +310,7 @@ client.connect(function (err) {
                     var count = sessionIdea.score + 1;
                     sessionIdea.score = count;
                   }
-              })
+              });
           })
 
           //Push firebase notification if everyone has submitted their results
@@ -386,11 +386,12 @@ client.connect(function (err) {
             .then((user) => {
               /* Add the user if they aren't in the session yet */
               var flag = false;
-              for (var i = 0; i < session.participants.length; i++) {
-                if (user.id === session.participants[i].id) {
-                  flag = true;
-                }
-              }
+              //TODO: Test
+              session.participants.forEach(function(participantUser) {
+                if (user.id === participantUser.id) {
+                    flag = true;
+                  }
+              })
               if (!flag) {
                 let newPerson = {
                   name: user.name,
