@@ -27,7 +27,7 @@ function sortSession(session) {
     results.sort(function (a, b) { return b.score - a.score; })
     session.results = results;
     return session;
-}
+};
 
 //--------Session requests
 //Get session
@@ -67,8 +67,8 @@ router.post("/", auth.checkFB, function (req, res) {
                 "pin": rString,
                 "list":/* req.body.list,*/ {
                     "name": "Movie Genres", "ideas": [{ "name": "Horror", "description": "For those that want to tremble", "picture": "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image" },
-                    { 'name': 'Comedy', "description": "For those that want to laugh", "picture": "https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp" },
-                    { 'name': 'Action', "description": "For those that like explosions", "picture": "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp" },
+                    { "name": "Comedy", "description": "For those that want to laugh", "picture": "https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp" },
+                    { "name": "Action", "description": "For those that like explosions", "picture": "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp" },
                     { "name": "Crime", "description": "For those that want suspense", "picture": "https://i0.wp.com/decider.com/wp-content/uploads/2017/03/the-godfather.jpg?quality=80&strip=all&ssl=1" },
                     { "name": "Romance", "description": "For those that want to cry", "picture": "https://www.altfg.com/film/wp-content/uploads/images/robert-pattinson-kristen-stewart-edward-bella-kissing-eclipse.jpg.webp" },
                     { "name": "Christmas", "description": "For those who can't get enough of christmas", "picture": "https://d1qxviojg2h5lt.cloudfront.net/images/01DWJWFNMRRFQY2Z9JFEV7NEYS/thegrinch570.png" }]
@@ -143,17 +143,19 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
             foundSessions[0].complete++;
 
             //Update database with new values
-            db.collection(process.env.SESSION_COLLECTION).updateOne(query, newvalues, function (err, result) {
-                if (err) res.status(402).send({ "ok": false, "message": "Couldn't update session with values" });
+            db.collection(process.env.SESSION_COLLECTION).updateOne(query, newValues, function (err, result) {
+                if (err) { 
+                    res.status(402).send({ "ok": false, "message": "Couldn't update session with values" });
+                }
                 else {
 
                     res.status(200).send({ ok: true });
                 }
-            })
+            });
 
         }
         else {
-            res.status(403).send({ "ok": false, "message": "User ID is not in the session" })
+            res.status(403).send({ "ok": false, "message": "User ID is not in the session" });
         }
     })
 });
@@ -169,7 +171,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
                 console.log("No session exists with ID: " + req.params.id);
                 res.status(400).send({ "ok": false });
             }
-            else if (session.status != "lobby") {
+            else if (session.status !== "lobby") {
                 console.log("Session " + req.params.id + " is no longer accepting new participants");
                 res.status(400).send({ "ok": false });
             }
@@ -179,16 +181,16 @@ router.post("/:id", auth.checkFB, function (req, res) {
                     .then((user) => {
 
                         /* Add the user if they aren't in the session yet */
-                        var flag = false;
-                        for (i = 0; i < session.participants.length; i++) {
-                            if (user.id == session.participants[i].id) flag = true;
+                        let flag = false;
+                        for (let i = 0; i < session.participants.length; i++) {
+                            if (user.id === session.participants[i].id) flag = true;
                         }
                         if (!flag) {
                             let newPerson = { "name": user.name, "id": String(res.locals.id) };
                             let participants = session.participants;
                             participants.push(newPerson);
                             db.collection(process.env.SESSION_COLLECTION)
-                                .updateOne({ "pin": req.params.id }, { $set: { "participants": participants } })
+                                .updateOne({ "pin": req.params.id }, { $set: { participants } })
                                 .then(() => {
                                     /* Push firebase message to each user in the session */
                                     firebaseUtil.sendFirebase(session);
@@ -197,12 +199,12 @@ router.post("/:id", auth.checkFB, function (req, res) {
                         }
                         else {
                             firebaseUtil.sendFirebase(session);
-                            res.status(201).send({ "ok": true })
+                            res.status(201).send({ "ok": true });
                         }
                     });
             }
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
             res.status(500).send({ "ok": false });
         })
@@ -210,25 +212,27 @@ router.post("/:id", auth.checkFB, function (req, res) {
 
 //Starts and runs a session
 //TODO: FB authentication, check if user is creator of session
-router.post('/:id/run', auth.checkFB, function (req, res) {
+router.post("/:id/run", auth.checkFB, function (req, res) {
     console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
-    var query = { "pin": req.params.id }
+    var query = { "pin": req.params.id };
     //Find session
     db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function (err, session) {
         if (err) {
             console.log(err);
             res.status(400).send({ "ok": false, "message": "Session doesn't exist" });
         }
-        else if (session[0].creator != String(res.locals.id)) {
+        else if (session[0].creator !== String(res.locals.id)) {
             res.status(400).send({ "ok": false, "message": "User is not the creator" });
         }
         else {
             //Check if session is in lobby
-            if (session[0].status == "lobby") {
-                var newvalues = { $set: { status: "running" } }
+            if (session[0].status === "lobby") {
+                var newvalues = { $set: { status: "running" } };
                 //Update session database
                 db.collection(process.env.SESSION_COLLECTION).updateOne(query, newvalues, function (err, result) {
-                    if (err) res.status(400).send({ "ok": false, "message": "Couldn't update session" });
+                    if (err) { 
+                         res.status(400).send({ "ok": false, "message": "Couldn't update session" });
+                    }
                     else {
                         //Respond to http request and send firebase notification
                         res.status(200).send({ ok: true });
@@ -238,7 +242,7 @@ router.post('/:id/run', auth.checkFB, function (req, res) {
                 })
             }
             else {
-                res.status(400).send({ "ok": false, "message": "Session has already started" })
+                res.status(400).send({ "ok": false, "message": "Session has already started" });
             }
         }
 

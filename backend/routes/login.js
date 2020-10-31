@@ -15,7 +15,7 @@ router.post("/", auth.checkFB, function (req, res, next) {
         .then((mydoc) => {
             /* If a user in the DB has a matching id */
             if (mydoc !== null) {
-                if (req.body.firebaseToken != mydoc.firebaseToken) {
+                if (req.body.firebaseToken !== mydoc.firebaseToken) {
                     db.collection(process.env.USER_COLLECTION)
                         .updateOne(
                             { id: String(res.locals.id) },
@@ -34,7 +34,7 @@ router.post("/", auth.checkFB, function (req, res, next) {
                 /* Get user's name */
                 let url = `https://graph.facebook.com/v8.0/${res.locals.id}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
                 axios.get(url)
-                    .then(facebookResponse => {
+                    .then((facebookResponse) => {
                         /* Create new user */
                         db.collection("users").insertOne(
                             {
@@ -49,16 +49,16 @@ router.post("/", auth.checkFB, function (req, res, next) {
                     })
                     .catch((err) => {
                         console.log(err);
-                    })
+                    });
             }
         })
-        .catch(err => {
+        .catch((err) => {
             console.log(err);
             res.status(500);
             res.json({
                 "message": "Error during authentication",
                 "ok": false
-            })
+            });
         });
 })
 
