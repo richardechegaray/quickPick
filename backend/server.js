@@ -157,10 +157,9 @@ client.connect(function (err) {
   //Get session
   app.get("/session:id", auth.checkFB, function (req, res) {
     console.log("DEBUG: Get request to /session/" + req.params.id);
-    var oId = new mongo.ObjectID(req.params.id);
 
     db.collection(process.env.SESSION_COLLECTION)
-      .find({ _id: oId })
+      .find({ _id: req.params.id }) //THIS NEEDS TO BE TESTED !!
       .toArray(function (err, result) {
         if (err) {
           res.status(400).send({
@@ -183,12 +182,12 @@ client.connect(function (err) {
     var count;
     //TODO: Iterate through sessions until we have a unique pin
 
-    var name = "";
+    var userName = "";
     db.collection(process.env.USER_COLLECTION)
       .findOne({ id: String(res.locals.id) })
       .then((user) => {
         if (user !== null) {
-          name = user.name;
+          userName = user.name;
         } else {
           res.status(400).send({
             ok: false,
@@ -247,20 +246,19 @@ client.connect(function (err) {
           results: [],
           participants: [
             {
-              name: name,
+              name: userName,
               id: String(res.locals.id),
             },
           ],
         };
         //Create results array with 0 counts
+        //TODO: Test
         var resultArray = [];
-        for (var i = 0; i < session.list.ideas.length; i++) {
-          var jsonVar = {
-            idea: session.list.ideas[i],
-            score: 0,
-          };
-          resultArray.push(jsonVar);
-        }
+        session.list.ideas.forEach((element) => 
+            resultArray.push({idea: element,
+            score: 0
+            })
+        );
         session.results = resultArray;
         db.collection(process.env.SESSION_COLLECTION).insertOne(
           session,
@@ -279,7 +277,6 @@ client.connect(function (err) {
   });
 
   //Endpoint to receive user choices for a session
-  //TODO: Error handling
   app.post("/session/:id/choices", auth.checkFB, function (req, res) {
     console.log(
       "DEBUG: post request to /session/" + req.params.id + "/choices"
@@ -290,28 +287,32 @@ client.connect(function (err) {
       .toArray(function (err, foundSessions) {
         //See if user is in session
         var isInSession = false;
-        for (var i = 0; i < foundSessions[0].participants.length; i++) {
-          if (String(res.locals.id) === foundSessions[0].participants[i].id) {
-            isInSession = true;
-          }
-        }
+
+        //TODO: Test
+        foundSessions[0].participants.forEach(function(entry) {
+            if (String(res.locals.id) === entry.id) {
+                isInSession = true;
+              }
+        });
+
         if (err || foundSessions.length === 0) {
           res.status(401).send({ ok: false, message: "Session doesn't exist" });
         } else if (isInSession) {
           //Iterate through responses, and also session to find idea names that match
-          for (var i = 0; i < req.body.choices.length; i++) {
-            for (var j = 0; j < foundSessions[0].results.length; j++) {
-              //If they match and the response is positive, then increment the record
-              if (
-                req.body.choices[i].idea.name ===
-                  foundSessions[0].results[j].idea.name &&
-                req.body.choices[i].choice
-              ) {
-                var count = foundSessions[0].results[j].score + 1;
-                foundSessions[0].results[j].score = count;
-              }
-            }
-          }
+          //TODO: Test
+          req.body.choices.forEach(function(userChoice) {
+              foundSessions.results.forEach(function(sessionIdea) {
+                if (
+                    userChoice.name ===
+                      sessionIdea.idea.name &&
+                    userChoice.choice
+                  ) {
+                    var count = sessionIdea.score + 1;
+                    sessionIdea.score = count;
+                  }
+              })
+          })
+
           //Push firebase notification if everyone has submitted their results
           var newComplete = foundSessions[0].complete + 1;
           var newvalues;
@@ -395,14 +396,14 @@ client.connect(function (err) {
                   name: user.name,
                   id: String(res.locals.id),
                 };
-                let participants = session.participants;
-                participants.push(newPerson);
+                let sessionParticipants = session.participants;
+                sessionParticipants.push(newPerson);
                 db.collection(process.env.SESSION_COLLECTION)
                   .updateOne(
                     { pin: req.params.id },
                     {
                       $set: {
-                        participants: participants,
+                        participants: sessionParticipants,
                       },
                     }
                   )
