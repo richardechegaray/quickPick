@@ -1,6 +1,4 @@
 require('dotenv').config();
-// console.log(printme);
-// console.log(process.env)
 /*
 ---------Initialization
 */
