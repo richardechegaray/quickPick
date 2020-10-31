@@ -28,4 +28,3 @@ mongoUtil.connectToServer(function (err, client) {
         console.log("Listening at http://%s:%s", host, port);
     });
 });
-
