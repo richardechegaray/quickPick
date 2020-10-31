@@ -1,0 +1,6 @@
+node_modules/
+.env
+quickpick-7f20f-firebase-adminsdk-hvb4p-96107c2f64.json
+addtodb.js
+createdb.js
+test.js
