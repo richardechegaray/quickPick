@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,20 +31,23 @@ public class SessionActivity extends AppCompatActivity {
 
     private SessionReceiver receiver;
 
-    private String facebookAccessToken;
+    private AccessToken accessToken;
+
+    private Button startSwipingButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session);
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null || accessToken.isExpired()) {
             startActivity(new Intent(getBaseContext(), LoginActivity.class));
             finish();
             return;
         }
-        facebookAccessToken = accessToken.getToken();
+        TextView sessionKeyView = findViewById(R.id.session_key_text);
+        startSwipingButton = findViewById(R.id.start_swiping_button);
 
         receiver = new SessionReceiver();
         SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
@@ -51,15 +55,14 @@ public class SessionActivity extends AppCompatActivity {
         setOnClickListeners();
         setUpRecyclerView();
 
-        TextView sessionKeyView = findViewById(R.id.session_key_text);
-
         model.getSession().observe(this, newSession ->
         {
             if ("running".equals(newSession.getStatus())) {
-                startActivity(new Intent(getApplicationContext(), SwipeActivity.class));
+                startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                 return;
             }
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
+            startSwipingButton.setEnabled(newSession.getCreator().equals(accessToken.getUserId()));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
         });
@@ -76,10 +79,10 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        findViewById(R.id.start_swiping_button).setOnClickListener(view ->
+        startSwipingButton.setOnClickListener(view ->
                 SessionRepository.getInstance().startSession(
                         () -> {
-                        }, facebookAccessToken));
+                        }, accessToken.getToken()));
     }
 
     @Override
