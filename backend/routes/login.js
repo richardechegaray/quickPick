@@ -60,6 +60,6 @@ router.post("/", auth.checkFB, function (req, res, next) {
                 "ok": false
             });
         });
-})
+});
 
 module.exports = router;

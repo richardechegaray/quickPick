@@ -24,10 +24,10 @@ function randomString(length, chars) {
 //Helper function for sorting a sessions results
 function sortSession(session) {
     var results = session.results;
-    results.sort(function (a, b) { return b.score - a.score; })
+    results.sort(function (a, b) { return b.score - a.score; });
     session.results = results;
     return session;
-};
+}
 
 //--------Session requests
 //Get session
@@ -107,26 +107,25 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
 
         //See if user is in session
         var isInSession = false;
-        for (let i = 0; i < foundSessions[0].participants.length; i++) {
-            if (String(res.locals.id) === foundSessions[0].participants[i].id) {
+        foundSessions.forEach(function (participantUser) {
+            if (res.user.id === participantUser.id) {
                 isInSession = true;
             }
-        }
+        })
         if (err || foundSessions.length === 0) {
             res.status(401).send({ "ok": false, "message": "Session doesn't exist" });
         }
         else if (isInSession) {
             //Iterate through responses, and also session to find idea names that match
-            for (let i = 0; i < req.body.choices.length; i++) {
-                for (let j = 0; j < foundSessions[0].results.length; j++) {
-
+            req.body.choices.forEach((choice) => {
+                foundSessions[0].results.forEach((result) => {
                     //If they match and the response is positive, then increment the record
-                    if (req.body.choices[i].idea.name === foundSessions[0].results[j].idea.name && req.body.choices[i].choice) {
-                        let count = foundSessions[0].results[j].score + 1;
-                        foundSessions[0].results[j].score = count;
+                    if (choice.idea.name === foundSessions[0].result.idea.name && choice.choice) {
+                        let count = foundSessions[0].result.score + 1;
+                        foundSessions[0].result.score = count;
                     }
-                }
-            }
+                });
+            });
             //Push firebase notification if everyone has submitted their results
             let newComplete = foundSessions[0].complete + 1;
             let newValues;
@@ -157,7 +156,7 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
         else {
             res.status(403).send({ "ok": false, "message": "User ID is not in the session" });
         }
-    })
+    });
 });
 
 //Adds a user to a session
@@ -182,9 +181,11 @@ router.post("/:id", auth.checkFB, function (req, res) {
 
                         /* Add the user if they aren't in the session yet */
                         let flag = false;
-                        for (let i = 0; i < session.participants.length; i++) {
-                            if (user.id === session.participants[i].id) flag = true;
-                        }
+                        session.participants.length.forEach(function(participantUser) {
+                            if (user.id === participantUser.id) {
+                                flag = true;
+                            }
+                        })
                         if (!flag) {
                             let newPerson = { "name": user.name, "id": String(res.locals.id) };
                             let participants = session.participants;
@@ -194,7 +195,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
                                 .then(() => {
                                     /* Push firebase message to each user in the session */
                                     firebaseUtil.sendFirebase(session);
-                                    res.status(201).send({ "ok": true })
+                                    res.status(201).send({ "ok": true });
                                 });
                         }
                         else {
