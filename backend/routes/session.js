@@ -82,10 +82,9 @@ router.post("/", auth.checkFB, function (req, res) {
             };
             //Create results array with 0 counts
             let resultArray = [];
-            for (let i = 0; i < session.list.ideas.length; i++) {
-                let jsonVar = { "idea": session.list.ideas[i], "score": 0 };
-                resultArray.push(jsonVar);
-            }
+            session.list.ideas.forEach((idea => {
+                resultArray.push({ idea, "score": 0 });
+            }))
             session.results = resultArray;
             db.collection(process.env.SESSION_COLLECTION).insertOne(session, function (err, result) {
                 if (err) {
@@ -103,15 +102,16 @@ router.post("/", auth.checkFB, function (req, res) {
 router.post("/:id/choices", auth.checkFB, function (req, res) {
     console.log("DEBUG: post request to /session/" + req.params.id + "/choices");
     var query = { "pin": req.params.id };
-    db.collection(process.env.SESSION_COLLECTION).find(query).toArray(function (err, foundSessions) {
-
+    db.collection(process.env.SESSION_COLLECTION)
+    .find(query)
+    .toArray(function (err, foundSessions) {
         //See if user is in session
         var isInSession = false;
-        foundSessions.forEach(function (participantUser) {
+        foundSessions[0].participants.forEach(function (participantUser) {
             if (res.user.id === participantUser.id) {
                 isInSession = true;
             }
-        })
+        });
         if (err || foundSessions.length === 0) {
             res.status(401).send({ "ok": false, "message": "Session doesn't exist" });
         }
