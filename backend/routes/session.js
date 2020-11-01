@@ -82,9 +82,9 @@ router.post("/", auth.checkFB, function (req, res) {
             };
             //Create results array with 0 counts
             let resultArray = [];
-            session.list.ideas.forEach((idea => {
+            session.list.ideas.forEach(((idea) => {
                 resultArray.push({ idea, "score": 0 });
-            }))
+            }));
             session.results = resultArray;
             db.collection(process.env.SESSION_COLLECTION).insertOne(session, function (err, result) {
                 if (err) {
@@ -101,13 +101,14 @@ router.post("/", auth.checkFB, function (req, res) {
 //TODO: Error handling
 router.post("/:id/choices", auth.checkFB, function (req, res) {
     console.log("DEBUG: post request to /session/" + req.params.id + "/choices");
-    var query = { "pin": req.params.id };
+    let query = { "pin": req.params.id };
     db.collection(process.env.SESSION_COLLECTION)
     .find(query)
     .toArray(function (err, foundSessions) {
         //See if user is in session
-        var isInSession = false;
-        foundSessions[0].participants.forEach(function (participantUser) {
+        let isInSession = false;
+        let currentSession = foundSessions[0];
+        currentSession.participants.forEach(function (participantUser) {
             if (res.user.id === participantUser.id) {
                 isInSession = true;
             }
@@ -118,36 +119,35 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
         else if (isInSession) {
             //Iterate through responses, and also session to find idea names that match
             req.body.choices.forEach((choice) => {
-                foundSessions[0].results.forEach((result) => {
+                currentSession.results.forEach((result) => {
                     //If they match and the response is positive, then increment the record
-                    if (choice.idea.name === foundSessions[0].result.idea.name && choice.choice) {
-                        let count = foundSessions[0].result.score + 1;
-                        foundSessions[0].result.score = count;
+                    if (choice.idea.name === result.idea.name && choice.choice) {
+                        result.score += 1;
                     }
                 });
             });
             //Push firebase notification if everyone has submitted their results
-            let newComplete = foundSessions[0].complete + 1;
+            let newComplete = currentSession.complete + 1;
             let newValues;
-            if (newComplete === foundSessions[0].participants.length) {
-                foundSessions[0].status = "complete";
-                foundSessions[0] = sortSession(foundSessions[0]);
-                firebaseUtil.sendFirebase(foundSessions[0]);
+            if (newComplete === currentSession.participants.length) {
+                currentSession.status = "complete";
+                currentSession = sortSession(currentSession);
+                firebaseUtil.sendFirebase(currentSession);
                 //Include the updated session status to the database update
-                newValues = { $set: { results: foundSessions[0].results, complete: newComplete, status: "complete" } };
+                newValues = { $set: { results: currentSession.results, complete: newComplete, status: "complete" } };
             }
             else {
-                newValues = { $set: { results: foundSessions[0].results, complete: newComplete } };
+                newValues = { $set: { results: currentSession.results, complete: newComplete } };
             }
-            foundSessions[0].complete++;
+            currentSession.complete++;
 
             //Update database with new values
-            db.collection(process.env.SESSION_COLLECTION).updateOne(query, newValues, function (err, result) {
+            db.collection(process.env.SESSION_COLLECTION)
+            .updateOne(query, newValues, function (err, result) {
                 if (err) { 
                     res.status(402).send({ "ok": false, "message": "Couldn't update session with values" });
                 }
                 else {
-
                     res.status(200).send({ ok: true });
                 }
             });
@@ -185,7 +185,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
                             if (user.id === participantUser.id) {
                                 flag = true;
                             }
-                        })
+                        });
                         if (!flag) {
                             let newPerson = { "name": user.name, "id": String(res.locals.id) };
                             let participants = session.participants;
