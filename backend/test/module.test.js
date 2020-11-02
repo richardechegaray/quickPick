@@ -1,13 +1,28 @@
 const loginModule = require("../helpers/loginhelper.js");
 const auth = require("../middleware/authentication");
+const { MongoClient } = require("mongodb");
 
 /*
 ---------Module Testing
 
 */
-describe("User login and authentication", function () {
+describe("User login and authentication", () => {
+  let connection;
+  let db;
+
+  beforeAll(async () => {
+    connection = await MongoClient.connect(process.env.MONGOURL, {
+      useNewUrlParser: true,
+    });
+    db = await connection.db(process.env.DBNAME);
+  });
+
+  afterAll(async () => {
+    await connection.close();
+    await db.close();
+  });
+
   it("Authenticating with facebook", (done) => {
-    //Creating mock req and res
     var req = {
       body: {
         facebookToken:
@@ -34,10 +49,20 @@ describe("User login and authentication", function () {
 
     auth.checkFB(req, mockRes, callback);
   });
-  /*
-    it("Checking if user has logged in before", () => {
 
-    });
+  it("Inserting and finding a user", async () => {
+    const insertedUser = {
+      _id: "auserid",
+      id: 1234567890,
+      name: "Test Guy",
+      firebaseToken: "onehundredthousand",
+    };
+    await db.collection(process.env.USER_COLLECTION).insertOne(insertedUser);
+    const foundUser = await db.collection(process.env.USER_COLLECTION).findOne({_id: "auserid"});
+    expect(foundUser).toEqual(insertedUser);    
+    await db.collection(process.env.USER_COLLECTION).deleteOne({_id: "auserid"});
+  });
+  /*
     it("Creating a new user", () => {
 
     });
