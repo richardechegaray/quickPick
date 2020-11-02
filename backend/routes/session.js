@@ -209,7 +209,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
             console.log(err);
             res.status(500).send({ "ok": false });
         });
-})
+});
 
 //Starts and runs a session
 //TODO: FB authentication, check if user is creator of session
