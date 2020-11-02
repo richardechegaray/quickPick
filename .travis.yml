@@ -3,6 +3,8 @@ node_js:
   - 12.19.0
 before_install:
   - npm i -g npm@6.14.8
+install:
+  - npm install
 script:
   - cd /home/travis/build/richardechegaray/quickPick/backend
   - npm test
