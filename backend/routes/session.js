@@ -208,7 +208,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
         .catch((err) => {
             console.log(err);
             res.status(500).send({ "ok": false });
-        })
+        });
 })
 
 //Starts and runs a session
