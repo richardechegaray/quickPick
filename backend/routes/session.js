@@ -76,47 +76,48 @@ router.post("/", auth.checkFB, function (req, res) {
       //Create session object
       let session = {
         pin: rString,
-        list: /* req.body.list,*/ {
-          name: "Movie Genres",
-          ideas: [
-            {
-              name: "Horror",
-              description: "For those that want to tremble",
-              picture:
-                "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image",
-            },
-            {
-              name: "Comedy",
-              description: "For those that want to laugh",
-              picture:
-                "https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp",
-            },
-            {
-              name: "Action",
-              description: "For those that like explosions",
-              picture:
-                "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp",
-            },
-            {
-              name: "Crime",
-              description: "For those that want suspense",
-              picture:
-                "https://i0.wp.com/decider.com/wp-content/uploads/2017/03/the-godfather.jpg?quality=80&strip=all&ssl=1",
-            },
-            {
-              name: "Romance",
-              description: "For those that want to cry",
-              picture:
-                "https://www.altfg.com/film/wp-content/uploads/images/robert-pattinson-kristen-stewart-edward-bella-kissing-eclipse.jpg.webp",
-            },
-            {
-              name: "Christmas",
-              description: "For those who can't get enough of christmas",
-              picture:
-                "https://d1qxviojg2h5lt.cloudfront.net/images/01DWJWFNMRRFQY2Z9JFEV7NEYS/thegrinch570.png",
-            },
-          ],
-        }, //TODO: not hardcoded list
+        list: {"name":"Group Activities","ideas":[{"name":"Cards","description":"Let's play some Go Fish","picture":"https://images.unsplash.com/photo-1556195332-95503f664ced?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"},{"name":"Alcohol","description":"You cared about me when no one else would","picture":"https://images.unsplash.com/photo-1527281400683-1aae777175f8?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"},{"name":"Sleep","description":"yeah...","picture":"https://images.unsplash.com/photo-1519003300449-424ad0405076?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"},{"name":"Biking","description":"Bikes are cool","picture":"https://images.unsplash.com/photo-1594058573823-d8edf1ad3380?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"}],"userID":"3591549284238798"},
+        // list: /* req.body.list,*/ {
+        //   name: "Movie Genres",
+        //   ideas: [
+        //     {
+        //       name: "Horror",
+        //       description: "For those that want to tremble",
+        //       picture:
+        //         "https://ca-times.brightspotcdn.com/dims4/default/52ce001/2147483647/strip/true/crop/2045x1150+0+0/resize/1486x836!/quality/90/?url=https%3A%2F%2Fcalifornia-times-brightspot.s3.amazonaws.com%2Fa5%2F5d%2Ffffe5dd7df3c47bcdabc16fc2d9a%2Fla-1539995022-xl6x2n389a-snap-image",
+        //     },
+        //     {
+        //       name: "Comedy",
+        //       description: "For those that want to laugh",
+        //       picture:
+        //         "https://i.insider.com/5aa97b4f3be59f2a008b465f?width=1100&format=jpeg&auto=webp",
+        //     },
+        //     {
+        //       name: "Action",
+        //       description: "For those that like explosions",
+        //       picture:
+        //         "https://i.insider.com/5b560e9657a20723008b45ab?width=600&format=jpeg&auto=webp",
+        //     },
+        //     {
+        //       name: "Crime",
+        //       description: "For those that want suspense",
+        //       picture:
+        //         "https://i0.wp.com/decider.com/wp-content/uploads/2017/03/the-godfather.jpg?quality=80&strip=all&ssl=1",
+        //     },
+        //     {
+        //       name: "Romance",
+        //       description: "For those that want to cry",
+        //       picture:
+        //         "https://www.altfg.com/film/wp-content/uploads/images/robert-pattinson-kristen-stewart-edward-bella-kissing-eclipse.jpg.webp",
+        //     },
+        //     {
+        //       name: "Christmas",
+        //       description: "For those who can't get enough of christmas",
+        //       picture:
+        //         "https://d1qxviojg2h5lt.cloudfront.net/images/01DWJWFNMRRFQY2Z9JFEV7NEYS/thegrinch570.png",
+        //     },
+        // ],
+        // }, //TODO: not hardcoded list
         status: "lobby",
         creator: String(res.locals.id),
         complete: 0,

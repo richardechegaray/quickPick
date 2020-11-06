@@ -22,11 +22,18 @@ module.exports = {
                 let msgData = { "type": "session", "session": JSON.stringify(session) };
                 let msg = {
                     "data": msgData,
-                    "tokens": tokens.map((t) => t.firebaseToken)
+                    "tokens": tokens.map((t) => t.firebaseToken),
+                    "webpush": {
+                        "headers": {
+                          "Urgency": "high"
+                        }
+                    }
                 };
+                console.log(msg.tokens);
                 admin.messaging().sendMulticast(msg)
                     .then((response) => {
-                        console.log(response.successCount + " messages were sent successfully");
+                        console.log(response);
+                        // console.log(response.successCount + " messages were sent successfully");
                     });
             });
     }
