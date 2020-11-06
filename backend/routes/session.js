@@ -156,17 +156,19 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
   db.collection(process.env.SESSION_COLLECTION)
     .find(query)
     .toArray(function (err, foundSessions) {
+      if (err || foundSessions.length === 0) {
+        res.status(401).send({ ok: false, message: "Session doesn't exist" });
+      } 
       //See if user is in session
       let isInSession = false;
       let currentSession = foundSessions[0];
       currentSession.participants.forEach(function (participantUser) {
-        if (res.user.id === participantUser.id) {
+        if (res.locals.id === participantUser.id) {
           isInSession = true;
         }
       });
-      if (err || foundSessions.length === 0) {
-        res.status(401).send({ ok: false, message: "Session doesn't exist" });
-      } else if (isInSession) {
+
+      if (isInSession) {
         //Iterate through responses, and also session to find idea names that match
         req.body.choices.forEach((choice) => {
           currentSession.results.forEach((result) => {
