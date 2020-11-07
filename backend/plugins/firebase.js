@@ -23,11 +23,9 @@ module.exports = {
                 let msg = {
                     "data": msgData,
                     "tokens": tokens.map((t) => t.firebaseToken),
-                    "webpush": {
-                        "headers": {
-                          "Urgency": "high"
-                        }
-                    }
+                    "android":{
+                        "priority":"normal"
+                    },
                 };
                 console.log(msg.tokens);
                 admin.messaging().sendMulticast(msg)
