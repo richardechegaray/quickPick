@@ -11,6 +11,8 @@ public class ListPayload {
 
     private String name;
 
+    private String id;
+
     @Nullable
     private List<IdeaPayload> ideas;
 

@@ -24,7 +24,9 @@ public class SessionPayload implements Serializable {
     @Nullable
     private List<ResultPayload> results;
 
-    private ListPayload list;
+    private ListPayload list; // TODO: remove when backend stops sending this
+
+    private String listId;
 
     private String creator;
 

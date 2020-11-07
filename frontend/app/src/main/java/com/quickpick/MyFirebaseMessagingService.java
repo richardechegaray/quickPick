@@ -46,6 +46,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        // TODO: handle getting sent a list
         Log.d(FIREBASE_MESSAGING_SERVICE_DEBUG, "Received message from " + remoteMessage.getFrom());
         Intent intent = new Intent(SESSION_INTENT);
         Map<String, String> data = remoteMessage.getData();
