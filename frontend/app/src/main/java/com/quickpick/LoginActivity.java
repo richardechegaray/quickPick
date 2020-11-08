@@ -38,11 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Check token prior to inflating layout, in case we are already logged in
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken != null && !accessToken.isExpired()) {
-            getFirebaseTokenAndCallLogin(accessToken.getToken());
-        }
         setContentView(R.layout.activity_login);
 
         facebookLoginButton = findViewById(R.id.login_button);
@@ -51,13 +46,21 @@ public class LoginActivity extends AppCompatActivity {
         registerFBButtonCallback();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken != null && !accessToken.isExpired()) {
+            getFirebaseTokenAndCallLogin(accessToken.getToken());
+        }
+    }
+
     private void registerFBButtonCallback() {
         facebookLoginButton.setPermissions("email");
         facebookLoginButton.registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Log.d(LOGIN, "registerFBButtonCallback");
-                getFirebaseTokenAndCallLogin(loginResult.getAccessToken().getToken());
+                Log.d(LOGIN, "Login success");
             }
 
             @Override
