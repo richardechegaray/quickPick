@@ -6,7 +6,7 @@ import androidx.core.util.Consumer;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
-import com.quickpick.apis.RetrofitApiBuilder;
+import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.apis.SessionApi;
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ChoicePayload;
@@ -34,7 +34,7 @@ public class SessionRepository {
     private final MediatorLiveData<SessionPayload> session;
 
     private SessionRepository() {
-        sessionApi = RetrofitApiBuilder.getApi(SessionApi.class);
+        sessionApi = RetrofitUtils.getApi(SessionApi.class);
         session = new MediatorLiveData<>();
     }
 
