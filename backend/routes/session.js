@@ -31,6 +31,17 @@ function sortSession(session) {
   return session;
 }
 
+//Checks if User is in the session
+function isInSession(userID, session) {
+  let present = false;
+  session.participants.forEach((participant) => {
+    if (String(userID) === String(participant.id)) {
+      present = true;
+    }
+  });
+  return present;
+}
+
 //--------Session requests
 //Get session
 router.get("/:pin", auth.checkFB, function (req, res) {
@@ -145,16 +156,10 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
       if (err || foundSessions.length === 0) {
         res.status(401).send({ ok: false, message: "Session doesn't exist" });
       } 
-      //See if user is in session
-      let isInSession = false;
       let currentSession = foundSessions[0];
-      currentSession.participants.forEach(function (participantUser) {
-        if (res.locals.id === participantUser.id) {
-          isInSession = true;
-        }
-      });
 
-      if (isInSession) {
+      //See if user is in session
+      if (isInSession(res.locals.id, currentSession)) {
         //Iterate through responses, and also session to find idea names that match
         req.body.choices.forEach((choice) => {
           currentSession.results.forEach((result) => {
