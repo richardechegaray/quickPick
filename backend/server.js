@@ -17,10 +17,10 @@ mongoUtil.connectToServer(function (err, client) {
 
     // Import routes
     const loginRouter = require("./routes/login");
-    const listsRouter = require("./routes/lists");
+    const listRouter = require("./routes/list");
     const sessionRouter = require("./routes/session");
     app.use("/login", loginRouter);
-    app.use("/lists", listsRouter);
+    app.use("/list", listRouter);
     app.use("/session", sessionRouter);
 
     // Listen on PORT

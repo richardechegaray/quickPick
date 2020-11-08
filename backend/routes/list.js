@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
+const ObjectId = require('mongodb').ObjectID;
 const mongoUtil = require("../database/mongo");
-var db = mongoUtil.getDb();
+const db = mongoUtil.getDb();
 
 const auth = require("../middleware/authentication");
-const loginHelper = require("../helpers/loginhelper");
 const imgUtil = require("../plugins/unsplash");
 
 /* Returns all lists where the userID field matches the user making the request */
@@ -65,7 +65,7 @@ router.get("/:id", auth.checkFB, async function (req, res) {
     try {
         /* Find the list matching the id */
         const myList = await db.collection(process.env.LISTS_COLLECTION)
-            .findOne({ _id: req.params.id });
+            .findOne({ "_id": ObjectId(req.params.id) });
 
         if (myList == null) {
             console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
