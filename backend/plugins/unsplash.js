@@ -18,7 +18,7 @@ module.exports = {
                 "query": searchString, 
                 "per_page": 1, 
                 "orientation": "portrait", 
-                "client_id": String(process.env.UNSPLASH_ACCESS_KEY) }
+                "client_id": String(process.env.UNSPLASH_ACCESS_KEY) };
             const unsplashResult = await axios.get(
                 "https://api.unsplash.com/search/photos",
                 { params: unsplashParameters });
