@@ -130,25 +130,20 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
     currentSession
   ) {
     //Assert session exists
-    if (err || currentSession === null || typeof(req.body.choices) !== 'object') {
+    if (err || currentSession === null || typeof(req.body.choices) !== "object") {
       res.status(401).send({ ok: false, message: "Session doesn't exist or choices are invalid" });
       return;
     }
     //Iterate through session and see if user is in
-    let isInSession = false;
+    
     currentSession.participants.forEach(function (participantUser) {
       if (res.locals.id === participantUser.id) {
-        isInSession = true;
-      }
-    });
-
-    //Assert user is not in session
-    if (!isInSession) {
-      res
+        res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
       return;
-    }
+      }
+    });
 
     //Iterate through responses, and also session to find idea names that match
     req.body.choices.forEach((choice) => {
@@ -199,6 +194,7 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
           return;
         }
         res.status(200).send({ ok: true });
+        return;
       }
     );
   });
@@ -328,7 +324,7 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
           res.status(200).send({ ok: true });
           var firebaseMessage = {
             type: "list",
-            session: session,
+            session,
             list: foundList,
           };
           firebaseUtil.sendFirebase(firebaseMessage);
@@ -345,7 +341,7 @@ Parameters:
 Returns:
 */
 router.put("/:id", auth.checkFB, function(req, res){
-  onsole.log("DEBUG: Put request to /session/" + req.params.id);
+  console.log("DEBUG: Put request to /session/" + req.params.id);
   //Assert parameters are valid
   if(req.params.id === null || req.body.listID === null){
     res.status(400).send();
@@ -358,8 +354,8 @@ router.put("/:id", auth.checkFB, function(req, res){
       res.status(400).send({ok: false});
       return;
     }
-    res.status(200).send({ok: true})
-  })
+    res.status(200).send({ok: true});
+  });
 })
 
 module.exports = router;
