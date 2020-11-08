@@ -298,7 +298,7 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
     }
     let query = { _id: new ObjectID(session.listID) };
     var newResults = [];
-    db.collection(process.env.LISTS_COLLECTION).findOne({}, function (
+    db.collection(process.env.LISTS_COLLECTION).findOne(query, function (
       err,
       foundList
     ) {
@@ -329,7 +329,7 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
           var firebaseMessage = {
             type: "list",
             session: session,
-            list: "",
+            list: foundList,
           };
           firebaseUtil.sendFirebase(firebaseMessage);
           return;
