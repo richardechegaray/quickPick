@@ -3,7 +3,7 @@ package com.quickpick.apis;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitApiBuilder {
+public class RetrofitUtils {
 
     private static final String SERVER_URL = "http://52.52.51.125:8081/";
 
