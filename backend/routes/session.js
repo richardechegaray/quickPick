@@ -135,15 +135,20 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
       return;
     }
     //Iterate through session and see if user is in
-    
+    let isInSession = false;
     currentSession.participants.forEach(function (participantUser) {
       if (res.locals.id === participantUser.id) {
-        res
+        isInSession = true;
+      }
+    });
+
+    //Assert user is not in session
+    if (!isInSession) {
+      res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
       return;
-      }
-    });
+    }
 
     //Iterate through responses, and also session to find idea names that match
     req.body.choices.forEach((choice) => {
