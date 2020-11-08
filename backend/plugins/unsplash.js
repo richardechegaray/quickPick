@@ -14,10 +14,14 @@ module.exports = {
         }
         else {
             console.log("No cached image, making external API call.");
+            let unsplashParameters = { 
+                "query": searchString, 
+                "per_page": 1, 
+                "orientation": "portrait", 
+                "client_id": String(process.env.UNSPLASH_ACCESS_KEY) };
             const unsplashResult = await axios.get(
                 "https://api.unsplash.com/search/photos",
-                { params: {query: searchString, per_page: 1, orientation: "portrait", 
-                  client_id: String(process.env.UNSPLASH_ACCESS_KEY) }});
+                { params: unsplashParameters });
             console.log(unsplashResult);
                   await db.collection(process.env.IMAGES_COLLECTION).insertOne({
                 name: searchString.toLowerCase(),

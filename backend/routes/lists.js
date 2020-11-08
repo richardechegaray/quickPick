@@ -20,7 +20,7 @@ router.get("/", auth.checkFB, async function (req, res) {
         myLists.forEach((doc) => {
             listResponseObj[String(count)] = doc;
             count++;
-        })
+        });
         listResponseObj.ok = true;
         res.status(200).send(listResponseObj);
     }
