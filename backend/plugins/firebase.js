@@ -12,14 +12,17 @@ admin.initializeApp({
 
 // Helper function for sending firebase messages
 module.exports = {
-    sendFirebase: (session) => {
+    sendFirebase: (data) => {
+        let session = data.session;
+        console.log(data);
+        console.log(JSON.stringify(data));
         const idList = session.participants.map((u) => u.id);
         db.collection(process.env.USER_COLLECTION)
             .find({ "id": { $in: idList } })
             .project({ "firebaseToken": true })
             .toArray()
             .then((tokens) => {
-                let msgData = { "type": "session", "session": JSON.stringify(session) };
+                let msgData = JSON.stringify(data);
                 let msg = {
                     "data": msgData,
                     "tokens": tokens.map((t) => t.firebaseToken),
