@@ -236,7 +236,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
           .then((user) => {
             /* Add the user if they aren't in the session yet */
             let flag = false;
-            session.participants.length.forEach(function (participantUser) {
+            session.participants.forEach(function (participantUser) {
               if (user.id === participantUser.id) {
                 flag = true;
               }
