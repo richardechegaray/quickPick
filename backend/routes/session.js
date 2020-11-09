@@ -2,6 +2,7 @@ const express = require("express");
 const { app } = require("firebase-admin");
 const router = express.Router();
 
+const ObjectId = require("mongodb").ObjectID;
 const mongoUtil = require("../database/mongo");
 const db = mongoUtil.getDb();
 
@@ -297,7 +298,7 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
         .send({ ok: false, message: "Session has already started" });
       return;
     }
-    let query = { _id: new ObjectID(session.listID) };
+    let query = { _id: ObjectId(session.listID) };
     var newResults = [];
     db.collection(process.env.LISTS_COLLECTION).findOne(query, function (
       err,
