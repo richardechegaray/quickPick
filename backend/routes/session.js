@@ -361,6 +361,6 @@ router.put("/:id", auth.checkFB, function(req, res){
     }
     res.status(200).send({ok: true});
   });
-})
+});
 
 module.exports = router;
