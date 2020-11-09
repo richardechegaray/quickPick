@@ -4,7 +4,7 @@ require("dotenv").config();
 module.exports = {
   /* Verifies the token passed in the request's facebookToken field */
   checkFB: (req, res, next) => {
-    let facebookToken = req.body.facebookToken;
+    let facebookToken = req.headers.facebooktoken;
     let url = `https://graph.facebook.com/debug_token?input_token=${facebookToken}&access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
 
     /* Pass the token to the Facebook endpoint */

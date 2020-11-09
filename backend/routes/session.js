@@ -1,4 +1,5 @@
 const express = require("express");
+const { app } = require("firebase-admin");
 const router = express.Router();
 
 const mongoUtil = require("../database/mongo");
@@ -21,7 +22,11 @@ function randomString(length, chars) {
   return result;
 }
 
-//Helper function for sorting a sessions results
+/*
+Helper function for sorting a sessions results
+Parameters:
+Returns:
+*/
 function sortSession(session) {
   var results = session.results;
   results.sort(function (a, b) {
@@ -31,19 +36,12 @@ function sortSession(session) {
   return session;
 }
 
-//Checks if User is in the session
-function isInSession(userID, session) {
-  let present = false;
-  session.participants.forEach((participant) => {
-    if (String(userID) === String(participant.id)) {
-      present = true;
-    }
-  });
-  return present;
-}
-
 //--------Session requests
-//Get session
+/*
+Get session
+Parameters: sessionID: req.params.pin
+Returns: 200 if succesffuly, 400 if it doesn't exist
+*/
 router.get("/:pin", auth.checkFB, function (req, res) {
   console.log("DEBUG: Get request to /session/" + req.params.pin);
   let myPin = req.params.pin;
@@ -59,210 +57,208 @@ router.get("/:pin", auth.checkFB, function (req, res) {
     });
 });
 
-//Create new session
+/*
+Create new session
+Parameters: Size: req.body.size, FBToken: facebookToken
+Returns: 400 if invalid parameters or session doesn't exist, 201 if successful
+*/
 router.post("/", auth.checkFB, function (req, res) {
   console.log("DEBUG: Post request to /session");
   let rString = randomString(
     5,
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
   );
-  let count;
   //TODO: Iterate through sessions until we have a unique pin
 
-  let name = "";
   db.collection(process.env.USER_COLLECTION)
     .findOne({ id: String(res.locals.id) })
     .then((user) => {
-      if (user != null) {
-        name = user.name;
-      } else {
-        res
-          .status(400)
-          .send({
-            ok: false,
-            message: "UserID Invalid / User has not logged in before",
-          });
+      //Assert user has logged in and parameters are valid
+      if (
+        user === null ||
+        typeof res.locals.id !== "string" ||
+        typeof req.body.size !== "string"
+      ) {
+        console.log(typeof req.body.size);
+        res.status(400).send({
+          ok: false,
+          message: "Invalid parameters",
+        });
+        return;
       }
 
       //Create session object
       let session = {
         pin: rString,
-        list: {
-          "_id": "5fa730493d8e7915e45205f2",
-          "name": "Dinner Options",
-          "ideas": [
-              {
-                  "name": "Pizza",
-                  "description": "Let's order some pizza!",
-                  "picture": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"
-              },
-              {
-                  "name": "Sushi",
-                  "description": "Itadakimasu ;)",
-                  "picture": "https://images.unsplash.com/photo-1582450871972-ab5ca641643d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"
-              },
-              {
-                  "name": "Tacos",
-                  "description": "It's Taco Time everybody!",
-                  "picture": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"
-              },
-              {
-                  "name": "Indian Food",
-                  "description": "Bring the heat",
-                  "picture": "https://images.unsplash.com/photo-1517244683847-7456b63c5969?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDM0OH0"
-              }
-          ],
-          "userID": "1716297428546579"
-      }, //TODO: not hardcoded list
+        listID: "",
         status: "lobby",
         creator: String(res.locals.id),
         complete: 0,
         size: req.body.size,
         results: [],
-        participants: [{ name, id: String(res.locals.id) }],
+        participants: [{ name: user.name, id: String(res.locals.id) }],
       };
-      //Create results array with 0 counts
-      let resultArray = [];
-      session.list.ideas.forEach((idea) => {
-        resultArray.push({ idea, score: 0 });
-      });
-      session.results = resultArray;
+
+      //Add to session collection
       db.collection(process.env.SESSION_COLLECTION).insertOne(
         session,
         function (err, result) {
           if (err) {
-            res
-              .status(400)
-              .send({
-                ok: false,
-                message: "Session couldn't be inserted into DB",
-              });
-          } else {
-            res.status(201).send(session);
+            res.status(400).send({
+              ok: false,
+              message: "Session couldn't be inserted into DB",
+            });
+            return;
           }
+          res.status(201).send(session);
         }
       );
     });
 });
 
-//Endpoint to receive user choices for a session
-//TODO: Error handling
+/*
+Endpoint to receive user choices for a session
+Parameters:
+Returns:
+*/
 router.post("/:id/choices", auth.checkFB, function (req, res) {
   console.log("DEBUG: post request to /session/" + req.params.id + "/choices");
+  //Find session
   let query = { pin: req.params.id };
-  db.collection(process.env.SESSION_COLLECTION)
-    .find(query)
-    .toArray(function (err, foundSessions) {
-      if (err || foundSessions.length === 0) {
-        res.status(401).send({ ok: false, message: "Session doesn't exist" });
-      } 
-      let currentSession = foundSessions[0];
-
-      //See if user is in session
-      if (isInSession(res.locals.id, currentSession)) {
-        //Iterate through responses, and also session to find idea names that match
-        req.body.choices.forEach((choice) => {
-          currentSession.results.forEach((result) => {
-            //If they match and the response is positive, then increment the record
-            if (choice.idea.name === result.idea.name && choice.choice) {
-              result.score += 1;
-            }
-          });
-        });
-        //Push firebase notification if everyone has submitted their results
-        let newComplete = currentSession.complete + 1;
-        let newValues;
-        if (newComplete === currentSession.participants.length) {
-          currentSession.status = "complete";
-          currentSession = sortSession(currentSession);
-          firebaseUtil.sendFirebase(currentSession);
-          //Include the updated session status to the database update
-          newValues = {
-            $set: {
-              results: currentSession.results,
-              complete: newComplete,
-              status: "complete",
-            },
-          };
-        } else {
-          newValues = {
-            $set: { results: currentSession.results, complete: newComplete },
-          };
-        }
-        currentSession.complete++;
-
-        //Update database with new values
-        db.collection(process.env.SESSION_COLLECTION).updateOne(
-          query,
-          newValues,
-          function (err, result) {
-            if (err) {
-              res
-                .status(402)
-                .send({
-                  ok: false,
-                  message: "Couldn't update session with values",
-                });
-            } else {
-              res.status(200).send({ ok: true });
-            }
-          }
-        );
-      } else {
-        res
-          .status(403)
-          .send({ ok: false, message: "User ID is not in the session" });
+  db.collection(process.env.SESSION_COLLECTION).findOne(query, function (
+    err,
+    currentSession
+  ) {
+    //Assert session exists
+    if (err || currentSession === null || typeof(req.body.choices) !== "object") {
+      res.status(401).send({ ok: false, message: "Session doesn't exist or choices are invalid" });
+      return;
+    }
+    //Iterate through session and see if user is in
+    let isInSession = false;
+    currentSession.participants.forEach(function (participantUser) {
+      if (res.locals.id === participantUser.id) {
+        isInSession = true;
       }
     });
+
+    //Assert user is not in session
+    if (!isInSession) {
+      res
+        .status(403)
+        .send({ ok: false, message: "User ID is not in the session" });
+      return;
+    }
+
+    //Iterate through responses, and also session to find idea names that match
+    req.body.choices.forEach((choice) => {
+      currentSession.results.forEach((result) => {
+        //If they match and the response is positive, then increment the record
+        if (choice.idea.name === result.idea.name && choice.choice) {
+          result.score += 1;
+        }
+      });
+    });
+
+    //Push firebase notification if everyone has submitted their results
+    let newComplete = currentSession.complete + 1;
+    let newValues;
+    if (newComplete === currentSession.participants.length) {
+      currentSession.status = "complete";
+      currentSession = sortSession(currentSession);
+      var firebaseMessage = {
+        type: "session",
+        session: currentSession,
+      };
+      firebaseUtil.sendFirebase(firebaseMessage);
+      //Include the updated session status to the database update
+      newValues = {
+        $set: {
+          results: currentSession.results,
+          complete: newComplete,
+          status: "complete",
+        },
+      };
+    } else {
+      newValues = {
+        $set: { results: currentSession.results, complete: newComplete },
+      };
+    }
+    currentSession.complete++;
+
+    //Update database with new values
+    db.collection(process.env.SESSION_COLLECTION).updateOne(
+      query,
+      newValues,
+      function (err, result) {
+        if (err) {
+          res.status(402).send({
+            ok: false,
+            message: "Couldn't update session with values",
+          });
+          return;
+        }
+        res.status(200).send({ ok: true });
+        return;
+      }
+    );
+  });
 });
 
-//Adds a user to a session
-//TODO: Error handling in case id does not exist
+/*
+Adds a user to a session
+Parameters: SessionID: req.params.id, FacebookToken
+Returns: 400 or 201
+*/
 router.post("/:id", auth.checkFB, function (req, res) {
   console.log("DEBUG: Post request to /session/" + req.params.id);
   /* Get session matching ID */
   db.collection(process.env.SESSION_COLLECTION)
     .findOne({ pin: req.params.id })
     .then((session) => {
+      //Assert session is found
       if (session == null) {
         console.log("No session exists with ID: " + req.params.id);
         res.status(400).send({ ok: false });
-      } else if (session.status !== "lobby") {
+        return;
+      }
+      //Assert session has not started
+      if (session.status !== "lobby") {
         console.log(
           "Session " +
             req.params.id +
             " is no longer accepting new participants"
         );
         res.status(400).send({ ok: false });
-      } else {
-        /* Get user matching the token that was authenticated */
-        db.collection(process.env.USER_COLLECTION)
-          .findOne({ id: String(res.locals.id) })
-          .then((user) => {
-            /* Add the user if they aren't in the session yet */
-            let flag = false;
-            session.participants.forEach(function (participantUser) {
-              if (user.id === participantUser.id) {
-                flag = true;
-              }
-            });
-            if (!flag) {
-              let newPerson = { name: user.name, id: String(res.locals.id) };
-              let participants = session.participants;
-              participants.push(newPerson);
-              db.collection(process.env.SESSION_COLLECTION)
-                .updateOne({ pin: req.params.id }, { $set: { participants } })
-                .then(() => {
-                  /* Push firebase message to each user in the session */
-                  firebaseUtil.sendFirebase(session);
-                  res.status(201).send({ ok: true });
-                });
-            } else {
-              firebaseUtil.sendFirebase(session);
-              res.status(201).send({ ok: true });
+        return;
+      }
+      /* Get user matching the token that was authenticated */
+      db.collection(process.env.USER_COLLECTION)
+        .findOne({ id: String(res.locals.id) })
+        .then((user) => {
+          /* Add the user if they aren't in the session yet */
+          session.participants.length.forEach(function (participantUser) {
+            if (user.id === participantUser.id) {
+              res.status(400).send({ ok: false });
+              return;
             }
           });
-      }
+          let newPerson = { name: user.name, id: String(res.locals.id) };
+          let participants = session.participants;
+          participants.push(newPerson);
+          db.collection(process.env.SESSION_COLLECTION)
+            .updateOne({ pin: req.params.id }, { $set: { participants } })
+            .then((updatedSession) => {
+              /* Push firebase message to each user in the session */
+              var firebaseMessage = {
+                type: "session",
+                session: updatedSession,
+              };
+              firebaseUtil.sendFirebase(firebaseMessage);
+              res.status(201).send({ ok: true });
+              return;
+            });
+        });
     })
     .catch((err) => {
       console.log(err);
@@ -270,48 +266,101 @@ router.post("/:id", auth.checkFB, function (req, res) {
     });
 });
 
-//Starts and runs a session
-//TODO: FB authentication, check if user is creator of session
+/*
+Starts and runs a session
+Parameters: facebookToken: User's facebook token, req.params.id: ID of session to start
+Returns: 400 if any asserts are not met, 200 if succesful
+*/
 router.post("/:id/run", auth.checkFB, function (req, res) {
   console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
   var query = { pin: req.params.id };
   //Find session
-  db.collection(process.env.SESSION_COLLECTION)
-    .find(query)
-    .toArray(function (err, session) {
+  db.collection(process.env.SESSION_COLLECTION).findOne(query, function (
+    err,
+    session
+  ) {
+    //Assert session is found properly
+    if (err || session === null) {
+      console.log(err);
+      res.status(400).send({ ok: false, message: "Session doesn't exist" });
+      return;
+    }
+    //Assert user has rights to start
+    if (session.creator !== String(res.locals.id)) {
+      res.status(400).send({ ok: false, message: "User is not the creator" });
+      return;
+    }
+    //Assert session is in lobby
+    if (session.status !== "lobby") {
+      res
+        .status(400)
+        .send({ ok: false, message: "Session has already started" });
+      return;
+    }
+    let query = { _id: new ObjectID(session.listID) };
+    var newResults = [];
+    db.collection(process.env.LISTS_COLLECTION).findOne(query, function (
+      err,
+      foundList
+    ) {
       if (err) {
-        console.log(err);
-        res.status(400).send({ ok: false, message: "Session doesn't exist" });
-      } else if (session[0].creator !== String(res.locals.id)) {
-        res.status(400).send({ ok: false, message: "User is not the creator" });
-      } else {
-        //Check if session is in lobby
-        if (session[0].status === "lobby") {
-          var newvalues = { $set: { status: "running" } };
-          //Update session database
-          db.collection(process.env.SESSION_COLLECTION).updateOne(
-            query,
-            newvalues,
-            function (err, result) {
-              if (err) {
-                res
-                  .status(400)
-                  .send({ ok: false, message: "Couldn't update session" });
-              } else {
-                //Respond to http request and send firebase notification
-                res.status(200).send({ ok: true });
-                session[0].status = "running";
-                firebaseUtil.sendFirebase(session[0]);
-              }
-            }
-          );
-        } else {
-          res
-            .status(400)
-            .send({ ok: false, message: "Session has already started" });
-        }
+        res.status(400).send();
+        return;
       }
+      foundList.ideas.forEach((foundIdea) => {
+        newResults.push({ idea: foundIdea, score: 0 });
+      });
+
+      session.status = "running";
+      session.results = newResults;
+      var newvalues = { $set: { status: "running", results: newResults } };
+      //Update session database
+      db.collection(process.env.SESSION_COLLECTION).updateOne(
+        { pin: req.params.id },
+        newvalues,
+        function (err, result) {
+          if (err) {
+            res
+              .status(400)
+              .send({ ok: false, message: "Couldn't update session" });
+            return;
+          }
+          //Respond to http request and send firebase notification
+          res.status(200).send({ ok: true });
+          var firebaseMessage = {
+            type: "list",
+            session,
+            list: foundList,
+          };
+          firebaseUtil.sendFirebase(firebaseMessage);
+          return;
+        }
+      );
     });
+  });
+});
+
+/*
+Updates the list for a session
+Parameters:
+Returns:
+*/
+router.put("/:id", auth.checkFB, function(req, res){
+  console.log("DEBUG: Put request to /session/" + req.params.id);
+  //Assert parameters are valid
+  if(req.params.id === null || req.body.listID === null){
+    res.status(400).send();
+    return;
+  }
+  //TODO: Assert that session is in lobby
+  var newvalues = {$set: {listID: req.body.listID}};
+  db.collection(process.env.SESSION_COLLECTION).updateOne({pin: req.params.id}, newvalues, function(err, result){
+    if(err){
+      res.status(400).send({ok: false});
+      return;
+    }
+    res.status(200).send({ok: true});
+  });
 });
 
 module.exports = router;
