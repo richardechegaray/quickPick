@@ -1,8 +1,5 @@
 package com.quickpick.repositories;
 
-import android.util.Log;
-
-import androidx.core.util.Consumer;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 
@@ -18,9 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.internal.EverythingIsNonNull;
 
 public class SessionRepository {
 
@@ -56,54 +50,32 @@ public class SessionRepository {
     public void createSession(Runnable callback, String facebookToken) {
         // TODO: Remove hard-coded limit of 6 on party size
         Call<SessionPayload> createSessionCall = sessionApi.createSession(facebookToken, new CreateSessionRequest(6));
-        createSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
+        createSessionCall.enqueue(new RepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
             callback.run();
-        }));
+        }, SESSION_DEBUG));
     }
 
     public void joinSession(Runnable callback, String sessionId, String facebookToken) {
         Call<SessionPayload> joinSessionCall = sessionApi.joinSession(facebookToken, sessionId);
-        joinSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
+        joinSessionCall.enqueue(new RepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
             callback.run();
-        }));
+        }, SESSION_DEBUG));
     }
 
     public void startSession(Runnable callback, String facebookToken) {
         Call<BasicResponse> startSessionCall = sessionApi.startSession(facebookToken, getCurrentSessionId());
-        startSessionCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
+        startSessionCall.enqueue(new RepositoryCallback<>(basicResponse -> callback.run(), SESSION_DEBUG));
     }
 
     public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
         Call<BasicResponse> postChoicesCall = sessionApi.postChoices(facebookToken, getCurrentSessionId(), new PostChoicesRequest(choices));
-        postChoicesCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
+        postChoicesCall.enqueue(new RepositoryCallback<>(basicResponse -> callback.run(), SESSION_DEBUG));
     }
 
     private String getCurrentSessionId() {
         return Optional.ofNullable(session.getValue()).orElse(new SessionPayload()).getPin();
     }
 
-    private static class SessionRepositoryCallback<T> implements Callback<T> {
-        private final Consumer<T> onSuccessCallback;
-
-        SessionRepositoryCallback(Consumer<T> onSuccessCallback) {
-            this.onSuccessCallback = onSuccessCallback;
-        }
-
-        @Override
-        @EverythingIsNonNull
-        public void onResponse(Call<T> call, Response<T> response) {
-            Log.d(SESSION_DEBUG, response.toString());
-            if (response.isSuccessful()) {
-                onSuccessCallback.accept(response.body());
-            }
-        }
-
-        @Override
-        @EverythingIsNonNull
-        public void onFailure(Call<T> call, Throwable t) {
-            Log.d(SESSION_DEBUG, call.request().toString(), t);
-        }
-    }
 }
