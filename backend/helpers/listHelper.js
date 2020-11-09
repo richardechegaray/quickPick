@@ -1,4 +1,4 @@
-const ObjectId = require('mongodb').ObjectID;
+const ObjectId = require("mongodb").ObjectID;
 const mongoUtil = require("../database/mongo");
 const db = mongoUtil.getDb();
 
@@ -39,8 +39,8 @@ module.exports = {
             try {
                 /* Add an image url to each idea on the list */
                 for (let i = 0; i < newList.ideas.length; i++) {
-                    let imgUrl = await imgUtil.getImage(newList.ideas[i].name);
-                    newList.ideas[i].picture = imgUrl;
+                    let imgUrl = await imgUtil.getImage(newList.ideas[parseInt(i)].name);
+                    newList.ideas[parseInt(i)].picture = imgUrl;
                 }
                 /* Set user making request as the list's owner */
                 newList.userID = res.locals.id;
@@ -80,4 +80,4 @@ module.exports = {
             res.status(500).send({});
         }
     }
-}
+};
