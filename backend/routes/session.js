@@ -78,7 +78,7 @@ router.post("/", auth.checkFB, function (req, res) {
       if (
         user === null ||
         typeof res.locals.id !== "string" ||
-        typeof req.body.size !== "string"
+        typeof req.body.size !== "number"
       ) {
         console.log(typeof req.body.size);
         res.status(400).send({
@@ -297,6 +297,10 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
         .status(400)
         .send({ ok: false, message: "Session has already started" });
       return;
+    }
+    //Assert session references a valid list
+    if (session.status.listID === "") {
+      res.status(400).send({ ok: false, message: "Session contains an invalid list ID"});
     }
     let query = { _id: ObjectId(session.listID) };
     var newResults = [];
