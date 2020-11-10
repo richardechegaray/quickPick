@@ -11,7 +11,6 @@ import com.quickpick.apis.SessionApi;
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.CreateSessionRequest;
-import com.quickpick.payloads.FacebookTokenRequest;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
 
@@ -56,7 +55,7 @@ public class SessionRepository {
 
     public void createSession(Runnable callback, String facebookToken) {
         // TODO: Remove hard-coded limit of 6 on party size
-        Call<SessionPayload> createSessionCall = sessionApi.createSession(new CreateSessionRequest(facebookToken, 6));
+        Call<SessionPayload> createSessionCall = sessionApi.createSession(facebookToken, new CreateSessionRequest(6));
         createSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
             callback.run();
@@ -64,7 +63,7 @@ public class SessionRepository {
     }
 
     public void joinSession(Runnable callback, String sessionId, String facebookToken) {
-        Call<SessionPayload> joinSessionCall = sessionApi.joinSession(sessionId, new FacebookTokenRequest(facebookToken));
+        Call<SessionPayload> joinSessionCall = sessionApi.joinSession(facebookToken, sessionId);
         joinSessionCall.enqueue(new SessionRepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
             callback.run();
@@ -72,12 +71,12 @@ public class SessionRepository {
     }
 
     public void startSession(Runnable callback, String facebookToken) {
-        Call<BasicResponse> startSessionCall = sessionApi.startSession(getCurrentSessionId(), new FacebookTokenRequest(facebookToken));
+        Call<BasicResponse> startSessionCall = sessionApi.startSession(facebookToken, getCurrentSessionId());
         startSessionCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
     }
 
     public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
-        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(getCurrentSessionId(), new PostChoicesRequest(facebookToken, choices));
+        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(facebookToken, getCurrentSessionId(), new PostChoicesRequest(choices));
         postChoicesCall.enqueue(new SessionRepositoryCallback<>(basicResponse -> callback.run()));
     }
 
