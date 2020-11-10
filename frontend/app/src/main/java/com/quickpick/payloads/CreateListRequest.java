@@ -2,12 +2,9 @@ package com.quickpick.payloads;
 
 public class CreateListRequest {
 
-    private final String facebookToken;
-
     private final ListPayload list;
 
-    public CreateListRequest(String facebookToken, ListPayload list) {
-        this.facebookToken = facebookToken;
+    public CreateListRequest(ListPayload list) {
         this.list = list;
     }
 

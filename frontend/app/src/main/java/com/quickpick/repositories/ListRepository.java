@@ -3,7 +3,7 @@ package com.quickpick.repositories;
 import androidx.lifecycle.MediatorLiveData;
 
 import com.quickpick.apis.ListApi;
-import com.quickpick.apis.RetrofitApiBuilder;
+import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.payloads.ListPayload;
 
 public class ListRepository {
@@ -17,7 +17,7 @@ public class ListRepository {
     private final MediatorLiveData<ListPayload> list;
 
     private ListRepository() {
-        listApi = RetrofitApiBuilder.getApi(ListApi.class);
+        listApi = RetrofitUtils.getApi(ListApi.class);
         list = new MediatorLiveData<>();
     }
 
