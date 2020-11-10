@@ -14,7 +14,7 @@ import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.IdeaPayload;
 import com.quickpick.repositories.SessionRepository;
 import com.quickpick.viewmodels.IdeaCard;
-import com.quickpick.viewmodels.SessionViewModel;
+import com.quickpick.viewmodels.ListViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +52,10 @@ public class SwipeActivity extends AppCompatActivity {
                         .setSwipeInMsgLayoutId(R.layout.swipe_in_msg_view)
                         .setSwipeOutMsgLayoutId(R.layout.swipe_out_msg_view));
 
-        SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
-                .get(SessionViewModel.class);
+        ListViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
+                .get(ListViewModel.class);
 
-        for (IdeaPayload idea : model.getSession().getValue().getList().getIdeas()) {
+        for (IdeaPayload idea : model.getList().getValue().getIdeas()) {
             IdeaCard ideaCard = new IdeaCard(idea, mContext);
             ideaList.add(ideaCard);
             mSwipeView.addView(ideaCard);

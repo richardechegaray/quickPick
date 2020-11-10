@@ -10,6 +10,7 @@ import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
+import com.quickpick.payloads.UpdateListRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +73,15 @@ public class SessionRepository {
     public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
         Call<BasicResponse> postChoicesCall = sessionApi.postChoices(facebookToken, getCurrentSessionId(), new PostChoicesRequest(choices));
         postChoicesCall.enqueue(new RepositoryCallback<>(basicResponse -> callback.run(), SESSION_DEBUG));
+    }
+
+    public void updateList(Runnable successCallback, Runnable failureCallback,
+                           String facebookToken, String newListId) {
+        Call<SessionPayload> updateListCall = sessionApi.updateList(facebookToken, getCurrentSessionId(), new UpdateListRequest(newListId));
+        updateListCall.enqueue(new RepositoryCallback<>(responsePayload -> {
+            session.setValue(responsePayload);
+            successCallback.run();
+        }, failureCallback, SESSION_DEBUG));
     }
 
     private String getCurrentSessionId() {
