@@ -20,10 +20,10 @@ import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.LoginRequest;
 
-import okhttp3.internal.annotations.EverythingIsNonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 
 import static androidx.lifecycle.Lifecycle.State.RESUMED;
 
@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
         String firebaseToken = firebaseTokenTask.getResult();
         LoginApi loginApi = RetrofitUtils.getApi(LoginApi.class);
         Log.d(LOGIN, String.format("facebookToken: %s, firebaseToken: %s", facebookToken, firebaseToken));
-        Call<BasicResponse> loginCall = loginApi.login(new LoginRequest(facebookToken, firebaseToken));
+        Call<BasicResponse> loginCall = loginApi.login(facebookToken, new LoginRequest(firebaseToken));
         loginCall.enqueue(new Callback<BasicResponse>() {
             @Override
             @EverythingIsNonNull
