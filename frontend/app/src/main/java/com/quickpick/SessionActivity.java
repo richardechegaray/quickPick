@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,13 +18,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.AccessToken;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ParticipantPayload;
 import com.quickpick.receivers.SessionReceiver;
+import com.quickpick.repositories.CommonRunnables;
+import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.SessionRepository;
+import com.quickpick.viewmodels.ListViewModel;
 import com.quickpick.viewmodels.SessionViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SessionActivity extends AppCompatActivity {
 
@@ -34,6 +42,8 @@ public class SessionActivity extends AppCompatActivity {
     private AccessToken accessToken;
 
     private Button startSwipingButton;
+
+    private TextInputEditText listEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,27 +56,70 @@ public class SessionActivity extends AppCompatActivity {
             finish();
             return;
         }
-        TextView sessionKeyView = findViewById(R.id.session_key_text);
         startSwipingButton = findViewById(R.id.start_swiping_button);
+        listEditText = findViewById(R.id.session_list_edit_text);
 
         receiver = new SessionReceiver();
-        SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
-                .get(SessionViewModel.class);
+        ViewModelProvider provider = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory());
+        observeSession(provider.get(SessionViewModel.class));
+        setUpListEditText(provider.get(ListViewModel.class));
         setOnClickListeners();
         setUpRecyclerView();
+    }
 
-        model.getSession().observe(this, newSession ->
+    private void observeSession(SessionViewModel sessionViewModel) {
+        TextView sessionKeyView = findViewById(R.id.session_key_text);
+        sessionViewModel.getSession().observe(this, newSession ->
         {
+            boolean isOwner = newSession.getCreator().equals(accessToken.getUserId());
             if ("running".equals(newSession.getStatus())) {
                 startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                 return;
             }
+            if (isOwner) {
+                ListRepository.getInstance().callGetLists(() -> {},
+                        () -> Toast.makeText(this, "Failed to get lists", Toast.LENGTH_SHORT).show(),
+                        accessToken.getToken());
+            }
+            ListRepository.getInstance().callGetList(CommonRunnables.DO_NOTHING,
+                    CommonRunnables.showToast(this, getString(R.string.get_list_failed)),
+                    accessToken.getToken(),
+                    newSession.getListId()
+            );
+            listEditText.setEnabled(isOwner);
+            startSwipingButton.setEnabled(isOwner);
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
-            startSwipingButton.setEnabled(newSession.getCreator().equals(accessToken.getUserId()));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
         });
+    }
 
+    private void setUpListEditText(ListViewModel listViewModel) {
+        listEditText.setFocusable(false);
+        listEditText.setOnClickListener(view ->
+                {
+                    List<ListPayload> lists = listViewModel.getLists().getValue().getLists();
+                    String[] listNames = lists.stream().map(ListPayload::getName).toArray(String[]::new);
+                    List<String> listIds = lists.stream().map(ListPayload::getId).collect(Collectors.toList());
+                    final int[] selectedItem = new int[1];
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle(getString(R.string.session_list_text))
+                            .setNeutralButton(getString(R.string.dialog_cancel_button_text),
+                                    (dialog, which) -> CommonRunnables.showToast(this, getString(R.string.select_list_cancelled)).run())
+                            .setPositiveButton(getString(R.string.dialog_select_button_text),
+                                    (dialog, which) -> SessionRepository.getInstance().updateList(CommonRunnables.DO_NOTHING,
+                                            CommonRunnables.showToast(this, getString(R.string.select_list_failed)),
+                                            accessToken.getToken(),
+                                            listIds.get(selectedItem[0])))
+                            .setSingleChoiceItems(listNames,
+                                    0,
+                                    (dialog, which) -> selectedItem[0] = which)
+                            .show();
+                }
+        );
+        listViewModel.getList().observe(this, newList ->
+                listEditText.setText(newList.getName())
+        );
     }
 
     private void setUpRecyclerView() {
@@ -79,10 +132,8 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        startSwipingButton.setOnClickListener(view ->
-                SessionRepository.getInstance().startSession(
-                        () -> {
-                        }, accessToken.getToken()));
+        startSwipingButton.setOnClickListener(view -> SessionRepository.getInstance().startSession(
+                CommonRunnables.DO_NOTHING, accessToken.getToken()));
     }
 
     @Override

@@ -14,10 +14,8 @@
     <string name="session_id_edit_text_hint">Session ID</string>
     <string name="dialog_join_button_text">Join</string>
     <string name="dialog_cancel_button_text">Cancel</string>
-    <string name="session_type_text">Select a session type:</string>
-    <string name="sports_session_text">Sports:</string>
-    <string name="food_session_text">Foods:</string>
-    <string name="movie_session_text">Movies:</string>
+    <string name="dialog_select_button_text">Select</string>
+    <string name="session_list_text">Select a list</string>
     <string name="start_swiping_button">Start Swiping!</string>
     <string name="session_code_string_format">Session Code: %s</string>
     <string name="dislike_button_attribute_text">dislike button</string>
@@ -28,4 +26,8 @@
     <string name="return_to_main_activity_button_text">Return to Main Menu</string>
     <string name="quick_text">quick</string>
     <string name="pick_text">Pick</string>
+    <string name="selected_list_text">Selected List</string>
+    <string name="select_list_cancelled">Did not select new list</string>
+    <string name="select_list_failed">List update failed, try again</string>
+    <string name="get_list_failed">Get list failed, try again</string>
 </resources>
