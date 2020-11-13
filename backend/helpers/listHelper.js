@@ -10,12 +10,15 @@ module.exports = {
         console.log("DEBUG: Get request to lists");
         try {
             const myLists = await db.collection(process.env.LISTS_COLLECTION)
-                .find({ userID: res.locals.id }).toArray();
-
+                .find({ userID: { $in: [res.locals.id, "quickpick.admin"]} })
+                .sort({ name: 1})
+                .toArray();
+            
             let listResponseObj = { lists: [] };
 
             myLists.forEach((ideaList) => {
-                listResponseObj.lists.push(ideaList);
+                let listSimplified = {name: ideaList.name, _id: ideaList._id};
+                listResponseObj.lists.push(listSimplified);
             });
 
             res.status(200).send(listResponseObj);
@@ -54,9 +57,10 @@ module.exports = {
             }
         }
     },
+
     /* Finds a list matching the id and returns it if the the list belongs to the user */
     getList: async (req, res) => {
-        console.log("DEBUG: Get request to lists");
+        console.log("DEBUG: Get request to list");
         try {
             /* Find the list matching the id */
             const myList = await db.collection(process.env.LISTS_COLLECTION)
@@ -66,7 +70,7 @@ module.exports = {
                 console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
                 res.status(404).send({});
             }
-            else if (myList.userID !== res.locals.id) {
+            else if (myList.userID !== res.locals.id && myList.userID !== "quickpick.admin") {
                 console.log("DEBUG: Attempted to access another user's list");
                 res.status(403).send({});
             }

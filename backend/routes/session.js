@@ -80,7 +80,6 @@ router.post("/", auth.checkFB, function (req, res) {
         typeof res.locals.id !== "string" ||
         typeof req.body.size !== "number"
       ) {
-        console.log(typeof req.body.size);
         res.status(400).send({
           ok: false,
           message: "Invalid parameters",
@@ -167,8 +166,7 @@ router.post("/:id/choices", auth.checkFB, function (req, res) {
     if (newComplete === currentSession.participants.length) {
       currentSession.status = "complete";
       currentSession = sortSession(currentSession);
-      var firebaseMessage = {
-        type: "session",
+      let firebaseMessage = {
         session: currentSession,
       };
       firebaseUtil.sendFirebase(firebaseMessage);
@@ -238,7 +236,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
         .findOne({ id: String(res.locals.id) })
         .then((user) => {
           /* Add the user if they aren't in the session yet */
-          session.participants.length.forEach(function (participantUser) {
+          session.participants.forEach(function (participantUser) {
             if (user.id === participantUser.id) {
               res.status(400).send({ ok: false });
               return;
@@ -251,8 +249,7 @@ router.post("/:id", auth.checkFB, function (req, res) {
             .updateOne({ pin: req.params.id }, { $set: { participants } })
             .then((updatedSession) => {
               /* Push firebase message to each user in the session */
-              var firebaseMessage = {
-                type: "session",
+              let firebaseMessage = {
                 session: updatedSession,
               };
               firebaseUtil.sendFirebase(firebaseMessage);
@@ -274,7 +271,7 @@ Returns: 400 if any asserts are not met, 200 if succesful
 */
 router.post("/:id/run", auth.checkFB, function (req, res) {
   console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
-  var query = { pin: req.params.id };
+  let query = { pin: req.params.id };
   //Find session
   db.collection(process.env.SESSION_COLLECTION).findOne(query, function (
     err,
@@ -299,11 +296,12 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
       return;
     }
     //Assert session references a valid list
-    if (session.status.listID === "") {
+    if (session.listID === "" || typeof(session.listID) !== "string") {
       res.status(400).send({ ok: false, message: "Session contains an invalid list ID"});
+      return;
     }
     let query = { _id: ObjectId(session.listID) };
-    var newResults = [];
+    let newResults = [];
     db.collection(process.env.LISTS_COLLECTION).findOne(query, function (
       err,
       foundList
@@ -333,9 +331,8 @@ router.post("/:id/run", auth.checkFB, function (req, res) {
           //Respond to http request and send firebase notification
           res.status(200).send({ ok: true });
           var firebaseMessage = {
-            type: "list",
             session,
-            list: foundList,
+            "list": foundList,
           };
           firebaseUtil.sendFirebase(firebaseMessage);
           return;
@@ -358,13 +355,20 @@ router.put("/:id", auth.checkFB, function(req, res){
     return;
   }
   //TODO: Assert that session is in lobby
-  var newvalues = {$set: {listID: req.body.listID}};
+  let newvalues = {$set: {listID: req.body.listID}};
   db.collection(process.env.SESSION_COLLECTION).updateOne({pin: req.params.id}, newvalues, function(err, result){
     if(err){
       res.status(400).send({ok: false});
       return;
     }
-    res.status(200).send({ok: true});
+    db.collection(process.env.SESSION_COLLECTION).findOne({pin: req.params.id})
+      .then((updatedSession) => {
+        res.status(200).send(updatedSession);
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send({ok: false});
+      })
   });
 });
 
