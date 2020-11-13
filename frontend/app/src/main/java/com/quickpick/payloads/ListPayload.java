@@ -4,12 +4,15 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class ListPayload {
+public class ListPayload implements Serializable {
+
+    public static final String INTENT_KEY = "ListPayload";
 
     @Nullable
     private String name;
