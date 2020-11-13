@@ -14,6 +14,7 @@ import com.quickpick.payloads.SessionPayload;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -27,23 +28,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final Map<String, Class<? extends Serializable>> TYPE_TO_CLASS_MAP = getTypeToClassMap();
 
     private static Map<String, Class<? extends Serializable>> getTypeToClassMap() {
-        Map<String, Class<? extends Serializable>> map = new HashMap<>();
-        map.put("session", SessionPayload.class);
+        Map<String, Class<? extends Serializable>> map = new LinkedHashMap<>();
+        // crucial that list is inserted first so that list responses are handled first
         map.put("list", ListPayload.class);
+        map.put("session", SessionPayload.class);
         return map;
     }
 
     private static Map<String, String> getTypeToIntentActionMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("session", SESSION_INTENT_ACTION);
         map.put("list", LIST_INTENT_ACTION);
+        map.put("session", SESSION_INTENT_ACTION);
         return map;
     }
 
     private static Map<String, String> getTypeToIntentKeyMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("session", SessionPayload.INTENT_KEY);
         map.put("list", ListPayload.INTENT_KEY);
+        map.put("session", SessionPayload.INTENT_KEY);
         return map;
     }
 
@@ -73,7 +75,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 Intent intent = new Intent(typeToIntentActionMap.get(key));
                 Class<? extends Serializable> jsonObjectClass = TYPE_TO_CLASS_MAP.get(key);
                 intent = intent.putExtra(getTypeToIntentKeyMap().get(key), getPayload(data.get(key), jsonObjectClass));
-                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcastSync(intent);
             }
         }
     }

@@ -38,7 +38,9 @@ public class SessionActivity extends AppCompatActivity {
 
     private UserAdapter adapter;
 
-    private FirebaseIntentReceiver<SessionPayload> receiver;
+    private FirebaseIntentReceiver<SessionPayload> sessionReceiver;
+
+    private FirebaseIntentReceiver<ListPayload> listReceiver;
 
     private AccessToken accessToken;
 
@@ -60,7 +62,9 @@ public class SessionActivity extends AppCompatActivity {
         startSwipingButton = findViewById(R.id.start_swiping_button);
         listEditText = findViewById(R.id.session_list_edit_text);
 
-        receiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
+        sessionReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
+        listReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.LIST_RECEIVER_TAG, ListPayload.INTENT_KEY);
+
         ViewModelProvider provider = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory());
         observeSession(provider.get(SessionViewModel.class));
         setUpListEditText(provider.get(ListViewModel.class));
@@ -82,11 +86,7 @@ public class SessionActivity extends AppCompatActivity {
                         () -> Toast.makeText(this, "Failed to get lists", Toast.LENGTH_SHORT).show(),
                         accessToken.getToken());
             }
-            ListRepository.getInstance().callGetList(RunnableUtils.DO_NOTHING,
-                    RunnableUtils.showToast(this, getString(R.string.get_list_failed)),
-                    accessToken.getToken(),
-                    newSession.getListId()
-            );
+            listEditText.setText(newSession.getListName());
             listEditText.setEnabled(isOwner);
             startSwipingButton.setEnabled(isOwner);
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
@@ -118,9 +118,6 @@ public class SessionActivity extends AppCompatActivity {
                             .show();
                 }
         );
-        listViewModel.getList().observe(this, newList ->
-                listEditText.setText(newList.getName())
-        );
     }
 
     private void setUpRecyclerView() {
@@ -140,15 +137,19 @@ public class SessionActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT_ACTION));
-        SessionRepository.getInstance().addSessionSource(receiver.getData());
+        LocalBroadcastManager.getInstance(this).registerReceiver(sessionReceiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT_ACTION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(listReceiver, new IntentFilter(MyFirebaseMessagingService.LIST_INTENT_ACTION));
+        SessionRepository.getInstance().addSessionSource(sessionReceiver.getData());
+        ListRepository.getInstance().addListSource(listReceiver.getData());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        SessionRepository.getInstance().removeSessionSource(receiver.getData());
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(sessionReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(listReceiver);
+        SessionRepository.getInstance().removeSessionSource(sessionReceiver.getData());
+        ListRepository.getInstance().removeListSource(listReceiver.getData());
     }
 
     private static class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {

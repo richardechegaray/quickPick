@@ -30,6 +30,8 @@ public class SessionPayload implements Serializable {
     @SerializedName("listID")
     private String listId;
 
+    private String listName;
+
     @Nullable
     private String creator;
 
@@ -51,6 +53,10 @@ public class SessionPayload implements Serializable {
 
     public String getListId() {
         return Optional.ofNullable(listId).orElse("");
+    }
+
+    public String getListName() {
+        return Optional.ofNullable(listName).orElse("");
     }
 
     public String getCreator() {
