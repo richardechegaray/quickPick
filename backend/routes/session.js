@@ -357,7 +357,7 @@ router.put("/:id", auth.checkFB, function (req, res) {
     res.status(400).send();
     return;
   }
-  //TODO: Assert that session is in lobby
+  /
   let listName = ""
   db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(req.body.listID) }, function (err, foundList) {
     if (err) {
@@ -386,6 +386,19 @@ router.put("/:id", auth.checkFB, function (req, res) {
         })
     });
   });
+
+  /*
+  Gets the list for a session
+  Parameters:
+  Returns:
+  */
+ router.get("/:id/list", auth.checkFB, function(req, res) {
+    //Assert user is in session
+
+    //Get list ID
+
+    //Get list
+ });
 });
 
 module.exports = router;
