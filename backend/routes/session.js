@@ -403,11 +403,6 @@ router.get("/:id/list", auth.checkFB, async function (req, res) {
     res.status(400).send({ ok: false });
     return;
   }
-  else if (!session.listID) {
-    /* There shouldn't be a session without a list ID */
-    res.status(500).send({ ok: false });
-    return;
-  }
 
   let isInSession = false;
   session.participants.forEach((participant) => {
