@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,23 +18,35 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.AccessToken;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
+import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ParticipantPayload;
-import com.quickpick.receivers.SessionReceiver;
+import com.quickpick.payloads.SessionPayload;
+import com.quickpick.receivers.FirebaseIntentReceiver;
+import com.quickpick.repositories.ListRepository;
+import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
+import com.quickpick.viewmodels.ListViewModel;
 import com.quickpick.viewmodels.SessionViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SessionActivity extends AppCompatActivity {
 
     private UserAdapter adapter;
 
-    private SessionReceiver receiver;
+    private FirebaseIntentReceiver<SessionPayload> sessionReceiver;
+
+    private FirebaseIntentReceiver<ListPayload> listReceiver;
 
     private AccessToken accessToken;
 
     private Button startSwipingButton;
+
+    private TextInputEditText listEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,27 +59,65 @@ public class SessionActivity extends AppCompatActivity {
             finish();
             return;
         }
-        TextView sessionKeyView = findViewById(R.id.session_key_text);
         startSwipingButton = findViewById(R.id.start_swiping_button);
+        listEditText = findViewById(R.id.session_list_edit_text);
 
-        receiver = new SessionReceiver();
-        SessionViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
-                .get(SessionViewModel.class);
+        sessionReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
+        listReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.LIST_RECEIVER_TAG, ListPayload.INTENT_KEY);
+
+        ViewModelProvider provider = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory());
+        observeSession(provider.get(SessionViewModel.class));
+        setUpListEditText(provider.get(ListViewModel.class));
         setOnClickListeners();
         setUpRecyclerView();
+    }
 
-        model.getSession().observe(this, newSession ->
+    private void observeSession(SessionViewModel sessionViewModel) {
+        TextView sessionKeyView = findViewById(R.id.session_key_text);
+        sessionViewModel.getSession().observe(this, newSession ->
         {
+            boolean isOwner = newSession.getCreator().equals(accessToken.getUserId());
             if ("running".equals(newSession.getStatus())) {
                 startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                 return;
             }
+            if (isOwner) {
+                ListRepository.getInstance().callGetLists(() -> {},
+                        () -> Toast.makeText(this, "Failed to get lists", Toast.LENGTH_SHORT).show(),
+                        accessToken.getToken());
+            }
+            listEditText.setText(newSession.getListName());
+            listEditText.setEnabled(isOwner);
+            startSwipingButton.setEnabled(isOwner);
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
-            startSwipingButton.setEnabled(newSession.getCreator().equals(accessToken.getUserId()));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
         });
+    }
 
+    private void setUpListEditText(ListViewModel listViewModel) {
+        listEditText.setFocusable(false);
+        listEditText.setOnClickListener(view ->
+                {
+                    List<ListPayload> lists = listViewModel.getLists().getValue().getLists();
+                    String[] listNames = lists.stream().map(ListPayload::getName).toArray(String[]::new);
+                    List<String> listIds = lists.stream().map(ListPayload::getId).collect(Collectors.toList());
+                    final int[] selectedItem = new int[1];
+                    new MaterialAlertDialogBuilder(this)
+                            .setTitle(getString(R.string.session_list_text))
+                            .setNeutralButton(getString(R.string.dialog_cancel_button_text),
+                                    (dialog, which) -> RunnableUtils.showToast(this, getString(R.string.select_list_cancelled)).run())
+                            .setPositiveButton(getString(R.string.dialog_select_button_text),
+                                    (dialog, which) -> SessionRepository.getInstance().updateList(RunnableUtils.DO_NOTHING,
+                                            RunnableUtils.showToast(this, getString(R.string.select_list_failed)),
+                                            accessToken.getToken(),
+                                            listIds.get(selectedItem[0])))
+                            .setSingleChoiceItems(listNames,
+                                    0,
+                                    (dialog, which) -> selectedItem[0] = which)
+                            .show();
+                }
+        );
     }
 
     private void setUpRecyclerView() {
@@ -79,24 +130,26 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        startSwipingButton.setOnClickListener(view ->
-                SessionRepository.getInstance().startSession(
-                        () -> {
-                        }, accessToken.getToken()));
+        startSwipingButton.setOnClickListener(view -> SessionRepository.getInstance().startSession(
+                RunnableUtils.DO_NOTHING, accessToken.getToken()));
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT));
-        SessionRepository.getInstance().addSessionSource(receiver.getSession());
+        LocalBroadcastManager.getInstance(this).registerReceiver(sessionReceiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT_ACTION));
+        LocalBroadcastManager.getInstance(this).registerReceiver(listReceiver, new IntentFilter(MyFirebaseMessagingService.LIST_INTENT_ACTION));
+        SessionRepository.getInstance().addSessionSource(sessionReceiver.getData());
+        ListRepository.getInstance().addListSource(listReceiver.getData());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-        SessionRepository.getInstance().removeSessionSource(receiver.getSession());
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(sessionReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(listReceiver);
+        SessionRepository.getInstance().removeSessionSource(sessionReceiver.getData());
+        ListRepository.getInstance().removeListSource(listReceiver.getData());
     }
 
     private static class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
