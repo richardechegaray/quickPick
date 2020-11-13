@@ -388,4 +388,39 @@ router.put("/:id", auth.checkFB, function (req, res) {
   });
 });
 
+router.get("/:id/list", auth.checkFB, async function (req, res) {
+  console.log("DEBUG: Get request to /session/list" + req.params.id);
+
+  if (req.params.id === null) {
+    res.status(400).send();
+    return;
+  }
+  
+  let session = await db.collection(process.env.SESSION_COLLECTION)
+                        .findOne({ pin: req.params.id });
+  console.log(session);
+  if (!session.participants) {
+    res.status(400).send({ ok: false });
+    return;
+  }
+
+  let isInSession = false;
+  session.participants.forEach((participant) => {
+    if (res.locals.id === participant.id) {
+      isInSession = true;
+    }
+  });
+
+  if (isInSession) {
+    let sessionList = await db.collection(process.env.LISTS_COLLECTION)
+                              .findOne({ _id: ObjectId(session.listID) });
+    res.status(200).send(sessionList);
+  }
+  else {
+    res.status(403).send({ ok: false });
+    return;
+  }
+
+});
+
 module.exports = router;
