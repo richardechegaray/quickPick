@@ -2,12 +2,14 @@ package com.quickpick.repositories;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.apis.SessionApi;
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.CreateSessionRequest;
+import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
 import com.quickpick.payloads.UpdateListRequest;
@@ -27,9 +29,12 @@ public class SessionRepository {
 
     private final MediatorLiveData<SessionPayload> session;
 
+    private final MutableLiveData<ListPayload> sessionList;
+
     private SessionRepository() {
         sessionApi = RetrofitUtils.getApi(SessionApi.class);
         session = new MediatorLiveData<>();
+        sessionList = new MutableLiveData<>();
     }
 
     public static SessionRepository getInstance() {
@@ -38,6 +43,10 @@ public class SessionRepository {
 
     public LiveData<SessionPayload> getSession() {
         return session;
+    }
+
+    public LiveData<ListPayload> getSessionList() {
+        return sessionList;
     }
 
     public void addSessionSource(LiveData<SessionPayload> source) {
@@ -80,6 +89,14 @@ public class SessionRepository {
         Call<SessionPayload> updateListCall = sessionApi.updateList(facebookToken, getCurrentSessionId(), new UpdateListRequest(newListId));
         updateListCall.enqueue(new RepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
+            successCallback.run();
+        }, failureCallback, SESSION_DEBUG));
+    }
+
+    public void callGetSessionList(Runnable successCallback, Runnable failureCallback, String facebookToken) {
+        Call<ListPayload> getSessionListCall = sessionApi.getSessionList(facebookToken, getCurrentSessionId());
+        getSessionListCall.enqueue(new RepositoryCallback<>(responsePayload -> {
+            sessionList.setValue(responsePayload);
             successCallback.run();
         }, failureCallback, SESSION_DEBUG));
     }

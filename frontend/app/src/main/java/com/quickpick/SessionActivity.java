@@ -40,8 +40,6 @@ public class SessionActivity extends AppCompatActivity {
 
     private FirebaseIntentReceiver<SessionPayload> sessionReceiver;
 
-    private FirebaseIntentReceiver<ListPayload> listReceiver;
-
     private AccessToken accessToken;
 
     private Button startSwipingButton;
@@ -63,7 +61,6 @@ public class SessionActivity extends AppCompatActivity {
         listEditText = findViewById(R.id.session_list_edit_text);
 
         sessionReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
-        listReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.LIST_RECEIVER_TAG, ListPayload.INTENT_KEY);
 
         ViewModelProvider provider = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory());
         observeSession(provider.get(SessionViewModel.class));
@@ -78,8 +75,10 @@ public class SessionActivity extends AppCompatActivity {
         {
             boolean isOwner = newSession.getCreator().equals(accessToken.getUserId());
             if ("running".equals(newSession.getStatus())) {
-                startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
-                return;
+                SessionRepository.getInstance().callGetSessionList(
+                        () -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)),
+                        RunnableUtils.showToast(this, "Failed to get list for swiping"),
+                        accessToken.getToken());
             }
             if (isOwner) {
                 ListRepository.getInstance().callGetLists(() -> {},
@@ -138,18 +137,14 @@ public class SessionActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(sessionReceiver, new IntentFilter(MyFirebaseMessagingService.SESSION_INTENT_ACTION));
-        LocalBroadcastManager.getInstance(this).registerReceiver(listReceiver, new IntentFilter(MyFirebaseMessagingService.LIST_INTENT_ACTION));
         SessionRepository.getInstance().addSessionSource(sessionReceiver.getData());
-        ListRepository.getInstance().addListSource(listReceiver.getData());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(sessionReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(listReceiver);
         SessionRepository.getInstance().removeSessionSource(sessionReceiver.getData());
-        ListRepository.getInstance().removeListSource(listReceiver.getData());
     }
 
     private static class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
