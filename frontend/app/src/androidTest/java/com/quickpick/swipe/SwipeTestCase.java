@@ -53,9 +53,15 @@ public class SwipeTestCase {
     @Test
     public void swipeTest() { //starts at main activity
 
+        startMovieSession();
+
+        testSwipes();
+    }
+
+    private void startMovieSession() {
         // create session
         ViewInteraction createSessionButton = onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.create_session_button), withText("Create Session"),
+                allOf(ViewMatchers.withId(R.id.create_session_button), withText("Create Session"),
                         isDisplayed()));
         createSessionButton.perform(click());
 
@@ -92,6 +98,9 @@ public class SwipeTestCase {
 
         sleep(1000);
 
+    }
+
+    private void testSwipes() {
         // starts swiping
         ViewInteraction startSwipingButton = onView(
                 allOf(withId(R.id.start_swiping_button), withText("Start Swiping!"),
