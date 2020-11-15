@@ -8,7 +8,7 @@ const listSchema = new Schema({
         description: String,
         picture: String, 
     }],
-    date: { type: Date, default: Date.now },
+    // date: { type: Date, default: Date.now },
     userID: String,
 });
 
