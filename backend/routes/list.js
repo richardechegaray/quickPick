@@ -3,15 +3,15 @@ const router = express.Router();
 
 const auth = require("../middleware/authentication");
 
-const listHelper = require("../helpers/listHelper");
+const listController = require("../controllers/list");
 
 /* Returns all lists where the userID field matches the user making the request */
-router.get("/", auth.checkFB, listHelper.getMyLists);
+router.get("/", auth.checkFB, listController.getMyLists);
 
 /* Takes the list from the request body and puts it into the DB */
-router.post("/", auth.checkFB, listHelper.createList);
+router.post("/", auth.checkFB, listController.createList);
 
 /* Finds a list matching the id and returns it if the the list belongs to the user */
-router.get("/:id", auth.checkFB, listHelper.getList);
+router.get("/:id", auth.checkFB, listController.getList);
 
 module.exports = router;
