@@ -9,7 +9,6 @@ module.exports = {
             const myLists = await List.find({ userID: { $in: [res.locals.id, "quickpick.admin"]} })
                             .sort({name:1}); // TODO Add sorting
             
-            console.log(myLists);
             let listResponseObj = { lists: [] };
 
             myLists.forEach((ideaList) => {
