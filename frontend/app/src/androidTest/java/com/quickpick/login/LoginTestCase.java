@@ -2,7 +2,6 @@ package com.quickpick.login;
 
 
 import androidx.test.espresso.ViewInteraction;
-import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -41,7 +40,7 @@ public class LoginTestCase {
         UiDevice device = UiDevice.getInstance(getInstrumentation());
 
         ViewInteraction facebookLoginButton = onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.login_button), withText("Continue with Facebook"),
+                Matchers.allOf(withId(R.id.login_button), withText("Continue with Facebook"),
                         withParent(withParent(withId(android.R.id.content))),
                         isDisplayed()));
         // Login button should prompt login at beginning
