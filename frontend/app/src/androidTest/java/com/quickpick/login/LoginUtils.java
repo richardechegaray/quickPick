@@ -24,9 +24,9 @@ public class LoginUtils {
         }
 
         ViewInteraction textView = onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.welcome_text), withText("Welcome!\nWhat do you want to do?"),
+                Matchers.allOf(ViewMatchers.withId(R.id.welcome_text), withText(R.string.welcome_message),
                         isDisplayed()));
-        textView.check(matches(withText("Welcome!\nWhat do you want to do?")));
+        textView.check(matches(withText(R.string.welcome_message)));
     }
 
 }

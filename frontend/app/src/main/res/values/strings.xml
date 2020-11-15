@@ -30,4 +30,5 @@
     <string name="select_list_cancelled">Did not select new list</string>
     <string name="select_list_failed">List update failed, try again</string>
     <string name="get_list_failed">Get list failed, try again</string>
+    <string name="invalid_code">Invalid code</string>
 </resources>

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
+import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
 
 public class MainActivity extends AppCompatActivity {
@@ -81,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (joinButton != null && sessionCode != null) {
             joinButton.setOnClickListener(button -> {
-                SessionRepository.getInstance().joinSession(this::navigateToSessionActivity, sessionCode.getText().toString(), facebookAccessToken);
+                SessionRepository.getInstance().joinSession(this::navigateToSessionActivity,
+                        RunnableUtils.showToast(this, getString(R.string.invalid_code)),
+                        sessionCode.getText().toString(), facebookAccessToken);
                 dialog.dismiss();
             });
         }
