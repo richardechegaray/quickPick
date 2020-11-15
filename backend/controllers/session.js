@@ -1,16 +1,12 @@
 const ObjectId = require("mongodb").ObjectID;
-const mongoUtil = require("../database/mongo");
-const db = mongoUtil.getDb();
 const firebaseUtil = require("../plugins/firebase")
+const Session = require("../models/session");
 
 module.exports = {
   getSession: async (req, res) => {
-    //TODO: Check that user is in session
     console.log("DEBUG: Get request to /session/" + req.params.pin);
     try {
-      let session = await db
-        .collection(process.env.SESSION_COLLECTION)
-        .find({ pin: req.params.pin });
+      let session = await Session.find({ pin: req.params.pin });
       res.status(200).send(session);
     } catch (error) {
       res.status(400).send(error);
@@ -24,7 +20,7 @@ module.exports = {
       let rString = randomString(5, "023456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ");
       //TODO: Iterate through sessions until we have a unique pin
 
-      let user = await db.collection(process.env.USER_COLLECTION).findOne({ id: String(res.locals.id) });
+      let user = await Session.findOne({ id: String(res.locals.id) });
 
       //Assert user has logged in and parameters are valid
       if (user === null || typeof res.locals.id !== "string" || typeof req.body.size !== "number") {
@@ -46,7 +42,7 @@ module.exports = {
       };
 
       //Add to session collection
-      await db.collection(process.env.SESSION_COLLECTION).insertOne(session);
+      await Session.insertOne(session);
       res.status(201).send(session);
 
     } catch (error) {
@@ -59,7 +55,7 @@ module.exports = {
     try {
       //Find session
       let query = { pin: req.params.id };
-      let currentSession = await db.collection(process.env.SESSION_COLLECTION).findOne(query)
+      let currentSession = await Session.findOne(query)
 
       //Assert session exists
       if (currentSession === null || typeof req.body.choices !== "object") {
@@ -117,7 +113,7 @@ module.exports = {
       currentSession.complete++;
 
       //Update database with new values
-      await db.collection(process.env.SESSION_COLLECTION).updateOne(query, newValues);
+      await Session.updateOne(query, newValues);
 
       res.status(200).send({ ok: true });
       return;
@@ -132,9 +128,7 @@ module.exports = {
 
     try {
       /* Get session matching ID */
-      let session = await db
-        .collection(process.env.SESSION_COLLECTION)
-        .findOne({ pin: req.params.id });
+      let session = await Session.findOne({ pin: req.params.id });
 
       //Assert session is found
       if (session == null) {
@@ -151,7 +145,7 @@ module.exports = {
       }
 
       /* Get user matching the token that was authenticated */
-      let user = await db.collection(process.env.USER_COLLECTION).findOne({ id: String(res.locals.id) });
+      let user = await Session.findOne({ id: String(res.locals.id) });
 
       /* Assert user isn't in session */
       session.participants.forEach(function (participantUser) {
@@ -169,7 +163,7 @@ module.exports = {
       session.participants = participants;
 
       /* Update db */
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, { $set: { participants } });
+      await Session.updateOne({ pin: req.params.id }, { $set: { participants } });
 
       /* Push firebase message to each user in the session */
       let firebaseMessage = {
@@ -188,7 +182,7 @@ module.exports = {
     console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
     try {
       //Find session
-      let session = await db.collection(process.env.SESSION_COLLECTION).findOne({ pin: req.params.id });
+      let session = await Session.findOne({ pin: req.params.id });
 
       //Assert user has rights to start
       if (session.creator !== String(res.locals.id) || session.status !== "lobby") {
@@ -205,7 +199,7 @@ module.exports = {
       }
 
       let newResults = [];
-      let foundList = await db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(session.listID) });
+      let foundList = await Session.findOne({ _id: ObjectId(session.listID) });
       console.log(foundList);
 
       //Initialize result array
@@ -218,7 +212,7 @@ module.exports = {
       var newvalues = { $set: { status: "running", results: newResults } };
       //Update session database
 
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, newvalues);
+      await Session.updateOne({ pin: req.params.id }, newvalues);
 
       //Respond to http request and send firebase notification
       res.status(200).send({ ok: true });
@@ -239,7 +233,7 @@ module.exports = {
     console.log("DEBUG: Put request to /session/" + req.params.id);
     try {
       //Find list that matches
-      let foundList = await db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(req.body.listID) });
+      let foundList = await Session.findOne({ _id: ObjectId(req.body.listID) });
 
       //Assert parameters are valid
       if (req.params.id === null || req.body.listID === null || foundList === null) {
@@ -251,10 +245,10 @@ module.exports = {
       let newvalues = {
         $set: { listID: req.body.listID, listName: foundList.name },
       };
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, newvalues);
+      await Session.updateOne({ pin: req.params.id }, newvalues);
 
       //Send firebase message
-      let updatedSession = await db.collection(process.env.SESSION_COLLECTION).findOne({ pin: req.params.id });
+      let updatedSession = await Session.findOne({ pin: req.params.id });
 
       let fbMessage = {
         session: updatedSession,
