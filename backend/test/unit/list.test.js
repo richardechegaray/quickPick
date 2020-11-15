@@ -8,7 +8,6 @@ const List = require("../../models/list");
 const User = require("../../models/user");
 
 describe("Unit tests for list functionalities", () => {
-    let connection;
     let TestUserID = "FacebookId123";
 
     const mockRequest = () => {
