@@ -42,14 +42,15 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/session_list_text_field"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/selected_list_text"
         app:layout_constraintBottom_toTopOf="@+id/start_swiping_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/user_recycler_view">
+        app:layout_constraintTop_toBottomOf="@+id/user_recycler_view"
+        app:layout_constraintWidth_percent="0.7">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/session_list_edit_text"

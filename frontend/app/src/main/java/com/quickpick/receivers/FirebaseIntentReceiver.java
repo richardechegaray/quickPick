@@ -14,8 +14,6 @@ public class FirebaseIntentReceiver<T extends Serializable> extends BroadcastRec
 
     public static final String SESSION_RECEIVER_TAG = "SESSION_RECEIVER";
 
-    public static final String LIST_RECEIVER_TAG = "LIST_RECEIVER";
-
     private final String debugTag;
     private final String intentKey;
     private final MutableLiveData<T> data = new MutableLiveData<>();

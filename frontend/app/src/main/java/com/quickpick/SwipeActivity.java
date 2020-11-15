@@ -41,7 +41,6 @@ public class SwipeActivity extends AppCompatActivity {
 
     private void setUpSwipeView() {
         SwipePlaceHolderView mSwipeView = findViewById(R.id.swipeView);
-        Context mContext = getApplicationContext();
         ArrayList<IdeaCard> ideaList = new ArrayList<>();
 
         mSwipeView.getBuilder()
@@ -54,12 +53,7 @@ public class SwipeActivity extends AppCompatActivity {
 
         ListViewModel model = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory())
                 .get(ListViewModel.class);
-
-        for (IdeaPayload idea : model.getList().getValue().getIdeas()) {
-            IdeaCard ideaCard = new IdeaCard(idea, mContext);
-            ideaList.add(ideaCard);
-            mSwipeView.addView(ideaCard);
-        }
+        addCardsToView(model.getSessionList().getValue().getIdeas(), ideaList, mSwipeView);
 
         findViewById(R.id.dislikeButton).setOnClickListener(view -> mSwipeView.doSwipe(false));
         findViewById(R.id.likeButton).setOnClickListener(view -> mSwipeView.doSwipe(true));
@@ -73,5 +67,14 @@ public class SwipeActivity extends AppCompatActivity {
                         .addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             }
         });
+    }
+
+    private void addCardsToView(List<IdeaPayload> ideas, ArrayList<IdeaCard> ideaList, SwipePlaceHolderView mSwipeView) {
+        Context mContext = getApplicationContext();
+        for (IdeaPayload idea : ideas) {
+            IdeaCard ideaCard = new IdeaCard(idea, mContext);
+            ideaList.add(ideaCard);
+            mSwipeView.addView(ideaCard);
+        }
     }
 }

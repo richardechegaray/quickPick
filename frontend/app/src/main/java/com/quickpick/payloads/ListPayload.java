@@ -12,8 +12,6 @@ import java.util.Optional;
 
 public class ListPayload implements Serializable {
 
-    public static final String INTENT_KEY = "ListPayload";
-
     @Nullable
     private String name;
 
