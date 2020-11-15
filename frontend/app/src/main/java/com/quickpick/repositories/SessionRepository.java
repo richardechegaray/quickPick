@@ -66,12 +66,12 @@ public class SessionRepository {
         }, SESSION_DEBUG));
     }
 
-    public void joinSession(Runnable callback, String sessionId, String facebookToken) {
+    public void joinSession(Runnable successCallback, Runnable failureCallback, String sessionId, String facebookToken) {
         Call<SessionPayload> joinSessionCall = sessionApi.joinSession(facebookToken, sessionId);
         joinSessionCall.enqueue(new RepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
-            callback.run();
-        }, SESSION_DEBUG));
+            successCallback.run();
+        }, failureCallback, SESSION_DEBUG));
     }
 
     public void startSession(Runnable callback, String facebookToken) {

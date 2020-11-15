@@ -3,31 +3,21 @@ const axios = require("axios");
 const User = require("../models/user");
 
 function findUser(userID) {
-  // return db
-  //   .collection(process.env.USER_COLLECTION)
-  //   .findOne({ id: String(userID) });
   return User.findOne({ id: String(userID) });
 }
 
 function updateFirebaseToken(userID, firebaseToken) {
-  const filter = { id: String(userID) };
-  const update = { firebaseToken: String(firebaseToken) };
 
-  User.findOneAndUpdate(filter, update);
-  
-  // db.collection(process.env.USER_COLLECTION).updateOne(
-  //   { id: String(userID) },
-  //   { $set: { firebaseToken: String(firebaseToken) } }
-  // );
-  console.log("Verified user, Firebase token was updated");
+  const filter = { "id": String(userID) };
+  const update = { $set: { "firebaseToken": String(firebaseToken) }};
+  User.findOneAndUpdate(filter, update)
+  .catch((err) => {
+    console.log(err);
+  });
+  console.log(`Verified user, FB token updated for ${userID}`);
 }
 
 function createNewUser(userID, name, firebaseToken) {
-  // db.collection("users").insertOne({
-  //   id: String(userID),
-  //   name: String(name),
-  //   firebaseToken: String(firebaseToken),
-  // });
   console.log(`FirebaseToken: ${firebaseToken}`);
   User.create({
     id: String(userID),

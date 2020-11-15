@@ -30,6 +30,7 @@ module.exports = {
                 msg.data.list = JSON.stringify(body.list);
             };
 
+
             let response = await admin.messaging().sendMulticast(msg);
             console.log(response.successCount + " messages were sent successfully");
 
