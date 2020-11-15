@@ -28,6 +28,7 @@ function createNewUser(userID, name, firebaseToken) {
   //   name: String(name),
   //   firebaseToken: String(firebaseToken),
   // });
+  console.log(`FirebaseToken: ${firebaseToken}`);
   User.create({
     id: String(userID),
     name: String(name),

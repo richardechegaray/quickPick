@@ -224,8 +224,7 @@ module.exports = {
       //Respond to http request and send firebase notification
       res.status(200).send({ ok: true });
       var firebaseMessage = {
-        session,
-        list: foundList,
+        session
       };
       firebaseUtil.sendFirebase(firebaseMessage);
       return;
