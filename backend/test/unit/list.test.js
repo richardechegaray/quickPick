@@ -13,7 +13,8 @@ describe("Unit tests for list functionalities", () => {
 
     const mockRequest = () => {
         const req = {};
-        req.params = {}
+        req.params = {};
+        req.body = {};
         return req;
     };
     
@@ -45,6 +46,18 @@ describe("Unit tests for list functionalities", () => {
     const testList2 = {
         userID: "quickpick.admin",
         name: "TestList-Default",
+        ideas: [
+            {
+                name: "Idea1",
+                description: "This is an idea",
+                picture: "https://fakeimage.com",
+            },
+        ],
+    };
+    
+    const testList3 = {
+        userID: TestUserID,
+        name: "TestList-NewList",
         ideas: [
             {
                 name: "Idea1",
@@ -131,5 +144,19 @@ describe("Unit tests for list functionalities", () => {
         await listHelper.getList(req, res);
         
         expect(res.status).toHaveBeenCalledWith(404);
+    });
+    
+    it("Create List - Basic", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+        
+        req.body.list = testList3;
+        res.locals.id = TestUserID;
+
+        await listHelper.createList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.body.name).toEqual(testList3.name);
     });
 });

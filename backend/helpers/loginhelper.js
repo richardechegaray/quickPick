@@ -19,7 +19,7 @@ function updateFirebaseToken(userID, firebaseToken) {
   //   { id: String(userID) },
   //   { $set: { firebaseToken: String(firebaseToken) } }
   // );
-  console.log("Verified user, FB token didn't need to be updated");
+  console.log("Verified user, Firebase token was updated");
 }
 
 function createNewUser(userID, name, firebaseToken) {
@@ -46,12 +46,12 @@ function loginHelper(userID, firebaseToken, res, callback) {
         if (firebaseToken !== foundUser.firebaseToken) {
           updateFirebaseToken(userID, firebaseToken);
           callback(res, 200, {
-            message: "Logged in user, updated firebase token",
+            message: "Logged in user, updated Firebase token",
             ok: true,
           });
         } else {
           callback(res, 200, {
-            message: "Logged in user, did not change firebase token",
+            message: "Logged in user, did not change Firebase token",
             ok: true,
           });
         }
