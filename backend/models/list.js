@@ -12,5 +12,5 @@ const listSchema = new Schema({
     userID: String,
 });
 
-const List = mongoose.model('List', listSchema);
+const List = mongoose.model('lists', listSchema);
 module.exports = List;
