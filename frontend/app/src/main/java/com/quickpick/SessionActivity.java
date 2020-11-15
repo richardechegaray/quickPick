@@ -71,6 +71,7 @@ public class SessionActivity extends AppCompatActivity {
 
     private void observeSession(SessionViewModel sessionViewModel) {
         TextView sessionKeyView = findViewById(R.id.session_key_text);
+        TextView sessionUserCount = findViewById(R.id.session_user_count);
         sessionViewModel.getSession().observe(this, newSession ->
         {
             boolean isOwner = newSession.getCreator().equals(accessToken.getUserId());
@@ -85,6 +86,7 @@ public class SessionActivity extends AppCompatActivity {
                         () -> Toast.makeText(this, "Failed to get lists", Toast.LENGTH_SHORT).show(),
                         accessToken.getToken());
             }
+            sessionUserCount.setText(String.format(getString(R.string.session_user_count_format), newSession.getParticipants().size()));
             listEditText.setText(newSession.getListName());
             listEditText.setEnabled(isOwner);
             startSwipingButton.setEnabled(isOwner);
