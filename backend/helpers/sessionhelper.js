@@ -1,6 +1,7 @@
 const ObjectId = require("mongodb").ObjectID;
 const mongoUtil = require("../database/mongo");
 const db = mongoUtil.getDb();
+const firebaseUtil = require("../plugins/firebase")
 
 module.exports = {
   getSession: async (req, res) => {
@@ -125,7 +126,7 @@ module.exports = {
 
   },
 
-  addUser: async (res, res) => {
+  addUser: async (req, res) => {
     console.log("DEBUG: Post request to /session/" + req.params.id);
 
     try {
@@ -159,6 +160,7 @@ module.exports = {
         }
       });
 
+      //TODO: Check if size is exceeded
       /* Create new person and insert */
       let newPerson = { name: user.name, id: String(res.locals.id) };
       let participants = session.participants;
@@ -202,7 +204,8 @@ module.exports = {
       }
 
       let newResults = [];
-      let foundList = db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(session.listID) });
+      let foundList = await db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(session.listID) });
+      console.log(foundList);
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
@@ -225,7 +228,9 @@ module.exports = {
       firebaseUtil.sendFirebase(firebaseMessage);
       return;
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
+      return;
     }
   },
 
@@ -250,13 +255,15 @@ module.exports = {
       //Send firebase message
       let updatedSession = await db.collection(process.env.SESSION_COLLECTION).findOne({ pin: req.params.id });
 
-      res.status(200).send(updatedSession);
       let fbMessage = {
         session: updatedSession,
       };
       firebaseUtil.sendFirebase(fbMessage);
+      res.status(200).send(updatedSession);
     } catch (error) {
-      res.status(400).send(error);
+      console.log(error);
+      res.status(400).send({message: error});
+      return;
     }
   },
 
