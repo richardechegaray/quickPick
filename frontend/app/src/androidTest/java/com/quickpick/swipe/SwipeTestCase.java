@@ -61,7 +61,7 @@ public class SwipeTestCase {
     private void startMovieSession() {
         // create session
         ViewInteraction createSessionButton = onView(
-                allOf(ViewMatchers.withId(R.id.create_session_button), withText("Create Session"),
+                allOf(withId(R.id.create_session_button), withText("Create Session"),
                         isDisplayed()));
         createSessionButton.perform(click());
 
