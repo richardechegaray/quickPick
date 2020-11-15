@@ -1,15 +1,44 @@
 const ObjectId = require("mongodb").ObjectID;
-const mongoUtil = require("../database/mongo");
-const db = mongoUtil.getDb();
-const firebaseUtil = require("../plugins/firebase")
+const firebaseUtil = require("../plugins/firebase");
+const Session = require("../models/session");
+const User = require("../models/user");
+const List = require("../models/list");
+
+/*
+----------Helper functions
+*/
+/*
+Random string helper
+Params: length, chars: string of valid characters to be selected
+Returns: string
+*/
+function randomString(length, chars) {
+  var result = "";
+  for (var i = length; i > 0; --i) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+/*
+Helper function for sorting a sessions results
+Parameters:
+Returns:
+*/
+function sortSession(session) {
+  var results = session.results;
+  results.sort(function (a, b) {
+    return b.score - a.score;
+  });
+  session.results = results;
+  return session;
+}
 
 module.exports = {
   getSession: async (req, res) => {
     console.log("DEBUG: Get request to /session/" + req.params.pin);
     try {
-      let session = await db
-        .collection(process.env.SESSION_COLLECTION)
-        .find({ pin: req.params.pin });
+      let session = await Session.find({ pin: req.params.pin });
       res.status(200).send(session);
     } catch (error) {
       res.status(400).send(error);
@@ -23,7 +52,7 @@ module.exports = {
       let rString = randomString(5, "023456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ");
       //TODO: Iterate through sessions until we have a unique pin
 
-      let user = await db.collection(process.env.USER_COLLECTION).findOne({ id: String(res.locals.id) });
+      let user = await User.findOne({ id: String(res.locals.id) });
 
       //Assert user has logged in and parameters are valid
       if (user === null || typeof res.locals.id !== "string" || typeof req.body.size !== "number") {
@@ -45,10 +74,11 @@ module.exports = {
       };
 
       //Add to session collection
-      await db.collection(process.env.SESSION_COLLECTION).insertOne(session);
+      await Session.create(session);
       res.status(201).send(session);
 
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
   },
@@ -58,7 +88,7 @@ module.exports = {
     try {
       //Find session
       let query = { pin: req.params.id };
-      let currentSession = await db.collection(process.env.SESSION_COLLECTION).findOne(query)
+      let currentSession = await Session.findOne(query);
 
       //Assert session exists
       if (currentSession === null || typeof req.body.choices !== "object") {
@@ -116,11 +146,12 @@ module.exports = {
       currentSession.complete++;
 
       //Update database with new values
-      await db.collection(process.env.SESSION_COLLECTION).updateOne(query, newValues);
+      await Session.updateOne(query, newValues);
 
       res.status(200).send({ ok: true });
       return;
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
 
@@ -131,9 +162,7 @@ module.exports = {
 
     try {
       /* Get session matching ID */
-      let session = await db
-        .collection(process.env.SESSION_COLLECTION)
-        .findOne({ pin: req.params.id });
+      let session = await Session.findOne({ pin: req.params.id });
 
       //Assert session is found
       if (session == null) {
@@ -144,21 +173,22 @@ module.exports = {
 
       //Assert session has not started
       if (session.status !== "lobby") {
-        console.log("Session " + req.params.id +" is no longer accepting new participants");
+        console.log("Session " + req.params.id + " is no longer accepting new participants");
         res.status(400).send({ ok: false });
         return;
       }
 
       /* Get user matching the token that was authenticated */
-      let user = await db.collection(process.env.USER_COLLECTION).findOne({ id: String(res.locals.id) });
+      let user = await User.findOne({ id: String(res.locals.id) });
 
       /* Assert user isn't in session */
-      session.participants.forEach(function (participantUser) {
-        if (user.id === participantUser.id || user === undefined) {
-          res.status(400).send({ ok: false });
+      for (const index in session.participants) {
+        if (user.id === session.participants[index].id || typeof(user) === "undefined") {
+          await res.status(400).send({ ok: false, message: "User is already in session" });
           return;
         }
-      });
+      }
+
 
       //TODO: Check if size is exceeded
       /* Create new person and insert */
@@ -168,7 +198,7 @@ module.exports = {
       session.participants = participants;
 
       /* Update db */
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, { $set: { participants } });
+      await Session.updateOne({ pin: req.params.id }, { $set: { participants } });
 
       /* Push firebase message to each user in the session */
       let firebaseMessage = {
@@ -178,6 +208,7 @@ module.exports = {
       res.status(201).send({ ok: true });
       return;
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
       return;
     }
@@ -187,11 +218,11 @@ module.exports = {
     console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
     try {
       //Find session
-      let session = await db.collection(process.env.SESSION_COLLECTION).findOne({ pin: req.params.id });
+      let session = await Session.findOne({ pin: req.params.id });
 
       //Assert user has rights to start
       if (session.creator !== String(res.locals.id) || session.status !== "lobby") {
-        res.status(400).send({ok: false, message: "User is not the creator or session has started"});
+        res.status(400).send({ ok: false, message: "User is not the creator or session has started" });
         return;
       }
 
@@ -204,11 +235,12 @@ module.exports = {
       }
 
       let newResults = [];
-      let foundList = await db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(session.listID) });
+      let foundList = await List.findOne({ _id: ObjectId(session.listID) });
       console.log(foundList);
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
+        console.log(foundIdea);
         newResults.push({ idea: foundIdea, score: 0 });
       });
 
@@ -217,13 +249,12 @@ module.exports = {
       var newvalues = { $set: { status: "running", results: newResults } };
       //Update session database
 
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, newvalues);
+      await session.save();//Session.updateOne({ pin: req.params.id }, newvalues);
 
       //Respond to http request and send firebase notification
       res.status(200).send({ ok: true });
       var firebaseMessage = {
-        session,
-        list: foundList,
+        session
       };
       firebaseUtil.sendFirebase(firebaseMessage);
       return;
@@ -238,7 +269,7 @@ module.exports = {
     console.log("DEBUG: Put request to /session/" + req.params.id);
     try {
       //Find list that matches
-      let foundList = await db.collection(process.env.LISTS_COLLECTION).findOne({ _id: ObjectId(req.body.listID) });
+      let foundList = await List.findOne({ _id: ObjectId(req.body.listID) });
 
       //Assert parameters are valid
       if (req.params.id === null || req.body.listID === null || foundList === null) {
@@ -250,10 +281,10 @@ module.exports = {
       let newvalues = {
         $set: { listID: req.body.listID, listName: foundList.name },
       };
-      await db.collection(process.env.SESSION_COLLECTION).updateOne({ pin: req.params.id }, newvalues);
+      await Session.updateOne({ pin: req.params.id }, newvalues);
 
       //Send firebase message
-      let updatedSession = await db.collection(process.env.SESSION_COLLECTION).findOne({ pin: req.params.id });
+      let updatedSession = await Session.findOne({ pin: req.params.id });
 
       let fbMessage = {
         session: updatedSession,
@@ -262,42 +293,33 @@ module.exports = {
       res.status(200).send(updatedSession);
     } catch (error) {
       console.log(error);
-      res.status(400).send({message: error});
+      res.status(400).send({ message: error });
       return;
     }
   },
 
-  getList: async (req, res) => { 
+  getList: async (req, res) => {
+    console.log("DEBUG: Get request to session/" + req.params.id + "/list");
+    try {
+      //Assert session id is valid
+      if (typeof(req.params.id) !== "string") {
+        res.status(400).send({ok: false, message: "Invalid session ID"});
+        return;
+      }
 
+      let session = await Session.findOne({ pin: req.params.id });
+      console.log(session);
+      //Assert session exists
+      if (session === null) {
+        res.status(400).send({ok: false, message: "Session could not be found"});
+        return;
+      }
+      let foundList = await List.findById(session.listID);
+      console.log(foundList);
+      res.status(200).send(foundList);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
   },
 };
-
-/*
-----------Helper functions
-*/
-/*
-Random string helper
-Params: length, chars: string of valid characters to be selected
-Returns: string
-*/
-function randomString(length, chars) {
-  var result = "";
-  for (var i = length; i > 0; --i) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
-
-/*
-Helper function for sorting a sessions results
-Parameters:
-Returns:
-*/
-function sortSession(session) {
-  var results = session.results;
-  results.sort(function (a, b) {
-    return b.score - a.score;
-  });
-  session.results = results;
-  return session;
-}
