@@ -25,12 +25,14 @@ module.exports = {
                     "priority": "normal"
                 },
             };
+            console.log(msg);
 
             if (body.list !== undefined) {
                 msg.data.list = JSON.stringify(body.list);
             };
 
             let response = await admin.messaging().sendMulticast(msg)
+            console.log(response.responses[0].error);
             console.log(response.successCount + " messages were sent successfully");
 
         } catch (error) {
