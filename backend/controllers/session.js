@@ -244,11 +244,11 @@ module.exports = {
 
       let newResults = [];
       let foundList = await List.findOne({ _id: ObjectId(session.listID) });
-      console.log(foundList);
+      // console.log(foundList);
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
-        console.log(foundIdea);
+        // console.log(foundIdea);
         newResults.push({ idea: foundIdea, score: 0 });
       });
 
@@ -316,14 +316,14 @@ module.exports = {
       }
 
       let session = await Session.findOne({ pin: req.params.id });
-      console.log(session);
+      // console.log(session);
       //Assert session exists
       if (session === null) {
         res.status(400).send({ ok: false, message: "Session could not be found" });
         return;
       }
       let foundList = await List.findById(session.listID);
-      console.log(foundList);
+      // console.log(foundList);
       res.status(200).send(foundList);
     } catch (error) {
       console.log(error);
