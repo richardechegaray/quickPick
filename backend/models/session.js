@@ -13,9 +13,12 @@ const sessionSchema = new Schema({
     complete: Number,
     size: Number,
     results: [{
-        name: String, 
-        description: String,
-        picture: String, 
+        idea: {
+            name: String,
+            description: String,
+            picture: String,
+        },
+        score: Number
     }],
     participants: [{
         name: String,

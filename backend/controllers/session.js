@@ -121,6 +121,7 @@ module.exports = {
       res.status(200).send({ ok: true });
       return;
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
 
@@ -151,12 +152,13 @@ module.exports = {
       let user = await User.findOne({ id: String(res.locals.id) });
 
       /* Assert user isn't in session */
-      session.participants.forEach(function (participantUser) {
-        if (user.id === participantUser.id || user === undefined) {
-          res.status(400).send({ ok: false });
+      for(const index in session.participants) {
+        if (user.id === session.participants[index].id || user === undefined) {
+          await res.status(400).send({ ok: false, message: "User is already in session"});
           return;
         }
-      });
+      }
+
 
       //TODO: Check if size is exceeded
       /* Create new person and insert */
@@ -176,6 +178,7 @@ module.exports = {
       res.status(201).send({ ok: true });
       return;
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
       return;
     }
@@ -203,9 +206,11 @@ module.exports = {
 
       let newResults = [];
       let foundList = await List.findOne({ _id: ObjectId(session.listID) });
+      console.log(foundList);
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
+        console.log(foundIdea);
         newResults.push({ idea: foundIdea, score: 0 });
       });
 
@@ -214,7 +219,7 @@ module.exports = {
       var newvalues = { $set: { status: "running", results: newResults } };
       //Update session database
 
-      await Session.updateOne({ pin: req.params.id }, newvalues);
+      await session.save();//Session.updateOne({ pin: req.params.id }, newvalues);
 
       //Respond to http request and send firebase notification
       res.status(200).send({ ok: true });

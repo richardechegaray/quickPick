@@ -15,7 +15,7 @@ router.post("/", auth.checkFB, sessionController.createSession);
 router.post("/:id/choices", auth.checkFB, sessionController.receiveChoices);
 
 /* Adds a user to a session */
-router.post("/id", auth.checkFB, sessionController.addUser);
+router.post("/:id", auth.checkFB, sessionController.addUser);
 
 /* Starts a session */
 router.post("/:id/run", auth.checkFB, sessionController.startSession);
