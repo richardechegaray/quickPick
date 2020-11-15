@@ -62,7 +62,8 @@ public class SwipeTest {
 
         sleep(1000);
 
-       // selects option button
+        onView(withText("Start Swiping")).check(matches());
+        // selects option button
         ViewInteraction selectListButton = onView(
                 allOf(withId(R.id.session_list_edit_text),
                         isDisplayed()));
