@@ -29,14 +29,6 @@ public class ListRepository {
         lists = new MutableLiveData<>();
     }
 
-    public void addListSource(LiveData<ListPayload> source) {
-        list.addSource(source, list::setValue);
-    }
-
-    public void removeListSource(LiveData<ListPayload> source) {
-        list.removeSource(source);
-    }
-
     public static ListRepository getInstance() {
         return LIST_REPOSITORY;
     }

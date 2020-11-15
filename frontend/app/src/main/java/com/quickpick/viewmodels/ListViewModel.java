@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ListsPayload;
 import com.quickpick.repositories.ListRepository;
+import com.quickpick.repositories.SessionRepository;
 
 public class ListViewModel extends ViewModel {
     private LiveData<ListsPayload> lists;
 
     private LiveData<ListPayload> list;
+    private LiveData<ListPayload> sessionList;
 
     public LiveData<ListsPayload> getLists() {
         if (lists == null) {
@@ -24,5 +26,12 @@ public class ListViewModel extends ViewModel {
             list = ListRepository.getInstance().getList();
         }
         return list;
+    }
+
+    public LiveData<ListPayload> getSessionList() {
+        if (sessionList == null) {
+            sessionList = SessionRepository.getInstance().getSessionList();
+        }
+        return sessionList;
     }
 }

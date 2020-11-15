@@ -2,6 +2,7 @@ package com.quickpick.apis;
 
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.CreateSessionRequest;
+import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
 import com.quickpick.payloads.UpdateListRequest;
@@ -35,5 +36,8 @@ public interface SessionApi {
     @PUT("session/{sessionId}")
     Call<SessionPayload> updateList(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
                                     @Body UpdateListRequest request);
+
+    @GET("session/{sessionId}/list")
+    Call<ListPayload> getSessionList(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
 
 }
