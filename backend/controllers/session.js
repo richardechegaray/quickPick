@@ -36,11 +36,17 @@ function sortSession(session) {
 
 module.exports = {
   getSession: async (req, res) => {
+    //TODO: Assert user is in session
     console.log("DEBUG: Get request to /session/" + req.params.pin);
     try {
-      let session = await Session.find({ pin: req.params.pin });
+      let session = await Session.findOne({ pin: req.params.pin });
+      if(typeof(session) === "undefined" || session === null){
+        res.status(400).send({ok: false, message: "Invalid session"});
+        return;
+      }
       res.status(200).send(session);
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
   },
@@ -55,11 +61,13 @@ module.exports = {
       let user = await User.findOne({ id: String(res.locals.id) });
 
       //Assert user has logged in and parameters are valid
+      console.log(typeof(req.body.size));
       if (user === null || typeof res.locals.id !== "string" || typeof req.body.size !== "number") {
         res.status(400).send({ ok: false, message: "Invalid parameters" });
         return;
       }
 
+      //TODO: Assert size is valid 0-100?
       //Create session object
       let session = {
         pin: rString,
@@ -236,11 +244,9 @@ module.exports = {
 
       let newResults = [];
       let foundList = await List.findOne({ _id: ObjectId(session.listID) });
-      console.log(foundList);
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
-        console.log(foundIdea);
         newResults.push({ idea: foundIdea, score: 0 });
       });
 
@@ -299,6 +305,7 @@ module.exports = {
   },
 
   getList: async (req, res) => {
+    //TODO: Assert user is in session
     console.log("DEBUG: Get request to session/" + req.params.id + "/list");
     try {
       //Assert session id is valid
@@ -308,14 +315,12 @@ module.exports = {
       }
 
       let session = await Session.findOne({ pin: req.params.id });
-      console.log(session);
       //Assert session exists
       if (session === null) {
         res.status(400).send({ok: false, message: "Session could not be found"});
         return;
       }
       let foundList = await List.findById(session.listID);
-      console.log(foundList);
       res.status(200).send(foundList);
     } catch (error) {
       console.log(error);
