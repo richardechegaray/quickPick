@@ -151,24 +151,32 @@ module.exports = {
       /* Get user matching the token that was authenticated */
       let user = await User.findOne({ id: String(res.locals.id) });
 
+      if (user === undefined) {
+        await res.status(400).send({ ok: false, message: "User is already in session" });
+        return;
+      }
+
+      let isInSession = false;
       /* Assert user isn't in session */
       for (const index in session.participants) {
-        if (user.id === session.participants[index].id || user === undefined) {
-          await res.status(400).send({ ok: false, message: "User is already in session" });
-          return;
+        if (user.id === session.participants[index].id) {
+          isInSession = true;
+          break;
         }
       }
 
+      if (!isInSession) {
 
-      //TODO: Check if size is exceeded
-      /* Create new person and insert */
-      let newPerson = { name: user.name, id: String(res.locals.id) };
-      let participants = session.participants;
-      participants.push(newPerson);
-      session.participants = participants;
+        //TODO: Check if size is exceeded
+        /* Create new person and insert */
+        let newPerson = { name: user.name, id: String(res.locals.id) };
+        let participants = session.participants;
+        participants.push(newPerson);
+        session.participants = participants;
 
-      /* Update db */
-      await Session.updateOne({ pin: req.params.id }, { $set: { participants } });
+        /* Update db */
+        await Session.updateOne({ pin: req.params.id }, { $set: { participants } });
+      }
 
       /* Push firebase message to each user in the session */
       let firebaseMessage = {
@@ -272,8 +280,8 @@ module.exports = {
     console.log("DEBUG: Get request to session/" + req.params.id + "/list");
     try {
       //Assert session id is valid
-      if (typeof(req.params.id) !== "string") {
-        res.status(400).send({ok: false, message: "Invalid session ID"});
+      if (typeof (req.params.id) !== "string") {
+        res.status(400).send({ ok: false, message: "Invalid session ID" });
         return;
       }
 
@@ -281,7 +289,7 @@ module.exports = {
       console.log(session);
       //Assert session exists
       if (session === null) {
-        res.status(400).send({ok: false, message: "Session could not be found"});
+        res.status(400).send({ ok: false, message: "Session could not be found" });
         return;
       }
       let foundList = await List.findById(session.listID);

@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const sessionSchema = new Schema({
     pin: String, 
     listID: String,
+    listName: String,
     status: {
         type: String,
         enum: ["lobby", "running", "complete"],
