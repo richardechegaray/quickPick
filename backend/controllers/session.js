@@ -1,6 +1,8 @@
 const ObjectId = require("mongodb").ObjectID;
 const firebaseUtil = require("../plugins/firebase")
 const Session = require("../models/session");
+const User = require("../models/user");
+const List = require("../models/list");
 
 module.exports = {
   getSession: async (req, res) => {
@@ -20,7 +22,7 @@ module.exports = {
       let rString = randomString(5, "023456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ");
       //TODO: Iterate through sessions until we have a unique pin
 
-      let user = await Session.findOne({ id: String(res.locals.id) });
+      let user = await User.findOne({ id: String(res.locals.id) });
 
       //Assert user has logged in and parameters are valid
       if (user === null || typeof res.locals.id !== "string" || typeof req.body.size !== "number") {
@@ -42,10 +44,11 @@ module.exports = {
       };
 
       //Add to session collection
-      await Session.insertOne(session);
+      await Session.create(session);
       res.status(201).send(session);
 
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
   },
@@ -145,7 +148,7 @@ module.exports = {
       }
 
       /* Get user matching the token that was authenticated */
-      let user = await Session.findOne({ id: String(res.locals.id) });
+      let user = await User.findOne({ id: String(res.locals.id) });
 
       /* Assert user isn't in session */
       session.participants.forEach(function (participantUser) {
@@ -199,8 +202,7 @@ module.exports = {
       }
 
       let newResults = [];
-      let foundList = await Session.findOne({ _id: ObjectId(session.listID) });
-      console.log(foundList);
+      let foundList = await List.findOne({ _id: ObjectId(session.listID) });
 
       //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
@@ -233,7 +235,7 @@ module.exports = {
     console.log("DEBUG: Put request to /session/" + req.params.id);
     try {
       //Find list that matches
-      let foundList = await Session.findOne({ _id: ObjectId(req.body.listID) });
+      let foundList = await List.findOne({ _id: ObjectId(req.body.listID) });
 
       //Assert parameters are valid
       if (req.params.id === null || req.body.listID === null || foundList === null) {

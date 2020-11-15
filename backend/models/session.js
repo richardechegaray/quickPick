@@ -23,5 +23,5 @@ const sessionSchema = new Schema({
     }]
 });
 
-const Session = mongoose.model('Session', sessionSchema);
+const Session = mongoose.model('sessions', sessionSchema);
 module.exports = Session;
