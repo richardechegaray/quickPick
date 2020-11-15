@@ -143,7 +143,7 @@ module.exports = {
 
       //Assert session has not started
       if (session.status !== "lobby") {
-        console.log("Session " + req.params.id +" is no longer accepting new participants");
+        console.log("Session " + req.params.id + " is no longer accepting new participants");
         res.status(400).send({ ok: false });
         return;
       }
@@ -152,9 +152,9 @@ module.exports = {
       let user = await User.findOne({ id: String(res.locals.id) });
 
       /* Assert user isn't in session */
-      for(const index in session.participants) {
+      for (const index in session.participants) {
         if (user.id === session.participants[index].id || user === undefined) {
-          await res.status(400).send({ ok: false, message: "User is already in session"});
+          await res.status(400).send({ ok: false, message: "User is already in session" });
           return;
         }
       }
@@ -192,7 +192,7 @@ module.exports = {
 
       //Assert user has rights to start
       if (session.creator !== String(res.locals.id) || session.status !== "lobby") {
-        res.status(400).send({ok: false, message: "User is not the creator or session has started"});
+        res.status(400).send({ ok: false, message: "User is not the creator or session has started" });
         return;
       }
 
@@ -264,15 +264,36 @@ module.exports = {
       res.status(200).send(updatedSession);
     } catch (error) {
       console.log(error);
-      res.status(400).send({message: error});
+      res.status(400).send({ message: error });
       return;
     }
   },
 
-  getList: async (req, res) => { 
+  getList: async (req, res) => {
+    console.log("DEBUG: Get request to session/" + req.params.id + "/list");
+    try {
+      //Assert session id is valid
+      if (typeof(req.params.id) !== "string") {
+        res.status(400).send({ok: false, message: "Invalid session ID"});
+        return;
+      }
 
+      let session = await Session.findOne({ pin: req.params.id });
+      console.log(session);
+      //Assert session exists
+      if (session === null) {
+        res.status(400).send({ok: false, message: "Session could not be found"});
+        return;
+      }
+      let foundList = await List.findById(session.listID);
+      console.log(foundList);
+      res.status(200).send(foundList);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
   },
-};
+}
 
 /*
 ----------Helper functions

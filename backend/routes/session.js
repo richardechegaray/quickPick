@@ -23,7 +23,7 @@ router.post("/:id/run", auth.checkFB, sessionController.startSession);
 /* Updates the chosen list for a session */
 router.put("/:id", auth.checkFB, sessionController.updateList);
 
-/*TODO: Returns the list for a session */
+/* Returns the list for a session */
 router.get("/:id/list", auth.checkFB, sessionController.getList);
 
 
