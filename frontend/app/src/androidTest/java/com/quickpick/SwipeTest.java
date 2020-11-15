@@ -47,41 +47,6 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class SwipeTest {
 
-    private static ViewAction swipeRight() {
-        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_LEFT,
-                GeneralLocation.CENTER_RIGHT, Press.FINGER);
-    }
-    private static ViewAction swipeLeft() {
-        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT,
-                GeneralLocation.CENTER_LEFT, Press.FINGER);
-    }
-
-    private static void sleep(int time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
-        return new TypeSafeMatcher<View>() {
-            int currentIndex = 0;
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("with index: ");
-                description.appendValue(index);
-                matcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view) {
-                return matcher.matches(view) && currentIndex++ == index;
-            }
-        };
-    }
-
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityTestRule = new ActivityScenarioRule<>(MainActivity.class);
 
@@ -167,8 +132,8 @@ public class SwipeTest {
 
         sleep(1000);
 
-        // write swipe tests x7
-        onView(withIndex(withId(R.id.card_view), 0)).perform(swipeRight());
+        // swiping tests, left and right
+        onView(withIndex(withId(R.id.card_view), 0)).perform(swipeLeft());
         for (int i = 0 ; i < 3 ; i++) {
             sleep(1000);
             onView(withIndex(withId(R.id.card_view), 0)).perform(swipeLeft());
@@ -178,7 +143,11 @@ public class SwipeTest {
 
         sleep(1000);
 
-        onView(withId(R.id.first_place_idea_text)).check(matches(withText("Horror")));
+        // expect to see top three choices and return to main menu button
+        onView(withText("Horror")).check(matches(isDisplayed()));
+        onView(withText("Sci-Fi")).check(matches(isDisplayed()));
+        onView(withText("Musical")).check(matches(isDisplayed()));
+        onView(withText("Return to Main Menu")).check(matches(isDisplayed()));
 
         ViewInteraction materialButton4 = onView(
                 allOf(withId(R.id.return_to_main_activity_button), withText("Return to Main Menu"),
@@ -190,6 +159,42 @@ public class SwipeTest {
                         isDisplayed()));
         materialButton4.perform(click());
 
+    }
+
+
+    private static ViewAction swipeRight() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_LEFT,
+                GeneralLocation.CENTER_RIGHT, Press.FINGER);
+    }
+    private static ViewAction swipeLeft() {
+        return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT,
+                GeneralLocation.CENTER_LEFT, Press.FINGER);
+    }
+
+    private static void sleep(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static Matcher<View> withIndex(final Matcher<View> matcher, final int index) {
+        return new TypeSafeMatcher<View>() {
+            int currentIndex = 0;
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with index: ");
+                description.appendValue(index);
+                matcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                return matcher.matches(view) && currentIndex++ == index;
+            }
+        };
     }
 
     private static Matcher<View> childAtPosition(
