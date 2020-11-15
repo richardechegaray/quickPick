@@ -90,46 +90,46 @@ public class SwipeTest {
     public void swipeTest() { //starts at main activity
 
         // create session
-        ViewInteraction materialButton = onView(
+        ViewInteraction createSessionButton = onView(
                 allOf(withId(R.id.create_session_button), withText("Create Session"),
                         isDisplayed()));
-        materialButton.perform(click());
+        createSessionButton.perform(click());
 
         sleep(1000);
 
        // selects option button
-        ViewInteraction textInputEditText = onView(
+        ViewInteraction selectListButton = onView(
                 allOf(withId(R.id.session_list_edit_text),
                         isDisplayed()));
-        textInputEditText.perform(click());
+        selectListButton.perform(click());
 
         sleep(1000);
 
         // selects movie genre
-        DataInteraction appCompatCheckedTextView = onData(anything())
+        DataInteraction movieOptionButton = onData(anything())
                 .inAdapterView(allOf(withId(R.id.select_dialog_listview),
                         childAtPosition(
                                 withId(R.id.contentPanel),
                                 0)))
                 .atPosition(1);
-        appCompatCheckedTextView.perform(click());
+        movieOptionButton.perform(click());
 
         sleep(1000);
 
         // selects done button
-        ViewInteraction materialButton2 = onView(
+        ViewInteraction confirmListButton = onView(
                 allOf(withId(android.R.id.button1), withText("Select"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.buttonPanel),
                                         0),
                                 3)));
-        materialButton2.perform(scrollTo(), click());
+        confirmListButton.perform(scrollTo(), click());
 
         sleep(1000);
 
         // starts swiping
-        ViewInteraction materialButton3 = onView(
+        ViewInteraction startSwipingButton = onView(
                 allOf(withId(R.id.start_swiping_button), withText("Start Swiping!"),
                         childAtPosition(
                                 childAtPosition(
@@ -137,12 +137,12 @@ public class SwipeTest {
                                         0),
                                 0),
                         isDisplayed()));
-        materialButton3.perform(click());
+        startSwipingButton.perform(click());
 
         sleep(1000);
 
         // like button
-        ViewInteraction appCompatImageButton = onView(
+        ViewInteraction likeButton = onView(
                 allOf(withId(R.id.likeButton), withContentDescription("like button"),
                         childAtPosition(
                                 childAtPosition(
@@ -150,12 +150,12 @@ public class SwipeTest {
                                         0),
                                 1),
                         isDisplayed()));
-        appCompatImageButton.perform(click());
+        likeButton.perform(click());
 
         sleep(1000);
 
         // dislike button
-        ViewInteraction appCompatImageButton2 = onView(
+        ViewInteraction dislikeButton = onView(
                 allOf(withId(R.id.dislikeButton), withContentDescription("dislike button"),
                         childAtPosition(
                                 childAtPosition(
@@ -163,7 +163,7 @@ public class SwipeTest {
                                         0),
                                 0),
                         isDisplayed()));
-        appCompatImageButton2.perform(click());
+        dislikeButton.perform(click());
 
         sleep(1000);
 
@@ -178,7 +178,7 @@ public class SwipeTest {
 
         sleep(1000);
 
-//        Assert.assertSame(R.id.card_view, onView(R.id.card_view));
+        onView(withId(R.id.first_place_idea_text)).check(matches(withText("Horror")));
 
         ViewInteraction materialButton4 = onView(
                 allOf(withId(R.id.return_to_main_activity_button), withText("Return to Main Menu"),
