@@ -1,12 +1,11 @@
 const axios = require("axios");
-
-const mongoUtil = require("../database/mongo");
-const db = mongoUtil.getDb();
+const Image = require("../models/image");
 
 module.exports = {
     getImage: async (searchString) => {
-        let searchResult = await db.collection(process.env.IMAGES_COLLECTION)
-        .findOne({name: searchString.toLowerCase()});
+        // let searchResult = await db.collection(process.env.IMAGES_COLLECTION)
+        // .findOne({name: searchString.toLowerCase()});
+        let searchResult = await Image.findOne({name: searchString.toLowerCase()});
         
         if (searchResult !== null) {
             console.log("Found cached image.");
@@ -23,10 +22,16 @@ module.exports = {
                 "https://api.unsplash.com/search/photos",
                 { params: unsplashParameters });
             console.log(unsplashResult);
-                  await db.collection(process.env.IMAGES_COLLECTION).insertOne({
-                name: searchString.toLowerCase(),
-                urls: unsplashResult.data.results[0].urls.small
-            });
+            //       await db.collection(process.env.IMAGES_COLLECTION).insertOne({
+            //     name: searchString.toLowerCase(),
+            //     urls: unsplashResult.data.results[0].urls.small
+            // });
+            await Image.create(
+                {
+                    name: searchString.toLowerCase(),
+                    urls: unsplashResult.data.results[0].urls.small
+                });
+
             return String(unsplashResult.data.results[0].urls.small);
         }
     }

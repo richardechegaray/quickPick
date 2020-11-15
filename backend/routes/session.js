@@ -3,21 +3,28 @@ const router = express.Router();
 
 const auth = require("../middleware/authentication");
 
-const sessionHelper = require("../helpers/sessionhelper");
+const sessionController = require("../controllers/session");
 
-router.get("/:id", auth.checkFB, sessionHelper.getSession);
+/* Returns the session as a JSON */
+router.get("/:id", auth.checkFB, sessionController.getSession);
 
-router.post("/", auth.checkFB, sessionHelper.createSession);
+/* Creates a session and returns it as a JSON */
+router.post("/", auth.checkFB, sessionController.createSession);
 
-router.post("/:id/choices", auth.checkFB, sessionHelper.receiveChoices);
+/* Receives a users choices for a session */
+router.post("/:id/choices", auth.checkFB, sessionController.receiveChoices);
 
-router.post("/id", auth.checkFB, sessionHelper.addUser);
+/* Adds a user to a session */
+router.post("/:id", auth.checkFB, sessionController.addUser);
 
-router.post("/:id/run", auth.checkFB, sessionHelper.startSession);
+/* Starts a session */
+router.post("/:id/run", auth.checkFB, sessionController.startSession);
 
-router.put("/:id", auth.checkFB, sessionHelper.updateList);
+/* Updates the chosen list for a session */
+router.put("/:id", auth.checkFB, sessionController.updateList);
 
-router.get("/:id/list", auth.checkFB, sessionHelper.getList);
+/* Returns the list for a session */
+router.get("/:id/list", auth.checkFB, sessionController.getList);
 
 
 module.exports = router;

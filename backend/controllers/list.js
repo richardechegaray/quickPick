@@ -1,7 +1,4 @@
-const ObjectId = require("mongodb").ObjectID;
-const mongoUtil = require("../database/mongo");
-const db = mongoUtil.getDb();
-
+const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
 
 module.exports = {
@@ -9,11 +6,10 @@ module.exports = {
     getMyLists: async (req, res) => {
         console.log("DEBUG: Get request to lists");
         try {
-            const myLists = await db.collection(process.env.LISTS_COLLECTION)
-                .find({ userID: { $in: [res.locals.id, "quickpick.admin"]} })
-                .sort({ name: 1})
-                .toArray();
+            const myLists = await List.find({ userID: { $in: [res.locals.id, "quickpick.admin"]} })
+                            .sort({name:1}); // TODO Add sorting
             
+            console.log(myLists);
             let listResponseObj = { lists: [] };
 
             myLists.forEach((ideaList) => {
@@ -48,7 +44,8 @@ module.exports = {
                 /* Set user making request as the list's owner */
                 newList.userID = res.locals.id;
 
-                await db.collection(process.env.LISTS_COLLECTION).insertOne(newList);
+                // await db.collection(process.env.LISTS_COLLECTION).insertOne(newList);
+                await List.create(newList);
                 res.status(201).send(newList);
             }
             catch (err) {
@@ -63,9 +60,8 @@ module.exports = {
         console.log("DEBUG: Get request to list");
         try {
             /* Find the list matching the id */
-            const myList = await db.collection(process.env.LISTS_COLLECTION)
-                .findOne({ "_id": ObjectId(req.params.id) });
-    
+            const myList = await List.findById(req.params.id);
+
             if (myList == null) {
                 console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
                 res.status(404).send({});

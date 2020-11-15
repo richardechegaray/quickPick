@@ -1,11 +1,10 @@
-package com.quickpick;
+package com.quickpick.swipe;
 
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.DataInteraction;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.ViewInteraction;
@@ -13,17 +12,18 @@ import androidx.test.espresso.action.GeneralLocation;
 import androidx.test.espresso.action.GeneralSwipeAction;
 import androidx.test.espresso.action.Press;
 import androidx.test.espresso.action.Swipe;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
-import androidx.test.rule.ActivityTestRule;
 
-import com.mindorks.placeholderview.annotations.swipe.SwipeView;
+import com.quickpick.MainActivity;
+import com.quickpick.R;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +33,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -45,7 +44,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class SwipeTest {
+public class SwipeTestCase {
 
     @Rule
     public ActivityScenarioRule<MainActivity> mActivityTestRule = new ActivityScenarioRule<>(MainActivity.class);
@@ -56,13 +55,12 @@ public class SwipeTest {
 
         // create session
         ViewInteraction createSessionButton = onView(
-                allOf(withId(R.id.create_session_button), withText("Create Session"),
+                Matchers.allOf(ViewMatchers.withId(R.id.create_session_button), withText("Create Session"),
                         isDisplayed()));
         createSessionButton.perform(click());
 
         sleep(1000);
 
-        onView(withText("Start Swiping")).check(matches());
         // selects option button
         ViewInteraction selectListButton = onView(
                 allOf(withId(R.id.session_list_edit_text),
@@ -135,7 +133,7 @@ public class SwipeTest {
 
         // swiping tests, left and right
         onView(withIndex(withId(R.id.card_view), 0)).perform(swipeLeft());
-        for (int i = 0 ; i < 3 ; i++) {
+        for (int i = 0; i < 3; i++) {
             sleep(1000);
             onView(withIndex(withId(R.id.card_view), 0)).perform(swipeLeft());
             sleep(1000);
@@ -150,7 +148,7 @@ public class SwipeTest {
         onView(withText("Musical")).check(matches(isDisplayed()));
         onView(withText("Return to Main Menu")).check(matches(isDisplayed()));
 
-        ViewInteraction materialButton4 = onView(
+        ViewInteraction returnToMainMenuButton = onView(
                 allOf(withId(R.id.return_to_main_activity_button), withText("Return to Main Menu"),
                         childAtPosition(
                                 childAtPosition( // error here
@@ -158,8 +156,7 @@ public class SwipeTest {
                                         0),
                                 3),
                         isDisplayed()));
-        materialButton4.perform(click());
-
+        returnToMainMenuButton.perform(click());
     }
 
 
@@ -167,6 +164,7 @@ public class SwipeTest {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_LEFT,
                 GeneralLocation.CENTER_RIGHT, Press.FINGER);
     }
+
     private static ViewAction swipeLeft() {
         return new GeneralSwipeAction(Swipe.FAST, GeneralLocation.CENTER_RIGHT,
                 GeneralLocation.CENTER_LEFT, Press.FINGER);

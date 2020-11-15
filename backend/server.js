@@ -6,27 +6,20 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Initialize mongodb
-const mongoUtil = require("./database/mongo");
+// Import the database connection
+require('./database/mongodb');
 
-// Connect to MongoDB
-mongoUtil.connectToServer(function (err, client) {
-    if (err) {
-        console.log(err);
-    }
+// Import routes
+const loginRouter = require("./routes/login");
+const listRouter = require("./routes/list");
+const sessionRouter = require("./routes/session");
+app.use("/login", loginRouter);
+app.use("/list", listRouter);
+app.use("/session", sessionRouter);
 
-    // Import routes
-    const loginRouter = require("./routes/login");
-    const listRouter = require("./routes/list");
-    const sessionRouter = require("./routes/session");
-    app.use("/login", loginRouter);
-    app.use("/list", listRouter);
-    app.use("/session", sessionRouter);
-
-    // Listen on PORT
-    var server = app.listen(process.env.PORT, function () {
-        var host = server.address().address;
-        var port = server.address().port;
-        console.log("Listening at http://%s:%s", host, port);
-    });
+// Listen on PORT
+var server = app.listen(process.env.PORT, function () {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log("Listening at http://%s:%s", host, port);
 });

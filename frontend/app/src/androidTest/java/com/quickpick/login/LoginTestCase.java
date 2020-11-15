@@ -40,7 +40,7 @@ public class LoginTestCase {
         UiDevice device = UiDevice.getInstance(getInstrumentation());
 
         ViewInteraction facebookLoginButton = onView(
-                Matchers.allOf(withId(R.id.login_button), withText("Continue with Facebook"),
+                Matchers.allOf(withId(R.id.login_button), withText(com.facebook.login.R.string.com_facebook_loginview_log_in_button_continue),
                         withParent(withParent(withId(android.R.id.content))),
                         isDisplayed()));
         // Login button should prompt login at beginning
