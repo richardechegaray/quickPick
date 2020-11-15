@@ -1,8 +1,38 @@
 const ObjectId = require("mongodb").ObjectID;
-const firebaseUtil = require("../plugins/firebase")
+const firebaseUtil = require("../plugins/firebase");
 const Session = require("../models/session");
 const User = require("../models/user");
 const List = require("../models/list");
+
+/*
+----------Helper functions
+*/
+/*
+Random string helper
+Params: length, chars: string of valid characters to be selected
+Returns: string
+*/
+function randomString(length, chars) {
+  var result = "";
+  for (var i = length; i > 0; --i) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+/*
+Helper function for sorting a sessions results
+Parameters:
+Returns:
+*/
+function sortSession(session) {
+  var results = session.results;
+  results.sort(function (a, b) {
+    return b.score - a.score;
+  });
+  session.results = results;
+  return session;
+}
 
 module.exports = {
   getSession: async (req, res) => {
@@ -58,7 +88,7 @@ module.exports = {
     try {
       //Find session
       let query = { pin: req.params.id };
-      let currentSession = await Session.findOne(query)
+      let currentSession = await Session.findOne(query);
 
       //Assert session exists
       if (currentSession === null || typeof req.body.choices !== "object") {
@@ -300,34 +330,4 @@ module.exports = {
       res.status(400).send(error);
     }
   },
-}
-
-/*
-----------Helper functions
-*/
-/*
-Random string helper
-Params: length, chars: string of valid characters to be selected
-Returns: string
-*/
-function randomString(length, chars) {
-  var result = "";
-  for (var i = length; i > 0; --i) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
-
-/*
-Helper function for sorting a sessions results
-Parameters:
-Returns:
-*/
-function sortSession(session) {
-  var results = session.results;
-  results.sort(function (a, b) {
-    return b.score - a.score;
-  });
-  session.results = results;
-  return session;
-}
+};
