@@ -154,7 +154,7 @@ describe("Get Session", function () {
 
         await sessionHelper.getSession(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(401);
     });
 
     it("Success", async () => {
@@ -178,7 +178,7 @@ describe("Add user to session", function () {
 
         await sessionHelper.addUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it("User is already in session or full", async () => {
@@ -200,7 +200,7 @@ describe("Add user to session", function () {
 
         await sessionHelper.addUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(201);
+        expect(res.status).toHaveBeenCalledWith(200);
     });
 });
 
@@ -224,7 +224,7 @@ describe("Update session list", function () {
         req.body.listID = list_id;
 
         await sessionHelper.updateList(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it("Success", async () => {
@@ -247,7 +247,7 @@ describe("Get session list", function () {
         req.params.id = "abcd";
 
         await sessionHelper.getList(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(401);
     });
 
     it("Success", async () => {
@@ -269,7 +269,7 @@ describe("Start session", function () {
         req.params.id = "12300";
 
         await sessionHelper.startSession(req, res);
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it("User is not owner", async () => {
@@ -301,7 +301,7 @@ describe("Receive choices", function () {
         req.params.id = "10231";
 
         await sessionHelper.receiveChoices(req, res);
-        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.status).toHaveBeenCalledWith(400);
     });
 
     it("Success", async () => {

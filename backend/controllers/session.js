@@ -174,7 +174,7 @@ module.exports = {
       //Assert session is found
       if (session == null) {
         console.log("No session exists with ID: " + req.params.id);
-        res.status(400).send({ ok: false });
+        res.status(404).send({ ok: false });
         return;
       }
 
@@ -212,7 +212,7 @@ module.exports = {
         session,
       };
       firebaseUtil.sendFirebase(firebaseMessage);
-      res.status(201).send({ ok: true });
+      res.status(200).send({ ok: true });
       return;
     } catch (error) {
       console.log(error);
@@ -227,6 +227,11 @@ module.exports = {
       //Find session
       let session = await Session.findOne({ pin: req.params.id });
 
+      //Assert session exists
+      if(session === null){
+        res.status(404).send({ok: false, message: "Session does not exist"});
+        return;
+      }
       //Assert user has rights to start
       if (session.creator !== String(res.locals.id) || session.status !== "lobby") {
         res.status(400).send({ ok: false, message: "User is not the creator or session has started" });
@@ -273,6 +278,12 @@ module.exports = {
   updateList: async (req, res) => {
     console.log("DEBUG: Put request to /session/" + req.params.id);
     try {
+      //Assert session exists
+      let checkSession = await Session.findOne({ pin: req.params.id });
+      if(checkSession === null){
+        res.status(404).send({ok: false, message: "Session does not exist"});
+        return;
+      }
       //Find list that matches
       let foundList = await List.findOne({ _id: ObjectId(req.body.listID) });
 
