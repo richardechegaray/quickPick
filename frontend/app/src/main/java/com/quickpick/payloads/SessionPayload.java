@@ -2,6 +2,8 @@ package com.quickpick.payloads;
 
 import androidx.annotation.Nullable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,8 +26,13 @@ public class SessionPayload implements Serializable {
     @Nullable
     private List<ResultPayload> results;
 
-    private ListPayload list;
+    @Nullable
+    @SerializedName("listID")
+    private String listId;
 
+    private String listName;
+
+    @Nullable
     private String creator;
 
     public String getPin() {
@@ -44,13 +51,16 @@ public class SessionPayload implements Serializable {
         return Collections.unmodifiableList(Optional.ofNullable(results).orElse(new ArrayList<>()));
     }
 
-    public ListPayload getList() {
-        return Optional.ofNullable(list).orElse(new ListPayload());
+    public String getListId() {
+        return Optional.ofNullable(listId).orElse("");
+    }
+
+    public String getListName() {
+        return Optional.ofNullable(listName).orElse("");
     }
 
     public String getCreator() {
         return Optional.ofNullable(creator).orElse("");
     }
-
 
 }

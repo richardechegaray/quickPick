@@ -4,12 +4,14 @@ import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
+import com.quickpick.payloads.UpdateListRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface SessionApi {
@@ -27,6 +29,11 @@ public interface SessionApi {
     Call<BasicResponse> startSession(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
 
     @POST("session/{sessionId}/choices")
-    Call<BasicResponse> postChoices(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId, @Body PostChoicesRequest request);
+    Call<BasicResponse> postChoices(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
+                                    @Body PostChoicesRequest request);
+
+    @PUT("session/{sessionId}")
+    Call<SessionPayload> updateList(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
+                                    @Body UpdateListRequest request);
 
 }
