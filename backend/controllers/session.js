@@ -61,7 +61,6 @@ module.exports = {
       let user = await User.findOne({ id: String(res.locals.id) });
 
       //Assert user has logged in and parameters are valid
-      console.log(typeof(req.body.size));
       if (user === null || typeof res.locals.id !== "string" || typeof req.body.size !== "number") {
         res.status(400).send({ ok: false, message: "Invalid parameters" });
         return;
