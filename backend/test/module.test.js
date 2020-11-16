@@ -34,15 +34,5 @@ describe("User login and authentication", function () {
 
     auth.checkFB(req, mockRes, callback);
   });
-  /*
-    it("Checking if user has logged in before", () => {
 
-    });
-    it("Creating a new user", () => {
-
-    });
-    it("Update the firebase token", () => {
-
-    });
-    */
 });

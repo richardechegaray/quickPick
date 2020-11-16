@@ -36,11 +36,17 @@ function sortSession(session) {
 
 module.exports = {
   getSession: async (req, res) => {
+    //TODO: Assert user is in session
     console.log("DEBUG: Get request to /session/" + req.params.pin);
     try {
-      let session = await Session.find({ pin: req.params.pin });
+      let session = await Session.findOne({ pin: req.params.pin });
+      if(typeof(session) === "undefined" || session === null){
+        res.status(400).send({ok: false, message: "Invalid session"});
+        return;
+      }
       res.status(200).send(session);
     } catch (error) {
+      console.log(error);
       res.status(400).send(error);
     }
   },
@@ -60,6 +66,7 @@ module.exports = {
         return;
       }
 
+      //TODO: Assert size is valid 0-100?
       //Create session object
       let session = {
         pin: rString,
@@ -167,7 +174,7 @@ module.exports = {
       //Assert session is found
       if (session == null) {
         console.log("No session exists with ID: " + req.params.id);
-        res.status(400).send({ ok: false });
+        res.status(404).send({ ok: false });
         return;
       }
 
@@ -213,7 +220,7 @@ module.exports = {
         session,
       };
       firebaseUtil.sendFirebase(firebaseMessage);
-      res.status(201).send({ ok: true });
+      res.status(200).send({ ok: true });
       return;
     } catch (error) {
       console.log(error);
@@ -228,6 +235,11 @@ module.exports = {
       //Find session
       let session = await Session.findOne({ pin: req.params.id });
 
+      //Assert session exists
+      if(session === null){
+        res.status(404).send({ok: false, message: "Session does not exist"});
+        return;
+      }
       //Assert user has rights to start
       if (session.creator !== String(res.locals.id) || session.status !== "lobby") {
         res.status(400).send({ ok: false, message: "User is not the creator or session has started" });
@@ -244,11 +256,8 @@ module.exports = {
 
       let newResults = [];
       let foundList = await List.findOne({ _id: ObjectId(session.listID) });
-      // console.log(foundList);
 
-      //Initialize result array
       foundList.ideas.forEach((foundIdea) => {
-        // console.log(foundIdea);
         newResults.push({ idea: foundIdea, score: 0 });
       });
 
@@ -276,6 +285,12 @@ module.exports = {
   updateList: async (req, res) => {
     console.log("DEBUG: Put request to /session/" + req.params.id);
     try {
+      //Assert session exists
+      let checkSession = await Session.findOne({ pin: req.params.id });
+      if(checkSession === null){
+        res.status(404).send({ok: false, message: "Session does not exist"});
+        return;
+      }
       //Find list that matches
       let foundList = await List.findOne({ _id: ObjectId(req.body.listID) });
 
@@ -307,6 +322,7 @@ module.exports = {
   },
 
   getList: async (req, res) => {
+    //TODO: Assert user is in session
     console.log("DEBUG: Get request to session/" + req.params.id + "/list");
     try {
       //Assert session id is valid
@@ -316,14 +332,14 @@ module.exports = {
       }
 
       let session = await Session.findOne({ pin: req.params.id });
-      // console.log(session);
+
       //Assert session exists
       if (session === null) {
         res.status(400).send({ ok: false, message: "Session could not be found" });
         return;
       }
       let foundList = await List.findById(session.listID);
-      // console.log(foundList);
+
       res.status(200).send(foundList);
     } catch (error) {
       console.log(error);

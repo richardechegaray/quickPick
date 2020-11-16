@@ -7,6 +7,7 @@ function findUser(userID) {
 }
 
 function updateFirebaseToken(userID, firebaseToken) {
+
   const filter = { "id": String(userID) };
   const update = { $set: { "firebaseToken": String(firebaseToken) }};
   User.findOneAndUpdate(filter, update)
@@ -35,12 +36,12 @@ function loginHelper(userID, firebaseToken, res, callback) {
         if (firebaseToken !== foundUser.firebaseToken) {
           updateFirebaseToken(userID, firebaseToken);
           callback(res, 200, {
-            message: "Logged in user, updated firebase token",
+            message: "Logged in user, updated Firebase token",
             ok: true,
           });
         } else {
           callback(res, 200, {
-            message: "Logged in user, did not change firebase token",
+            message: "Logged in user, did not change Firebase token",
             ok: true,
           });
         }
