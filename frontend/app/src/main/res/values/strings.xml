@@ -42,4 +42,6 @@
     <string name="create_list_description_edit_text_string">Enter description here</string>
     <string name="create_list_description_name_prompt">Description:</string>
     <string name="create_list_add_entries_button_text">Add Entries</string>
+    <string name="create_list_button">Create List</string>
+    <string name="create_list_entries_text">Entries:</string>
 </resources>
