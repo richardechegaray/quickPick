@@ -67,7 +67,7 @@ beforeAll(async () => {
             name: "me",
             id: TestUserID,
         }]
-    }
+    };
     await Session.create(newSession);
 
     let newUser = {
@@ -150,7 +150,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = "murphy";
-        req.params.pin = "abcd"
+        req.params.pin = "abcd";
 
         await sessionHelper.getSession(req, res);
 

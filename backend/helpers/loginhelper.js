@@ -23,7 +23,7 @@ function createNewUser(userID, name, firebaseToken) {
     id: String(userID),
     name: String(name),
     firebaseToken: String(firebaseToken),
-  })
+  });
 }
 
 function loginHelper(userID, firebaseToken, res, callback) {

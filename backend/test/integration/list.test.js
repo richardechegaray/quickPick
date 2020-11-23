@@ -45,7 +45,7 @@ describe("List Integration Tests", () => {
 
     afterAll(async () => {
         await dbHelper.close();
-    })
+    });
 
     test("Set session's list", async () => {
     const myList = await List.findOne({ name: "TestList1" });

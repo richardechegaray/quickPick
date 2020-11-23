@@ -1,7 +1,7 @@
 const app = require("./app.js");
 
 // Import the database connection
-require('./database/mongodb');
+require("./database/mongodb");
 
 // Listen on PORT
 var server = app.listen(process.env.PORT, function () {

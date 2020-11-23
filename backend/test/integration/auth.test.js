@@ -21,7 +21,7 @@ describe("List Integration Tests", () => {
 
     afterAll(async () => {
         await dbHelper.close();
-    })
+    });
 
     test("Post to login endpoint", async () => {
     const response = await request(app)

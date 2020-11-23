@@ -37,8 +37,8 @@ module.exports = {
             try {
                 /* Add an image url to each idea on the list */
                 for (let i = 0; i < newList.ideas.length; i++) {
-                    let imgUrl = await imgUtil.getImage(newList.ideas[parseInt(i)].name);
-                    newList.ideas[parseInt(i)].picture = imgUrl;
+                    let imgUrl = await imgUtil.getImage(newList.ideas[parseInt(i, 10)].name);
+                    newList.ideas[parseInt(i, 10)].picture = imgUrl;
                 }
                 /* Set user making request as the list's owner */
                 newList.userID = res.locals.id;
