@@ -3,8 +3,6 @@ const Image = require("../models/image");
 
 module.exports = {
     getImage: async (searchString) => {
-        // let searchResult = await db.collection(process.env.IMAGES_COLLECTION)
-        // .findOne({name: searchString.toLowerCase()});
         let searchResult = await Image.findOne({name: searchString.toLowerCase()});
         
         if (searchResult !== null) {
@@ -21,11 +19,7 @@ module.exports = {
             const unsplashResult = await axios.get(
                 "https://api.unsplash.com/search/photos",
                 { params: unsplashParameters });
-            console.log(unsplashResult);
-            //       await db.collection(process.env.IMAGES_COLLECTION).insertOne({
-            //     name: searchString.toLowerCase(),
-            //     urls: unsplashResult.data.results[0].urls.small
-            // });
+
             await Image.create(
                 {
                     name: searchString.toLowerCase(),
