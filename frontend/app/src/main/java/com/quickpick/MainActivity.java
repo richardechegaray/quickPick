@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .create();
         dialog.show();
 
-        EditText sessionCode = dialog.findViewById(R.id.add_entries_edit_text);
+        EditText sessionCode = dialog.findViewById(R.id.session_code_edit_text);
         Button cancelButton = dialog.findViewById(R.id.dialog_cancel_button);
         Button joinButton = dialog.findViewById(R.id.dialog_join_button);
 
