@@ -188,7 +188,7 @@ module.exports = {
       /* Get user matching the token that was authenticated */
       let user = await User.findOne({ id: String(res.locals.id) });
 
-      if (user === undefined) {
+      if (!user) {
         await res.status(400).send({ ok: false, message: "User is already in session" });
         return;
       }
@@ -196,7 +196,7 @@ module.exports = {
       let isInSession = false;
       /* Assert user isn't in session */
       for (const index in session.participants) {
-        if (user.id === session.participants[index].id) {
+        if (user.id === session.participants[parseInt(index)].id) {
           isInSession = true;
           break;
         }
