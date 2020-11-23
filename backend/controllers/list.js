@@ -45,7 +45,7 @@ module.exports = {
 
     /* Finds a list matching the id and returns it if the the list belongs to the user */
     getList: async (req, res) => {
-        console.log("DEBUG: Get request to list")
+        console.log("DEBUG: Get request to list");
         /* Find the list matching the id */
         const myList = await List.findById(req.params.id);
 
