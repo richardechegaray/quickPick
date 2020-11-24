@@ -81,20 +81,12 @@ module.exports = {
     //Assert user has logged in and parameters are valid
     if (
       user === null ||
-      typeof res.locals.id !== "string" ||
-      typeof req.body.size !== "number"
+      typeof res.locals.id !== "string"
     ) {
       res.status(400).send({ ok: false, message: "Invalid parameters" });
       return;
     }
 
-    //Assert size is valid 0-100?
-    if (req.body.size <= 0 || req.body.size > 100) {
-      res
-        .status(400)
-        .send({ ok: false, message: "Size must be between 0-100" });
-      return;
-    }
     //Create session object
     let session = {
       pin: rString,
@@ -103,7 +95,6 @@ module.exports = {
       status: "lobby",
       creator: String(res.locals.id),
       complete: 0,
-      size: req.body.size,
       results: [],
       participants: [{ name: user.name, id: String(res.locals.id) }],
     };
@@ -229,12 +220,6 @@ module.exports = {
         isInSession = true;
         break;
       }
-    }
-
-    //Assert size is not exceeded
-    if (session.size < session.participants.length + 1) {
-      res.status(400).send({ ok: false, message: "Session is full" });
-      return;
     }
 
     if (!isInSession) {

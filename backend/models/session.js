@@ -12,7 +12,6 @@ const sessionSchema = new Schema({
     },
     creator: String,
     complete: Number,
-    size: Number,
     results: [{
         idea: {
             name: String,
