@@ -1,6 +1,6 @@
 require("dotenv").config();
-const { MongoClient } = require("mongodb");
-const ObjectId = require("mongodb").ObjectID;
+
+jest.mock("../../plugins/unsplash")
 
 const listHelper = require("../../controllers/list");
 const dbHelper = require("../db/mongodb");
@@ -150,7 +150,7 @@ describe("Unit tests for list functionalities", () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
-        
+
         req.body.list = testList3;
         res.locals.id = TestUserID;
 
@@ -158,5 +158,20 @@ describe("Unit tests for list functionalities", () => {
         
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.body.name).toEqual(testList3.name);
+        console.log(res.body);
+    });
+
+    it("Create List - Null Parameter", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        // req.body.list = testList3;
+        res.locals.id = TestUserID;
+
+        await listHelper.createList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+        console.log(res.body);
     });
 });

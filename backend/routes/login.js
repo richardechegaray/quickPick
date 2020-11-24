@@ -15,7 +15,4 @@ router.post("/", auth.checkFB, function (req, res, next) {
     login.loginHelper(res.locals.id, req.body.firebaseToken, res, sendRes);  
 });
 
-
-
-
 module.exports = router;
