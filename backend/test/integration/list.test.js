@@ -8,7 +8,7 @@ const Image = require("../../models/image");
 const dbHelper = require("../db/mongodb");
 
 describe("List Integration Tests", () => {
-    const testToken = "EAALsZAFPkrZAUBAPyyFTYb5h6qehgpG6aDtYgXA3sEopdZAI5zP1ZCfdCvs8fNNeCCgns4kaIZBmuZA2OboGYvCedAWSkIWJJxbDijzY6zNgby1bqhyUvp6JAMIWJfyrZBe4ZAIZAMUTgC0fzyx5iRAaGiNexb2e7DCasYZBkjxVLtaiRwZBecHn7mHeZCfu3CXcP9AOw86hdZBoQmM7tycqYA5jLLJndw10OR3ZBWW1TWCh6ZAPV5lPVbtuvB4HXKytpr6eM8ZD";
+    const testToken = "EAALsZAFPkrZAUBAOgxeBByLz4Bttbz9fjEYxEoFUvHTHKHOsyxY1ECj5JRQ18Bo32oZBa4DdIpAYcsSzMxtFJy5zWdJBHGwJ3OttHr6VAxiac9fJQVHkY0xqwZAGzv067XIn7stSGmsFCGICzKexnDRbZA9YZANMGEzqLui37dkVX1tVNtOoWyUyPSrzkZBpyFEtIT44pnwLFs4eCIpsXH9";
     const sessionPin = "DhAy0";
 
     const testList1 = {
