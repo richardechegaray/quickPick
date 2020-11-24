@@ -80,8 +80,9 @@ describe("List Integration Tests", () => {
         await dbHelper.close();
     });
 
-    test("Set session's list", async () => {
+    it("Set session's list", async () => {
     const myList = await List.findOne({ name: "TestList1" });
+    
 
     const response = await request(app)
                         .put(`/session/${sessionPin}`)
@@ -95,7 +96,7 @@ describe("List Integration Tests", () => {
     expect(response.body.listID).toEqual(String(myList._id));
     });
 
-    test("Get specific list", async () => {
+    it("Get specific list", async () => {
         const myList = await List.findOne({ name: "TestList1" });
         
         const response = await request(app)
@@ -108,7 +109,7 @@ describe("List Integration Tests", () => {
         expect(response.body._id).toEqual(String(myList._id));
     });
     
-    test("Get specific list - Unauthorized Invalid Token", async () => {
+    it("Get specific list - Unauthorized Invalid Token", async () => {
         const myList = await List.findOne({ name: "TestList1" });
         
         const response = await request(app)
@@ -118,7 +119,7 @@ describe("List Integration Tests", () => {
         expect(response.statusCode).toBe(401);
     });
 
-    test("Get specific list - Restrict access to list", async () => {
+    it("Get specific list - Restrict access to list", async () => {
         const myList = await List.findOne({ name: "TestList2" });
         
         const response = await request(app)
@@ -129,7 +130,7 @@ describe("List Integration Tests", () => {
         expect(response.statusCode).toBe(403);
     });
     
-    test("Get specific list - List Doesn't exist", async () => {
+    it("Get specific list - List Doesn't exist", async () => {
         const response = await request(app)
                             .get("/list/fakeIdFoobar")
                             .set("facebookToken", testToken)
@@ -138,7 +139,7 @@ describe("List Integration Tests", () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test("Get all viewable lists - Basic", async () => {
+    it("Get all viewable lists - Basic", async () => {
         const myList = await List.findOne({ name: "TestList1" });
         const publicList = await List.findOne({ name: "TestList3" });
         
@@ -155,7 +156,7 @@ describe("List Integration Tests", () => {
         ]);
     });
 
-    test("Create List - Basic", async () => {
+    it("Create List - Basic", async () => {
         const newList = {
             name: "CreatedList1",
             ideas: [
@@ -188,13 +189,24 @@ describe("List Integration Tests", () => {
         expect(response.statusCode).toBe(201);
     });
 
-    test("Create List - Null List", async () => {        
+    it("Create List - Null List", async () => {        
         const response = await request(app)
                             .post("/list")
                             .set("facebookToken", testToken)
                             .send();
     
         expect(response.statusCode).toBe(400);
+    });
+
+    it("Create List - Bad List (Internal Error)", async () => {        
+        const response = await request(app)
+                            .post("/list")
+                            .set("facebookToken", testToken)
+                            .send({
+                                list: "die",
+                            });
+    
+        expect(response.statusCode).toBe(500);
     });
 
 });

@@ -58,11 +58,11 @@ describe("Session Integration", function () {
             }]
         }
         await Session.create(newSession);
-    })
+    });
 
     afterAll(async () => {
         await dbHelper.close();
-    })
+    });
 
     it("Create session", async () => {
         const response = await request(app).post("/session/").set({facebookToken}).send({});

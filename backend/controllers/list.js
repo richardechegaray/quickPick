@@ -6,7 +6,7 @@ module.exports = {
     getMyLists: async (req, res) => {
         console.log("DEBUG: Get request to lists");
         const myLists = await List.find({ userID: { $in: [res.locals.id, "quickpick.admin"] } })
-            .sort({ name: 1 }); // TODO Add sorting
+            .sort({ name: 1 });
 
         let listResponseObj = { lists: [] };
 
