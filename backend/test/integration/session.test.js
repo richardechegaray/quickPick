@@ -53,7 +53,6 @@ describe("Session Integration", function () {
             status: "lobby",
             creator: "108059947763278",
             complete: 0,
-            size: 6,
             results: [],
             participants: [{
                 name: "Ava Alefgghaihiec Narayananberg",
@@ -68,7 +67,7 @@ describe("Session Integration", function () {
     })
 
     it("Create session", async () => {
-        const response = await request(app).post("/session/").set({facebookToken}).send({size: 6});
+        const response = await request(app).post("/session/").set({facebookToken}).send({});
         expect(response.status).toBe(201);
     });
     it("Start session", async () => {
