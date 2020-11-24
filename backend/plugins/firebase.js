@@ -11,8 +11,8 @@ admin.initializeApp({
 // Helper function for sending firebase messages
 module.exports = {
     sendFirebase: async (body) => {
+        const idList = body.session.participants.map((u) => u.id);
         try {
-            const idList = body.session.participants.map((u) => u.id);
             let users = await User.find({ "id": { $in: idList } }).select({"firebaseToken": 1});
             let tokens = users.map((t) => t.get("firebaseToken"));
 
@@ -26,10 +26,9 @@ module.exports = {
                 },
             };
 
-            if (body.list !== undefined) {
+            if (body.list) {
                 msg.data.list = JSON.stringify(body.list);
-            };
-
+            }
 
             let response = await admin.messaging().sendMulticast(msg);
             console.log(response.successCount + " messages were sent successfully");

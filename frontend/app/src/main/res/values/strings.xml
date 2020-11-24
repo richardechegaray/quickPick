@@ -34,7 +34,8 @@
     <string name="selected_list_text">Selected List</string>
     <string name="select_list_cancelled">Did not select new list</string>
     <string name="select_list_failed">List update failed, try again</string>
-    <string name="get_list_failed">Get list failed, try again</string>
+    <string name="get_list_failed">Failed to get list for swiping</string>
+    <string name="get_lists_failed">Failed to get lists</string>
     <string name="invalid_code">Invalid code</string>
     <string name="create_list_title_prompt_text">Please enter the following fields\nfor your custom list:</string>
     <string name="create_list_name_prompt">Name:</string>
@@ -44,4 +45,5 @@
     <string name="create_list_add_entries_button_text">Add Entries</string>
     <string name="create_list_button">Create List</string>
     <string name="create_list_entries_text">Entries:</string>
+    <string name="logout">Logout</string>
 </resources>

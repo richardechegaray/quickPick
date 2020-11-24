@@ -9,16 +9,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
+import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
 
 public class MainActivity extends AppCompatActivity {
-
-    private Button createNewList;
-    private Button viewEditLists;
-    private Button joinSession;
-    private Button viewOldSessions;
-    private Button createSession;
 
     private String facebookAccessToken;
 
@@ -26,43 +22,61 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken == null || accessToken.isExpired()) {
-            startActivity(new Intent(getBaseContext(), LoginActivity.class));
+        if (facebookTokenIsInvalid()) {
+            navigateBackToLoginActivity();
             return;
         }
-        facebookAccessToken = accessToken.getToken();
-
         setContentView(R.layout.activity_main);
-        registerButtons();
         setOnClickListeners();
     }
 
-    private void registerButtons() {
-        createNewList = findViewById(R.id.create_new_list_button);
-        viewEditLists = findViewById(R.id.view_edit_lists_button);
-        joinSession = findViewById(R.id.join_session_button);
-        viewOldSessions = findViewById(R.id.view_old_sessions_button);
-        createSession = findViewById(R.id.create_session_button);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (facebookTokenIsInvalid()) {
+            navigateBackToLoginActivity();
+        }
+    }
+
+    private boolean facebookTokenIsInvalid() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        if (accessToken == null || accessToken.isExpired()) {
+            navigateBackToLoginActivity();
+            return true;
+        }
+        facebookAccessToken = accessToken.getToken();
+        return false;
     }
 
     private void setOnClickListeners() {
-        createNewList.setOnClickListener(view ->
+        findViewById(R.id.create_new_list_button).setOnClickListener(view ->
                 startActivity(new Intent(getApplicationContext(), CreateNewListActivity.class))
         );
 
-        viewEditLists.setOnClickListener(view ->
-                startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class))
+        findViewById(R.id.view_edit_lists_button).setOnClickListener(view ->
+                ListRepository.getInstance().callGetLists(
+                        () -> startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class)),
+                        RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
+                        facebookAccessToken
+                )
         );
 
-        joinSession.setOnClickListener(view -> showAlertDialog());
+        findViewById(R.id.join_session_button).setOnClickListener(view -> showAlertDialog());
 
-        viewOldSessions.setOnClickListener(view ->
+        findViewById(R.id.view_old_sessions_button).setOnClickListener(view ->
                 startActivity(new Intent(getBaseContext(), ViewOldSessionsActivity.class))
         );
 
-        createSession.setOnClickListener(view ->
+        findViewById(R.id.create_session_button).setOnClickListener(view ->
                 SessionRepository.getInstance().createSession(this::navigateToSessionActivity, facebookAccessToken)
+        );
+
+        findViewById(R.id.logout_button).setOnClickListener(view ->
+                {
+                    LoginManager.getInstance().logOut();
+                    navigateBackToLoginActivity();
+                    finish();
+                }
         );
     }
 
@@ -93,5 +107,9 @@ public class MainActivity extends AppCompatActivity {
     private void navigateToSessionActivity() {
         // Should not be able to navigate back to the session activity
         startActivity(new Intent(getBaseContext(), SessionActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+    }
+
+    private void navigateBackToLoginActivity() {
+        startActivity(new Intent(getBaseContext(), LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

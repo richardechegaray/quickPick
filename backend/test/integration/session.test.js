@@ -1,5 +1,5 @@
-const request = require('supertest');
-const { isExportDeclaration } = require('typescript');
+const request = require("supertest");
+const { isExportDeclaration } = require("typescript");
 const app = require("../../app");
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
@@ -46,10 +46,10 @@ describe("Session Integration", function () {
         };
     
         await List.create(list);
-        let list_id = await List.findOne({});
+        let myList = await List.findOne({});
         let newSession = {
             pin: "abcd",
-            listID: list_id._id,
+            listID: myList._id,
             status: "lobby",
             creator: "108059947763278",
             complete: 0,

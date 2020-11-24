@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { MongoClient } = require("mongodb");
-const ObjectId = require('mongodb').ObjectID;
+const ObjectId = require("mongodb").ObjectID;
 
 const listHelper = require("../../controllers/list");
 const dbHelper = require("../db/mongodb");
