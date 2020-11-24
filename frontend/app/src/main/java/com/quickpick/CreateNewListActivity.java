@@ -1,13 +1,22 @@
 package com.quickpick;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class CreateNewListActivity extends AppCompatActivity {
+import com.quickpick.payloads.IdeaPayload;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CreateNewListActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
 
     // TODO: figure out whether or not these private variables will be used in multiple methods
     private Button addEntries;
@@ -17,6 +26,8 @@ public class CreateNewListActivity extends AppCompatActivity {
     private EditText editName;
 
     private EditText editDescription;
+
+    MyRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +41,24 @@ public class CreateNewListActivity extends AppCompatActivity {
         addEntries = findViewById(R.id.create_list_add_entries_button);
 
         addEntries.setOnClickListener(view -> addEntriesDialog());
+
+        List<IdeaPayload> example = new ArrayList<>();
+        IdeaPayload ex = new IdeaPayload();
+        ex.setDescription("test");
+        ex.setName("name");
+        example.add(ex);
+
+        // set up the RecyclerView
+        RecyclerView recyclerView = findViewById(R.id.rv_entries);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new MyRecyclerViewAdapter(this, new ArrayList<>()); // need to pass in editview data here ?
+        adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
     private void addEntriesDialog() {
@@ -39,4 +68,5 @@ public class CreateNewListActivity extends AppCompatActivity {
                 .create();
         dialog.show();
     }
+
 }
