@@ -39,6 +39,12 @@ module.exports = {
   getSession: async (req, res) => {
     console.log("DEBUG: Get request to /session/" + req.params.pin);
     let session = await Session.findOne({ pin: req.params.pin });
+    //Assert session is found
+    if (session == null) {
+      res.status(404).send({ ok: false, message: "Invalid session ID" });
+      return;
+    }
+
     let inSession = false;
     session.participants.forEach((user) => {
       if (user.id === res.locals.id) {
@@ -46,7 +52,7 @@ module.exports = {
       }
     });
     if (!inSession) {
-      res.status(400).send({ ok: false, message: "User is not in session" });
+      res.status(401).send({ ok: false, message: "User is not in session" });
       return;
     }
     if (typeof session === "undefined" || session === null) {
@@ -115,7 +121,7 @@ module.exports = {
     //Assert session exists
     if (currentSession === null || typeof req.body.choices !== "object") {
       res
-        .status(401)
+        .status(400)
         .send({
           ok: false,
           message: "Session doesn't exist or choices are invalid",
@@ -184,11 +190,11 @@ module.exports = {
   addUser: async (req, res) => {
     console.log("DEBUG: Post request to /session/" + req.params.id);
 
-    /* Get session matching ID */
     let session = await Session.findOne({ pin: req.params.id });
+    let user = await User.findOne({ id: String(res.locals.id) });
 
     //Assert session is found
-    if (session == null) {
+    if (session == null || user == null) {
       console.log("No session exists with ID: " + req.params.id);
       res.status(404).send({ ok: false });
       return;
@@ -203,38 +209,27 @@ module.exports = {
       return;
     }
 
-    /* Get user matching the token that was authenticated */
-    let user = await User.findOne({ id: String(res.locals.id) });
 
-    if (!user) {
-      await res
-        .status(400)
-        .send({ ok: false, message: "User is already in session" });
-      return;
-    }
 
-    let isInSession = false;
     /* Assert user isn't in session */
     for (const index in session.participants) {
       if (user.id === session.participants[parseInt(index)].id) {
-        isInSession = true;
-        break;
+        res.status(400).send({ ok: false, message: "User is already in session" });
+        return;
       }
     }
 
-    if (!isInSession) {
-      /* Create new person and insert */
-      let newPerson = { name: user.name, id: String(res.locals.id) };
-      let participants = session.participants;
-      participants.push(newPerson);
-      session.participants = participants;
+    /* Create new person and insert */
+    let newPerson = { name: user.name, id: String(res.locals.id) };
+    let participants = session.participants;
+    participants.push(newPerson);
+    session.participants = participants;
 
-      /* Update db */
-      await Session.updateOne(
-        { pin: req.params.id },
-        { $set: { participants } }
-      );
-    }
+    /* Update db */
+    await Session.updateOne(
+      { pin: req.params.id },
+      { $set: { participants } }
+    );
 
     /* Push firebase message to each user in the session */
     let firebaseMessage = {
@@ -308,17 +303,23 @@ module.exports = {
       res.status(404).send({ ok: false, message: "Session does not exist" });
       return;
     }
+
     //Find list that matches
-    let foundList = await List.findOne({ _id: ObjectId(req.body.listID) });
+    await console.log(typeof (req.body.listID));
 
     //Assert parameters are valid
     if (
       req.params.id === null ||
-      req.body.listID === null ||
-      foundList === null
+      typeof (req.body.listID) !== "string"
     ) {
-      res.status(400).send();
+      res.status(400).send({ ok: false, message: "Invalid parameters" });
       return;
+    }
+
+    let foundList = await List.findById(req.body.listID);
+    //Assert list is found
+    if (foundList == null) {
+      res.status(404).send({ ok: false, message: "List was not found" });
     }
 
     //Update database
@@ -339,14 +340,15 @@ module.exports = {
 
   getList: async (req, res) => {
     console.log("DEBUG: Get request to session/" + req.params.id + "/list");
+    let session = await Session.findOne({ pin: req.params.id });
+
     //Assert session id is valid
-    if (typeof req.params.id !== "string") {
+    if (session === null) {
       res.status(400).send({ ok: false, message: "Invalid session ID" });
       return;
     }
 
-    let session = await Session.findOne({ pin: req.params.id });
-
+    let inSession = false;
     //Assert user is in session
     session.participants.forEach((user) => {
       if (user.id === res.locals.id) {
@@ -354,17 +356,10 @@ module.exports = {
       }
     });
     if (!inSession) {
-      res.status(400).send({ ok: false, message: "User is not in session" });
+      res.status(401).send({ ok: false, message: "User is not in session" });
       return;
     }
 
-    //Assert session exists
-    if (session === null) {
-      res
-        .status(400)
-        .send({ ok: false, message: "Session could not be found" });
-      return;
-    }
     let foundList = await List.findById(session.listID);
 
     res.status(200).send(foundList);
