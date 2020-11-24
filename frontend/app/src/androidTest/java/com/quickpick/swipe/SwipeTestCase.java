@@ -50,7 +50,6 @@ public class SwipeTestCase {
     @LargeTest
     @Test
     public void swipeTest() { //starts at main activity
-
         startMovieSession();
 
         testSwipes();
