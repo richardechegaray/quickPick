@@ -2,67 +2,27 @@ const axios = require("axios");
 
 const User = require("../models/user");
 
-function findUser(userID) {
-  return User.findOne({ id: String(userID) });
-}
+module.exports = {
+    putUser: async (req, res) => {
+        const foundUser = await User.findOne({ id: String(res.locals.id) });
+        /* Create user if DB doesn't have any users matching the id */
+        if (!foundUser) {
+            const url = `https://graph.facebook.com/v8.0/${res.locals.id}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
 
-function updateFirebaseToken(userID, firebaseToken) {
-
-  const filter = { "id": String(userID) };
-  const update = { $set: { "firebaseToken": String(firebaseToken) }};
-  User.findOneAndUpdate(filter, update)
-  .catch((err) => {
-    console.log(err);
-  });
-  console.log(`Verified user, FB token updated for ${userID}`);
-}
-
-function createNewUser(userID, name, firebaseToken) {
-  console.log(`FirebaseToken: ${firebaseToken}`);
-  User.create({
-    id: String(userID),
-    name: String(name),
-    firebaseToken: String(firebaseToken),
-  });
-}
-
-function loginHelper(userID, firebaseToken, res, callback) {
-  console.log("DEBUG: Post request to login");
-  /* Check users collection for document with matching FB id */
-  findUser(userID)
-    .then((foundUser) => {
-      /* If a user in the DB has a matching id */
-      if (foundUser !== null) {
-        if (firebaseToken !== foundUser.firebaseToken) {
-          updateFirebaseToken(userID, firebaseToken);
-          callback(res, 200, {
-            message: "Logged in user, updated Firebase token",
-            ok: true,
-          });
-        } else {
-          callback(res, 200, {
-            message: "Logged in user, did not change Firebase token",
-            ok: true,
-          });
+            const facebookResponse = await axios.get(url);
+            await User.create({
+                id: String(res.locals.id),
+                name: String(facebookResponse.data.name),
+                firebaseToken: String(req.body.firebaseToken),
+            });
+            res.status(201).send();
         }
-      } else {
-        /* Get user's name */
-        let url = `https://graph.facebook.com/v8.0/${userID}?access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
-        axios
-          .get(url)
-          .then((facebookResponse) => {
-            /* Create new user */
-            createNewUser(userID, facebookResponse.data.name, firebaseToken);
-            callback(res, 200, { message: "Created new user", ok: true });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      callback(res, 500, { message: "Error during authentication", ok: false });
-    });
+        /* Otherwise, update the firebase token */
+        else {
+            const filter = { "id": String(res.locals.id) };
+            const update = { $set: { "firebaseToken": String(req.body.firebaseToken) } };
+            await User.findOneAndUpdate(filter, update);
+            res.status(200).send();
+        }
+    }
 }
-module.exports = { loginHelper, createNewUser, updateFirebaseToken, findUser };
