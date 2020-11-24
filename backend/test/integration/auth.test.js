@@ -6,9 +6,9 @@ const User = require("../../models/user");
 const dbHelper = require("../db/mongodb");
 
 describe("Login Integration Tests", () => {
-    const testToken1 = "EAALsZAFPkrZAUBAKBruY4udFR1yLOyzTm3Wj8dPPJvr3ktDO5sFuAh5BxWcf97bI2UIRjLJfw0jrI7d9E0XfRtT7fQepRbqoZCnLY3m2BGZBo3KUeEZAZAigrzVv7ZCxjI6ypVIhAGrrLIuSE9iRZCJPi4i1GbHsj5ti7hah4oZB7Q9Hyaowzm22lFLeRp1SMsesXZCjiNSySkfQKgrhtQKKxv";
+    const testToken1 = "EAALsZAFPkrZAUBAO5AdNmEesraFKVzn5shZBtUJIFZAMjA2r6dDgZAHRZA22g9JcWVXjd1gyjw8PvSQaFtexH04Kzl2dyfUdR3cu7FbYMgiGJGP5bWoaRQITqZByqFslzW4M2ZBBBIkyiQJksMkLA7kU8D8HX1lwEPMbEM4G9lxO0D8e80iXUZB8x";
 
-    const invalidToken = "EAALsZAFPkrZAUBAKn9XDhw76qLhMHZB2pnQblNwhuqMZBg2mnp13PJzMEPsvug87fl34RmdQEIxGtYWAKd55xOvIE5uejN8gWjNYX8sHoCC88tsIjWT0R45792jyfgbFZChjzbVgayuwhdN7bBUswn3mBJ8ZCE0nARZAX5XsJmwpGq63L3GLhj3aAB5P6GFrytVNY3cUoZBqywzDvpZCx8bSZC";
+    const invalidToken = "EAALsZAFPkrZAUBAKBruY4udFR1yLOyzTm3Wj8dPPJvr3ktDO5sFuAh5BxWcf97bI2UIRjLJfw0jrI7d9E0XfRtT7fQepRbqoZCnLY3m2BGZBo3KUeEZAZAigrzVv7ZCxjI6ypVIhAGrrLIuSE9iRZCJPi4i1GbHsj5ti7hah4oZB7Q9Hyaowzm22lFLeRp1SMsesXZCjiNSySkfQKgrhtQKKxv";
 
     const testUser1 = {
         "id": "100722321844479",

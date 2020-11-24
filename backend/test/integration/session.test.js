@@ -1,8 +1,8 @@
 const request = require("supertest");
-const { isExportDeclaration } = require("typescript");
 const app = require("../../app");
+
 require("dotenv").config();
-const { MongoClient } = require("mongodb");
+
 const dbHelper = require("../db/mongodb");
 
 const User = require("../../models/user");
@@ -10,7 +10,7 @@ const Session = require("../../models/session");
 const List = require("../../models/list");
 
 describe("Session Integration", function () {
-    const facebookToken = "EAALsZAFPkrZAUBAPyyFTYb5h6qehgpG6aDtYgXA3sEopdZAI5zP1ZCfdCvs8fNNeCCgns4kaIZBmuZA2OboGYvCedAWSkIWJJxbDijzY6zNgby1bqhyUvp6JAMIWJfyrZBe4ZAIZAMUTgC0fzyx5iRAaGiNexb2e7DCasYZBkjxVLtaiRwZBecHn7mHeZCfu3CXcP9AOw86hdZBoQmM7tycqYA5jLLJndw10OR3ZBWW1TWCh6ZAPV5lPVbtuvB4HXKytpr6eM8ZD";
+    const facebookToken = "EAALsZAFPkrZAUBAO5AdNmEesraFKVzn5shZBtUJIFZAMjA2r6dDgZAHRZA22g9JcWVXjd1gyjw8PvSQaFtexH04Kzl2dyfUdR3cu7FbYMgiGJGP5bWoaRQITqZByqFslzW4M2ZBBBIkyiQJksMkLA7kU8D8HX1lwEPMbEM4G9lxO0D8e80iXUZB8x";
 
     let sessionPin = "";
     beforeAll(async () => {
@@ -22,15 +22,13 @@ describe("Session Integration", function () {
         await List.deleteMany({});
 
         let newUser = {
-            name: "Ava Alefgghaihiec Narayananberg",
-            id: "108059947763278"
+            name: "Buyonacy Changstein",
+            id: "100722321844479"
         }
         await User.create(newUser);
 
-        
-
         let list = {
-            userID: "108059947763278",
+            userID: newUser.id,
             name: "Food Cuisines",
             ideas: [
                 {
@@ -51,12 +49,12 @@ describe("Session Integration", function () {
             pin: "abcd",
             listID: myList._id,
             status: "lobby",
-            creator: "108059947763278",
+            creator: newUser.id,
             complete: 0,
             results: [],
             participants: [{
-                name: "Ava Alefgghaihiec Narayananberg",
-                id: "108059947763278",
+                name: "Buyonacy Changstein",
+                id: newUser.id,
             }]
         }
         await Session.create(newSession);

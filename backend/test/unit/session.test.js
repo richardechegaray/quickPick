@@ -10,6 +10,8 @@ const session = require("../../controllers/session");
 const Session = require("../../models/session");
 const { textSpanIntersectsWithPosition } = require("typescript");
 
+jest.mock("../../plugins/firebase");
+
 /*
 Mongodb setup*/
 
