@@ -1,5 +1,5 @@
 /* Module we want to mock */
-const imageUtil = jest.createMockFromModule('./unsplash.js');
+const imageUtil = jest.createMockFromModule("./unsplash.js");
 
 /* Function in mocked modules we are mocking */
 async function getImage(searchString) {

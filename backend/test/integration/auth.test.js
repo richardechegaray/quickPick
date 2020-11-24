@@ -8,8 +8,8 @@ const dbHelper = require("../db/mongodb");
 describe("Login Integration Tests", () => {
     const testToken1 = "EAALsZAFPkrZAUBALPZCf8D65zGKfJV4ffmIHoDFDVqvURxt6ocNAY33ZBbr1JmNZC36Tlv4WJpMMsczvQVMg2iRZA2ON7fGGSOGb9d8BpZCfLKulCA2P80pOZCsrJtUTvC5rfGdx0RPQMVbSv6qQ5DfEfQrnqKQzzhd2g5YnBZAEss4lwOaAtZB9HucB0YIWJmL0WzpZBIMYBeqZBuFMZCxamIvvA";
     const testUser1 = {
-        "id": "108059947763278",
-        "name": "Ava Alefgghaihiec Narayananberg",
+        "id": "100722321844479",
+        "name": "Buyonacy Changstein",
         "firebaseToken": "12345"
     };
     beforeAll(async () => {
@@ -30,8 +30,6 @@ describe("Login Integration Tests", () => {
             .send({
                 firebaseToken: testUser1.firebaseToken,
             });
-        const newUser = await User.findOne({ name: testUser1.name });
-        console.log(newUser)
         expect(response.statusCode).toBe(200);
     });
 

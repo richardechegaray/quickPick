@@ -8,12 +8,11 @@ const Image = require("../../models/image");
 const dbHelper = require("../db/mongodb");
 
 describe("List Integration Tests", () => {
-    // Uses testUser: Sarah Alegefcbjdhjg Chengsen
-    const testToken = "EAALsZAFPkrZAUBADrb8gfQigFjQmjgo3fttVyFEDpuSHfPiSbTvQHtisETQ1ZAMRnXJcNZC0UjAnTyPBChnet1SvpjP0NCja9N0NhkljLP7WNkfvIHWqyxlUuIOSuplpsC3o2kMlrctipS1DT49lZA9tP5oZBXjkrJGzIfNueF1XdITb1kwqWvVWCfNzzIBFWFk0a0OcfDmUBQUOEZAzfHv";
+    const testToken = "EAALsZAFPkrZAUBAPyyFTYb5h6qehgpG6aDtYgXA3sEopdZAI5zP1ZCfdCvs8fNNeCCgns4kaIZBmuZA2OboGYvCedAWSkIWJJxbDijzY6zNgby1bqhyUvp6JAMIWJfyrZBe4ZAIZAMUTgC0fzyx5iRAaGiNexb2e7DCasYZBkjxVLtaiRwZBecHn7mHeZCfu3CXcP9AOw86hdZBoQmM7tycqYA5jLLJndw10OR3ZBWW1TWCh6ZAPV5lPVbtuvB4HXKytpr6eM8ZD";
     const sessionPin = "DhAy0";
 
     const testList1 = {
-        userID: "106807727914667",
+        userID: "100722321844479",
         name: "TestList1",
         ideas: [
             {
@@ -50,7 +49,7 @@ describe("List Integration Tests", () => {
     const image1 = {
         name: "dog",
         urls: "https://cacheddogurl.com"
-    }
+    };
 
     beforeAll(async () => {
         await dbHelper.connect();
@@ -132,7 +131,7 @@ describe("List Integration Tests", () => {
     
     test("Get specific list - List Doesn't exist", async () => {
         const response = await request(app)
-                            .get(`/list/fakeIdFoobar`)
+                            .get("/list/fakeIdFoobar")
                             .set("facebookToken", testToken)
                             .send();
     
@@ -157,8 +156,7 @@ describe("List Integration Tests", () => {
     });
 
     test("Create List - Basic", async () => {
-        newList = {
-            userID: "106807727914667",
+        const newList = {
             name: "CreatedList1",
             ideas: [
                 {
@@ -182,7 +180,7 @@ describe("List Integration Tests", () => {
                             });
     
         // Check that list exists in DB
-        resultList = await List.findOne({name: "CreatedList1"});
+        const resultList = await List.findOne({name: "CreatedList1"});
         expect(resultList); // Not null
         expect(resultList.name).toEqual("CreatedList1");
         expect(resultList.ideas.map((i) => i.name).toObject()).toEqual(["dog", "cat"]);

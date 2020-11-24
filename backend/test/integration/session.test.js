@@ -10,7 +10,7 @@ const Session = require("../../models/session");
 const List = require("../../models/list");
 
 describe("Session Integration", function () {
-    const facebookToken = "EAALsZAFPkrZAUBAL6aMB2kFSf7xkBc8FYRMBOSdMTNgqpGRqnC8YSWm8oiiDnexl8L5wNKWa1qo0GhBj5l4un2zBBMvDb1J9HZBZApYZBScYSyF5RTLXZAn58HY9oBZCrLu8kjWy9I8DHoNpIOfdhFlEWahabFy96LUUwpOnd3abpaGZB6lcdNkZBtkwqNbbckuthATK78RJoPVYw43Pvuwrj42LTfkA5ZAeYZB8Ceg9XtW3a8S7ZCU3KbZBgJHJRZCH7YX6IZD";
+    const facebookToken = "EAALsZAFPkrZAUBAPyyFTYb5h6qehgpG6aDtYgXA3sEopdZAI5zP1ZCfdCvs8fNNeCCgns4kaIZBmuZA2OboGYvCedAWSkIWJJxbDijzY6zNgby1bqhyUvp6JAMIWJfyrZBe4ZAIZAMUTgC0fzyx5iRAaGiNexb2e7DCasYZBkjxVLtaiRwZBecHn7mHeZCfu3CXcP9AOw86hdZBoQmM7tycqYA5jLLJndw10OR3ZBWW1TWCh6ZAPV5lPVbtuvB4HXKytpr6eM8ZD";
 
     let sessionPin = "";
     beforeAll(async () => {

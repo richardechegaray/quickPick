@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-jest.mock("../../plugins/unsplash")
+jest.mock("../../plugins/unsplash");
 
 const listHelper = require("../../controllers/list");
 const dbHelper = require("../db/mongodb");
