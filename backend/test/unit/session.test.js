@@ -19,7 +19,6 @@ let list_id = "";
 const mockRequest = () => {
     const req = {
         body: {
-            size: "",
             listID: "",
             choices: [],
         },
@@ -61,7 +60,6 @@ beforeAll(async () => {
         status: "lobby",
         creator: TestUserID,
         complete: 0,
-        size: 6,
         results: [],
         participants: [{
             name: "me",
@@ -111,22 +109,10 @@ afterAll(async () => {
 Module Tests!
 */
 describe("Create Session", function () {
-    it("Invalid params", async () => {
-        const req = mockRequest();
-        const res = mockResponse();
-        res.locals.id = TestUserID;
-        req.body.size = "one hundred thousand";
-
-        await sessionHelper.createSession(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(400);
-    });
-
     it("Success", async () => {
         const req = mockRequest();
         const res = mockResponse();
-        res.locals.id = TestUserID;
-        req.body.size = 6;
+        res.locals.id = 
 
         await sessionHelper.createSession(req, res);
 
