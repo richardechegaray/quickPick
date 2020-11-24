@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
 
@@ -53,7 +54,11 @@ public class MainActivity extends AppCompatActivity {
         );
 
         findViewById(R.id.view_edit_lists_button).setOnClickListener(view ->
-                startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class))
+                ListRepository.getInstance().callGetLists(
+                        () -> startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class)),
+                        RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
+                        facebookAccessToken
+                )
         );
 
         findViewById(R.id.join_session_button).setOnClickListener(view -> showAlertDialog());

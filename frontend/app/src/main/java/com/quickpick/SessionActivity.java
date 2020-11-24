@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +20,7 @@ import com.facebook.AccessToken;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.quickpick.payloads.ListPayload;
+import com.quickpick.payloads.ListsPayload;
 import com.quickpick.payloads.ParticipantPayload;
 import com.quickpick.payloads.SessionPayload;
 import com.quickpick.receivers.FirebaseIntentReceiver;
@@ -32,6 +32,7 @@ import com.quickpick.viewmodels.SessionViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class SessionActivity extends AppCompatActivity {
@@ -78,12 +79,12 @@ public class SessionActivity extends AppCompatActivity {
             if ("running".equals(newSession.getStatus())) {
                 SessionRepository.getInstance().callGetSessionList(
                         () -> startActivity(new Intent(getApplicationContext(), SwipeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)),
-                        RunnableUtils.showToast(this, "Failed to get list for swiping"),
+                        RunnableUtils.showToast(this, getString(R.string.get_list_failed)),
                         accessToken.getToken());
             }
             if (isOwner) {
-                ListRepository.getInstance().callGetLists(() -> {},
-                        () -> Toast.makeText(this, "Failed to get lists", Toast.LENGTH_SHORT).show(),
+                ListRepository.getInstance().callGetLists(RunnableUtils.DO_NOTHING,
+                        RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
                         accessToken.getToken());
             }
             sessionUserCount.setText(String.format(getString(R.string.session_user_count_format), newSession.getParticipants().size()));
@@ -100,7 +101,7 @@ public class SessionActivity extends AppCompatActivity {
         listEditText.setFocusable(false);
         listEditText.setOnClickListener(view ->
                 {
-                    List<ListPayload> lists = listViewModel.getLists().getValue().getLists();
+                    List<ListPayload> lists = Optional.ofNullable(listViewModel.getLists().getValue()).orElse(new ListsPayload()).getLists();
                     String[] listNames = lists.stream().map(ListPayload::getName).toArray(String[]::new);
                     List<String> listIds = lists.stream().map(ListPayload::getId).collect(Collectors.toList());
                     final int[] selectedItem = new int[1];
