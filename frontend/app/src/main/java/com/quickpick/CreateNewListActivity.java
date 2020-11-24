@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class CreateNewListActivity extends AppCompatActivity {
 
+    // TODO: figure out whether or not these private variables will be used in multiple methods
     private Button addEntries;
 
     private Button createList;
@@ -32,12 +33,10 @@ public class CreateNewListActivity extends AppCompatActivity {
     }
 
     private void addEntriesDialog() {
-
         AlertDialog dialog = new AlertDialog.Builder(CreateNewListActivity.this)
                 .setTitle(getString(R.string.add_entries_title))
                 .setView(R.layout.dialog_add_entries)
                 .create();
         dialog.show();
-
     }
 }

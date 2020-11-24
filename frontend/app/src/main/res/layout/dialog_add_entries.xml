@@ -21,6 +21,8 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+<!--    TODO: add text for description-->
+
     <LinearLayout
         style="?android:attr/buttonBarStyle"
         android:layout_width="match_parent"
