@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".CreateNewListActivity">
 
-
     <TextView
         android:id="@+id/create_list_title_prompt"
         android:layout_width="346dp"
@@ -65,6 +64,27 @@
         app:layout_constraintTop_toBottomOf="@+id/create_list_description_name"
         app:layout_constraintVertical_bias="0.77" />
 
+    <TextView
+        android:id="@+id/create_list_entries_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/create_list_entries_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
+        app:layout_constraintVertical_bias="0.32999998" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_entries"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/create_list_add_entries_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view" />
+
     <Button
         android:id="@+id/create_list_add_entries_button"
         android:layout_width="wrap_content"
@@ -86,17 +106,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
         app:layout_constraintVertical_bias="0.97" />
-
-    <TextView
-        android:id="@+id/create_list_entries_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/create_list_entries_text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.32999998" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

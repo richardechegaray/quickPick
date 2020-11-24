@@ -53,8 +53,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_recycler_view" />
-
-
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout
