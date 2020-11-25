@@ -34,4 +34,5 @@
     <string name="get_lists_failed">Failed to get lists</string>
     <string name="invalid_code">Invalid code</string>
     <string name="logout">Logout</string>
+    <string name="missing_list">Select a list first!</string>
 </resources>

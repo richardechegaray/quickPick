@@ -1,7 +1,6 @@
 package com.quickpick.apis;
 
 import com.quickpick.payloads.BasicResponse;
-import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
@@ -18,7 +17,7 @@ import retrofit2.http.Path;
 public interface SessionApi {
 
     @POST("session")
-    Call<SessionPayload> createSession(@Header("facebooktoken") String facebookToken, @Body CreateSessionRequest request);
+    Call<SessionPayload> createSession(@Header("facebooktoken") String facebookToken);
 
     @GET("session/{sessionId}")
     Call<SessionPayload> getSession(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
