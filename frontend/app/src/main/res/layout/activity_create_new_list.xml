@@ -86,6 +86,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/create_list_add_entries_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="250dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view" />
 
