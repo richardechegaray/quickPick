@@ -6,87 +6,63 @@
     android:layout_height="match_parent"
     tools:context=".CreateNewListActivity">
 
-    <TextView
-        android:id="@+id/create_list_title_prompt"
-        android:layout_width="346dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/create_list_name_edit_text_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/create_list_title_prompt_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:hint="@string/create_list_name_prompt"
+        app:layout_constraintBottom_toTopOf="@+id/create_list_description_edit_text_layout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.04000000" />
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintWidth_min="250dp">
 
-    <TextView
-        android:id="@+id/create_list_name"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/create_list_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/create_list_description_edit_text_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_list_name_prompt"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:hint="@string/create_list_description_name_prompt"
+        app:layout_constraintBottom_toTopOf="@+id/create_list_entries_text_view"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.050000012" />
+        app:layout_constraintTop_toBottomOf="@+id/create_list_name_edit_text_layout"
+        app:layout_constraintWidth_min="250dp">
 
-    <EditText
-        android:id="@+id/create_list_name_exit_text"
-        android:minWidth="200dp"
-        android:layout_width="200dp"
-        android:maxWidth="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="506dp"
-        android:hint="@string/create_list_name_edit_text_string"
-        android:inputType="text"
-        android:autofillHints="Name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_name" />
-
-    <TextView
-        android:id="@+id/create_list_description_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/create_list_description_name_prompt"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.18" />
-
-    <EditText
-        android:id="@+id/create_list_description_edit_text"
-        android:minWidth="200dp"
-        android:layout_width="200dp"
-        android:maxWidth="300dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/create_list_description_edit_text_string"
-        android:inputType="text"
-        android:autofillHints="Description"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_description_name"
-        app:layout_constraintVertical_bias="0.77" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/create_list_description_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/create_list_entries_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_list_entries_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/rv_entries"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.06"
+        app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.32999998" />
+        app:layout_constraintTop_toBottomOf="@+id/create_list_description_edit_text_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_entries"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scrollbars="vertical"
+        app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/create_list_add_entries_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="250dp"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view" />
 
@@ -95,11 +71,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_list_add_entries_button_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/create_list_create_list_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.89" />
+        app:layout_constraintTop_toBottomOf="@+id/rv_entries" />
 
     <Button
         android:id="@+id/create_list_create_list_button"
@@ -108,8 +84,8 @@
         android:text="@string/create_list_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_title_prompt"
-        app:layout_constraintVertical_bias="0.97" />
+        app:layout_constraintTop_toBottomOf="@+id/create_list_add_entries_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

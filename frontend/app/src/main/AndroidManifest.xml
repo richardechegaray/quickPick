@@ -16,19 +16,29 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".LoginActivity">
+        <activity
+            android:name=".LoginActivity"
+            android:label="Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SessionActivity" />
-        <activity android:name=".SummaryActivity" />
+        <activity
+            android:name=".SessionActivity"
+            android:label="New Session" />
+        <activity
+            android:name=".SummaryActivity"
+            android:label="Results" />
         <activity android:name=".ViewEditListsActivity" />
         <activity android:name=".ViewOldSessionsActivity" />
-        <activity android:name=".CreateNewListActivity" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".CreateNewListActivity"
+            android:label="Create a New List" />
+        <activity
+            android:name=".MainActivity"
+            android:label="Main Menu" />
         <activity android:name=".SwipeActivity" />
 
         <service

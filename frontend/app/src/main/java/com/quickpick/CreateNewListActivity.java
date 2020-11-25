@@ -34,7 +34,7 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_list);
 
-        editName = (EditText) findViewById(R.id.create_list_name_exit_text);
+        editName = (EditText) findViewById(R.id.create_list_name_edit_text);
 
         editDescription = (EditText) findViewById(R.id.create_list_description_edit_text);
 
@@ -65,6 +65,7 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
         Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
+    // TODO:Delete if not using
     private void addEntriesDialog() {
         AlertDialog dialog = new AlertDialog.Builder(CreateNewListActivity.this)
                 .setTitle(getString(R.string.add_entries_title))
