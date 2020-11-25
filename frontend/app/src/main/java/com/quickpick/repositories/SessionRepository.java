@@ -8,7 +8,6 @@ import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.apis.SessionApi;
 import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ChoicePayload;
-import com.quickpick.payloads.CreateSessionRequest;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
@@ -58,8 +57,7 @@ public class SessionRepository {
     }
 
     public void createSession(Runnable callback, String facebookToken) {
-        // TODO: Remove hard-coded limit of 6 on party size
-        Call<SessionPayload> createSessionCall = sessionApi.createSession(facebookToken, new CreateSessionRequest(6));
+        Call<SessionPayload> createSessionCall = sessionApi.createSession(facebookToken);
         createSessionCall.enqueue(new RepositoryCallback<>(responsePayload -> {
             session.setValue(responsePayload);
             callback.run();
