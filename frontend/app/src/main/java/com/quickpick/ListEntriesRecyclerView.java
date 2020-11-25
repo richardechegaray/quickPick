@@ -48,7 +48,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    private static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         EditText myEntry;
 
         EditText myDescription;
@@ -63,6 +63,14 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+        }
+
+        EditText getMyEntry() {
+            return myEntry;
+        }
+
+        EditText getMyDescription() {
+            return  myDescription;
         }
     }
 

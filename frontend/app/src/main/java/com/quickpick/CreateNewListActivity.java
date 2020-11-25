@@ -27,7 +27,7 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
 
     private EditText editDescription;
 
-    MyRecyclerViewAdapter adapter;
+    private MyRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,8 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
 
         addEntries.setOnClickListener(view -> addEntriesDialog());
 
+
+        // TODO: do we need this or not?
         List<IdeaPayload> example = new ArrayList<>();
         IdeaPayload ex = new IdeaPayload();
         ex.setDescription("test");

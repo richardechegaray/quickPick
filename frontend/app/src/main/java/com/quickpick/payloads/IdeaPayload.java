@@ -7,10 +7,10 @@ import java.util.Optional;
 public class IdeaPayload {
 
     @Nullable
-    private  String name;
+    private String name;
 
     @Nullable
-    private  String description;
+    private String description;
 
     @Nullable
     private final String picture;

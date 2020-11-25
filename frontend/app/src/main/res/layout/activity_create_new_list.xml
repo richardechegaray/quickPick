@@ -31,7 +31,9 @@
 
     <EditText
         android:id="@+id/create_list_name_exit_text"
-        android:layout_width="match_parent"
+        android:minWidth="200dp"
+        android:layout_width="200dp"
+        android:maxWidth="300dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="506dp"
         android:hint="@string/create_list_name_edit_text_string"
@@ -54,7 +56,9 @@
 
     <EditText
         android:id="@+id/create_list_description_edit_text"
-        android:layout_width="match_parent"
+        android:minWidth="200dp"
+        android:layout_width="200dp"
+        android:maxWidth="300dp"
         android:layout_height="wrap_content"
         android:hint="@string/create_list_description_edit_text_string"
         android:inputType="text"
