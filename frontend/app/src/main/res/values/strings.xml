@@ -46,6 +46,7 @@
     <string name="create_list_button">Create List</string>
     <string name="create_list_entries_text">Entries:</string>
     <string name="logout">Logout</string>
+    <string name="missing_list">Select a list first!</string>
     <string name="rv_entries_delete_button_text">x</string>
     <string name="rv_description_hint">Description:</string>
     <string name="rv_entry_hint">Entry:</string>

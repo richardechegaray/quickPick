@@ -132,8 +132,14 @@ public class SessionActivity extends AppCompatActivity {
     }
 
     private void setOnClickListeners() {
-        startSwipingButton.setOnClickListener(view -> SessionRepository.getInstance().startSession(
-                RunnableUtils.DO_NOTHING, accessToken.getToken()));
+        startSwipingButton.setOnClickListener(view -> {
+            if (listEditText.getText().toString().isEmpty()) {
+                RunnableUtils.showToast(this, getString(R.string.missing_list)).run();
+            } else {
+                SessionRepository.getInstance().startSession(
+                        RunnableUtils.DO_NOTHING, accessToken.getToken());
+            }
+        });
     }
 
     @Override

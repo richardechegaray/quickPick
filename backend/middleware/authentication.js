@@ -2,36 +2,18 @@ const axios = require("axios");
 require("dotenv").config();
 
 module.exports = {
-  /* Verifies the token passed in the request's facebookToken field */
-  checkFB: (req, res, next) => {
-    let facebookToken = req.headers.facebooktoken;
-    let url = `https://graph.facebook.com/debug_token?input_token=${facebookToken}&access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
+    checkFB: async (req, res, next) => {
+        const facebookToken = req.headers.facebooktoken;
+        const url = `https://graph.facebook.com/debug_token?input_token=${facebookToken}&access_token=${process.env.FB_APP_ID}|${process.env.FB_APP_SECRET}`;
 
-    /* Pass the token to the Facebook endpoint */
-    axios
-      .get(url)
-      .then((facebookResponse) => {
+        const facebookResponse = await axios.get(url);
+        
         if (facebookResponse.data.data.is_valid) {
-          res.locals.id = facebookResponse.data.data.user_id;
-          /* Run the protected function on the endpoint */
-          next();
-        } else {
-          /* Bad token, reject access to the endpoint */
-          res.status(401);
-          res.json({
-            message: "Invalid token!",
-            ok: false,
-          });
+            res.locals.id = facebookResponse.data.data.user_id;
+            next();
         }
-      })
-      .catch((error) => {
-        /* Validation Error occured (likely a bad parameter) */
-        res.status(401);
-        console.log(error);
-        res.json({
-          message: "FB request returned an error",
-          ok: false,
-        });
-      });
-  },
+        else {
+            res.status(401).send({ message: "Failed to authenticate Facebook token" });
+        }
+    }
 };

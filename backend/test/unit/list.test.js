@@ -1,6 +1,6 @@
 require("dotenv").config();
-const { MongoClient } = require("mongodb");
-const ObjectId = require("mongodb").ObjectID;
+
+jest.mock("../../plugins/unsplash");
 
 const listHelper = require("../../controllers/list");
 const dbHelper = require("../db/mongodb");
@@ -8,88 +8,87 @@ const dbHelper = require("../db/mongodb");
 const List = require("../../models/list");
 const User = require("../../models/user");
 
-describe("Unit tests for list functionalities", () => {
-    const TestUserID = "FacebookId123";
+const mockRequest = () => {
+    const req = {};
+    req.params = {};
+    req.body = {};
+    return req;
+};
 
-    const mockRequest = () => {
-        const req = {};
-        req.params = {};
-        req.body = {};
-        return req;
-    };
-    
-    const mockResponse = () => {
-        const res = {};
-        res.body = {};
-        res.status = jest.fn().mockReturnValue(res);
-        // res.send = jest.fn().mockReturnValue(res);
-        res.send = (result) => {
-            res.body = JSON.parse(JSON.stringify(result));
-        };
-
-        res.locals = {};
-        return res;
+const mockResponse = () => {
+    const res = {};
+    res.body = {};
+    res.status = jest.fn().mockReturnValue(res);
+    // res.send = jest.fn().mockReturnValue(res);
+    res.send = (result) => {
+        res.body = JSON.parse(JSON.stringify(result));
     };
 
-    const testList1 = {
-        userID: TestUserID,
-        name: "TestList-FakeID",
-        ideas: [
-            {
-                name: "Idea1",
-                description: "This is an idea",
-                picture: "https://fakeimage.com",
-            },
-        ],
-    };
+    res.locals = {};
+    return res;
+};
 
-    const testList2 = {
-        userID: "quickpick.admin",
-        name: "TestList-Default",
-        ideas: [
-            {
-                name: "Idea1",
-                description: "This is an idea",
-                picture: "https://fakeimage.com",
-            },
-        ],
-    };
-    
-    const testList3 = {
-        userID: TestUserID,
-        name: "TestList-NewList",
-        ideas: [
-            {
-                name: "Idea1",
-                description: "This is an idea",
-                picture: "https://fakeimage.com",
-            },
-        ],
-    };
+const TestUserID = "FacebookId123";
 
-    beforeAll(async () => {
-        await dbHelper.connect();
+const testList1 = {
+    userID: TestUserID,
+    name: "TestList-FakeID",
+    ideas: [
+        {
+            name: "Idea1",
+            description: "This is an idea",
+            picture: "https://fakeimage.com",
+        },
+    ],
+};
 
-        /* Clear out the database */
-        await List.deleteMany({});
-        await User.deleteMany({});
+const testList2 = {
+    userID: "quickpick.admin",
+    name: "TestList-Default",
+    ideas: [
+        {
+            name: "Idea1",
+            description: "This is an idea",
+            picture: "https://fakeimage.com",
+        },
+    ],
+};
 
-        await User.create({
-            id: TestUserID,
-            name: "TestUserX",
-            firebaseToken: "FakeTokenX",
-        });
+const testList3 = {
+    userID: TestUserID,
+    name: "TestList-NewList",
+    ideas: [
+        {
+            name: "Idea1",
+            description: "This is an idea",
+            picture: "https://fakeimage.com",
+        },
+    ],
+};
 
-        
-        await List.create(testList1);
-        await List.create(testList2);
+beforeAll(async () => {
+    await dbHelper.connect();
+
+    /* Clear out the database */
+    await List.deleteMany({});
+    await User.deleteMany({});
+
+    await User.create({
+        id: TestUserID,
+        name: "TestUserX",
+        firebaseToken: "FakeTokenX",
     });
+    
+    await List.create(testList1);
+    await List.create(testList2);
+});
 
-    afterAll(async () => {
-        await dbHelper.close();
-    });
+afterAll(async () => {
+    await dbHelper.close();
+});
 
-    it("Get All Lists - Basic", async () => {
+describe("Get All Accessible Lists", () => {
+    it("Success", async () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
@@ -103,8 +102,10 @@ describe("Unit tests for list functionalities", () => {
             "TestList-FakeID"
         ]);
     });
+});
 
-    it("Get Specific List - Attempt to access someone else's list", async () => {
+describe("Get Specific List", () => {
+    it("Unauthorized Access to Someone's List", async () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
@@ -118,7 +119,7 @@ describe("Unit tests for list functionalities", () => {
         expect(res.status).toHaveBeenCalledWith(403);
     });
     
-    it("Get Specific List - Retrieve personal list", async () => {
+    it("Retrieve Personal List", async () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
@@ -133,7 +134,7 @@ describe("Unit tests for list functionalities", () => {
         expect(res.body.name).toEqual(myList.name);
     });
 
-    it("Get Specific List - Search for non-existent list", async () => {
+    it("Attempt to Get Non-Existent List", async () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
@@ -145,12 +146,14 @@ describe("Unit tests for list functionalities", () => {
         
         expect(res.status).toHaveBeenCalledWith(404);
     });
-    
-    it("Create List - Basic", async () => {
+});
+
+describe("Create a List", () => {
+    it("Success", async () => {
         /* Mock the Request and Response objects */
         const req = mockRequest();
         const res = mockResponse();
-        
+
         req.body.list = testList3;
         res.locals.id = TestUserID;
 
@@ -158,5 +161,20 @@ describe("Unit tests for list functionalities", () => {
         
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.body.name).toEqual(testList3.name);
+        console.log(res.body);
+    });
+
+    it("Null Parameter", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        // req.body.list = testList3;
+        res.locals.id = TestUserID;
+
+        await listHelper.createList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+        console.log(res.body);
     });
 });

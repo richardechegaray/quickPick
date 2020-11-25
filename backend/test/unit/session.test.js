@@ -8,6 +8,9 @@ const List = require("../../models/list");
 const User = require("../../models/user");
 const session = require("../../controllers/session");
 const Session = require("../../models/session");
+const { textSpanIntersectsWithPosition } = require("typescript");
+
+jest.mock("../../plugins/firebase");
 
 /*
 Mongodb setup*/
@@ -19,7 +22,6 @@ let list_id = "";
 const mockRequest = () => {
     const req = {
         body: {
-            size: "",
             listID: "",
             choices: [],
         },
@@ -46,7 +48,7 @@ const mockResponse = () => {
 
 };
 
-beforeAll(async () => {
+beforeEach(async () => {
     await dbHelper.connect();
 
     /* Clear out the database */
@@ -55,20 +57,6 @@ beforeAll(async () => {
     await List.deleteMany({});
 
     /* We have one mock session, two mock users, and one mock list for testing */
-    let newSession = {
-        pin: "abcd",
-        listID: "1234",
-        status: "lobby",
-        creator: TestUserID,
-        complete: 0,
-        size: 6,
-        results: [],
-        participants: [{
-            name: "me",
-            id: TestUserID,
-        }]
-    };
-    await Session.create(newSession);
 
     let newUser = {
         name: "me",
@@ -96,11 +84,24 @@ beforeAll(async () => {
             }
         ]
     };
-
     await List.create(list);
 
-    list_id = (await List.findOne({}))._id;
-    
+    let foundList = await List.findOne({});
+    list_id = foundList._id;
+
+    let newSession = {
+        pin: "abcd",
+        listID: "",
+        status: "lobby",
+        creator: TestUserID,
+        complete: 0,
+        results: [],
+        participants: [{
+            name: "me",
+            id: TestUserID,
+        }]
+    };
+    await Session.create(newSession);
 });
 
 afterAll(async () => {
@@ -111,31 +112,20 @@ afterAll(async () => {
 Module Tests!
 */
 describe("Create Session", function () {
-    it("Invalid params", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
-        req.body.size = "one hundred thousand";
-
-        await sessionHelper.createSession(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(400);
-    });
-
-    it("Success", async () => {
-        const req = mockRequest();
-        const res = mockResponse();
-        res.locals.id = TestUserID;
-        req.body.size = 6;
 
         await sessionHelper.createSession(req, res);
 
         expect(res.status).toHaveBeenCalledWith(201);
+        done();
     });
 });
 
 describe("Get Session", function () {
-    it("Session doesn't exist", async () => {
+    it("Session doesn't exist", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -143,10 +133,11 @@ describe("Get Session", function () {
 
         await sessionHelper.getSession(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.status).toHaveBeenCalledWith(404);
+        done();
     });
 
-    it("User is not in session", async () => {
+    it("User is not in session", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = "murphy";
@@ -155,9 +146,10 @@ describe("Get Session", function () {
         await sessionHelper.getSession(req, res);
 
         expect(res.status).toHaveBeenCalledWith(401);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -166,11 +158,12 @@ describe("Get Session", function () {
         await sessionHelper.getSession(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });
 
 describe("Add user to session", function () {
-    it("Session doesn't exist", async () => {
+    it("Session doesn't exist", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -179,9 +172,10 @@ describe("Add user to session", function () {
         await sessionHelper.addUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(404);
+        done();
     });
 
-    it("User is already in session or full", async () => {
+    it("User is already in session or full", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -190,9 +184,10 @@ describe("Add user to session", function () {
         await sessionHelper.addUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID2;
@@ -201,11 +196,12 @@ describe("Add user to session", function () {
         await sessionHelper.addUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });
 
 describe("Update session list", function () {
-    it("Invalid listID", async () => {
+    it("Invalid listID", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -214,33 +210,36 @@ describe("Update session list", function () {
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(400);
+        done();
     });
 
-    it("Session doesn't exist", async () => {
+    it("Session doesn't exist", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "10000";
-        req.body.listID = list_id;
+        req.body.listID = list_id.toString();
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(404);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
-        req.body.listID = list_id;
+        req.body.listID = list_id.toString();
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });
 
 describe("Get session list", function () {
-    it("User is not in session", async () => {
+    it("User is not in session", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID2;
@@ -248,21 +247,24 @@ describe("Get session list", function () {
 
         await sessionHelper.getList(req, res);
         expect(res.status).toHaveBeenCalledWith(401);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
+        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: list_id });
 
         await sessionHelper.getList(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });
 
 describe("Start session", function () {
-    it("Session does not exist", async () => {
+    it("Session does not exist", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -270,9 +272,10 @@ describe("Start session", function () {
 
         await sessionHelper.startSession(req, res);
         expect(res.status).toHaveBeenCalledWith(404);
+        done();
     });
 
-    it("User is not owner", async () => {
+    it("User is not owner", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID2;
@@ -280,21 +283,24 @@ describe("Start session", function () {
 
         await sessionHelper.startSession(req, res);
         expect(res.status).toHaveBeenCalledWith(400);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
+        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: list_id });
 
         await sessionHelper.startSession(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });
 
 describe("Receive choices", function () {
-    it("Invalid params", async () => {
+    it("Invalid params", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
@@ -302,26 +308,28 @@ describe("Receive choices", function () {
 
         await sessionHelper.receiveChoices(req, res);
         expect(res.status).toHaveBeenCalledWith(400);
+        done();
     });
 
-    it("Success", async () => {
+    it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
         req.body.choices = [
             {
-                idea: {name: "Italian"}, choice: true
+                idea: { name: "Italian" }, choice: true
             },
             {
-                idea: {name: "French"}, choice: false
+                idea: { name: "French" }, choice: false
             },
             {
-                idea: {name: "Mexican"}, choice: true
+                idea: { name: "Mexican" }, choice: true
             },
         ];
 
         await sessionHelper.receiveChoices(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
+        done();
     });
 });

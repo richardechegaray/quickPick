@@ -1,8 +1,8 @@
 const request = require("supertest");
-const { isExportDeclaration } = require("typescript");
 const app = require("../../app");
+
 require("dotenv").config();
-const { MongoClient } = require("mongodb");
+
 const dbHelper = require("../db/mongodb");
 
 const User = require("../../models/user");
@@ -10,7 +10,7 @@ const Session = require("../../models/session");
 const List = require("../../models/list");
 
 describe("Session Integration", function () {
-    const facebookToken = "EAALsZAFPkrZAUBAL6aMB2kFSf7xkBc8FYRMBOSdMTNgqpGRqnC8YSWm8oiiDnexl8L5wNKWa1qo0GhBj5l4un2zBBMvDb1J9HZBZApYZBScYSyF5RTLXZAn58HY9oBZCrLu8kjWy9I8DHoNpIOfdhFlEWahabFy96LUUwpOnd3abpaGZB6lcdNkZBtkwqNbbckuthATK78RJoPVYw43Pvuwrj42LTfkA5ZAeYZB8Ceg9XtW3a8S7ZCU3KbZBgJHJRZCH7YX6IZD";
+    const facebookToken = "EAALsZAFPkrZAUBAO5AdNmEesraFKVzn5shZBtUJIFZAMjA2r6dDgZAHRZA22g9JcWVXjd1gyjw8PvSQaFtexH04Kzl2dyfUdR3cu7FbYMgiGJGP5bWoaRQITqZByqFslzW4M2ZBBBIkyiQJksMkLA7kU8D8HX1lwEPMbEM4G9lxO0D8e80iXUZB8x";
 
     let sessionPin = "";
     beforeAll(async () => {
@@ -22,15 +22,13 @@ describe("Session Integration", function () {
         await List.deleteMany({});
 
         let newUser = {
-            name: "Ava Alefgghaihiec Narayananberg",
-            id: "108059947763278"
+            name: "Buyonacy Changstein",
+            id: "100722321844479"
         }
         await User.create(newUser);
 
-        
-
         let list = {
-            userID: "108059947763278",
+            userID: newUser.id,
             name: "Food Cuisines",
             ideas: [
                 {
@@ -51,24 +49,23 @@ describe("Session Integration", function () {
             pin: "abcd",
             listID: myList._id,
             status: "lobby",
-            creator: "108059947763278",
+            creator: newUser.id,
             complete: 0,
-            size: 6,
             results: [],
             participants: [{
-                name: "Ava Alefgghaihiec Narayananberg",
-                id: "108059947763278",
+                name: "Buyonacy Changstein",
+                id: newUser.id,
             }]
         }
         await Session.create(newSession);
-    })
+    });
 
     afterAll(async () => {
         await dbHelper.close();
-    })
+    });
 
     it("Create session", async () => {
-        const response = await request(app).post("/session/").set({facebookToken}).send({size: 6});
+        const response = await request(app).post("/session/").set({facebookToken}).send({});
         expect(response.status).toBe(201);
     });
     it("Start session", async () => {
