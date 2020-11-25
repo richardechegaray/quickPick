@@ -37,8 +37,8 @@ function sortSession(session) {
 
 module.exports = {
   getSession: async (req, res) => {
-    console.log("DEBUG: Get request to /session/" + req.params.pin);
-    let session = await Session.findOne({ pin: req.params.pin });
+    console.log("DEBUG: Get request to /session/" + req.params.id);
+    let session = await Session.findOne({ pin: req.params.id });
     //Assert session is found
     if (session == null) {
       res.status(404).send({ ok: false, message: "Invalid session ID" });

@@ -15,14 +15,14 @@ module.exports = {
                 name: String(facebookResponse.data.name),
                 firebaseToken: String(req.body.firebaseToken),
             });
-            res.status(201).send();
+            res.status(201).send({ ok: true });
         }
         /* Otherwise, update the firebase token */
         else {
             const filter = { "id": String(res.locals.id) };
             const update = { $set: { "firebaseToken": String(req.body.firebaseToken) } };
             await User.findOneAndUpdate(filter, update);
-            res.status(200).send();
+            res.status(200).send({ ok: true });
         }
     }
 };
