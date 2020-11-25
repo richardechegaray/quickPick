@@ -17,7 +17,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.quickpick.apis.LoginApi;
 import com.quickpick.apis.RetrofitUtils;
-import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.LoginRequest;
 
 import retrofit2.Call;
@@ -94,11 +93,11 @@ public class LoginActivity extends AppCompatActivity {
         String firebaseToken = firebaseTokenTask.getResult();
         LoginApi loginApi = RetrofitUtils.getApi(LoginApi.class);
         Log.d(LOGIN, String.format("facebookToken: %s, firebaseToken: %s", facebookToken, firebaseToken));
-        Call<BasicResponse> loginCall = loginApi.login(facebookToken, new LoginRequest(firebaseToken));
-        loginCall.enqueue(new Callback<BasicResponse>() {
+        Call<Void> loginCall = loginApi.login(facebookToken, new LoginRequest(firebaseToken));
+        loginCall.enqueue(new Callback<Void>() {
             @Override
             @EverythingIsNonNull
-            public void onResponse(Call<BasicResponse> call, Response<BasicResponse> response) {
+            public void onResponse(Call<Void> call, Response<Void> response) {
                 Log.d(LOGIN, response.toString());
                 if (response.isSuccessful()) {
                     navigateToMainActivity();
@@ -107,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             @EverythingIsNonNull
-            public void onFailure(Call<BasicResponse> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Log.d(LOGIN, call.request().toString(), t);
                 Toast.makeText(getBaseContext(), "Error, try again!", Toast.LENGTH_LONG).show();
             }

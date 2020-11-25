@@ -1,6 +1,5 @@
 package com.quickpick.apis;
 
-import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
 import com.quickpick.payloads.SessionPayload;
@@ -26,11 +25,11 @@ public interface SessionApi {
     Call<SessionPayload> joinSession(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
 
     @POST("session/{sessionId}/run")
-    Call<BasicResponse> startSession(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
+    Call<Void> startSession(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId);
 
     @POST("session/{sessionId}/choices")
-    Call<BasicResponse> postChoices(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
-                                    @Body PostChoicesRequest request);
+    Call<Void> postChoices(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
+                           @Body PostChoicesRequest request);
 
     @PUT("session/{sessionId}")
     Call<SessionPayload> updateList(@Header("facebooktoken") String facebookToken, @Path("sessionId") String sessionId,
