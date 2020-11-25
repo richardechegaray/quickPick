@@ -40,7 +40,9 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
 
         addEntries = findViewById(R.id.create_list_add_entries_button);
 
-        addEntries.setOnClickListener(view -> addEntriesDialog());
+        IdeaPayload idea = new IdeaPayload();
+
+        addEntries.setOnClickListener(view -> adapter.add(idea));
 
 
         // TODO: do we need this or not?

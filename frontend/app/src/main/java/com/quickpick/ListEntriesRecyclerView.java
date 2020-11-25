@@ -8,6 +8,7 @@ import android.widget.EditText;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.quickpick.payloads.IdeaPayload;
 
 import java.util.List;
@@ -55,8 +56,8 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
 
         ViewHolder(View itemView) {
             super(itemView);
-            myEntry = itemView.findViewById(R.id.rv_entry);
-            myDescription = itemView.findViewById(R.id.rv_description);
+            myEntry = (TextInputEditText) itemView.findViewById(R.id.rv_entry);
+            myDescription = (TextInputEditText) itemView.findViewById(R.id.rv_description);
             itemView.setOnClickListener(this);
         }
 
@@ -77,6 +78,11 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
     // convenience method for getting data at click position
     IdeaPayload getItem(int id) {
         return mData.get(id);
+    }
+
+    void add(IdeaPayload idea) {
+        mData.add(idea);
+        notifyDataSetChanged();
     }
 
     // allows clicks events to be caught
