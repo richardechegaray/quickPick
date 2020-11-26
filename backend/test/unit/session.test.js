@@ -154,7 +154,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
-        req.params.id = "abcd"
+        req.params.id = "abcd";
 
         await sessionHelper.getSession(req, res);
 
@@ -358,7 +358,7 @@ describe("Receive choices", function () {
         await Session.findOneAndUpdate( 
             { "pin": "abcd"},
             newValues
-        )
+        );
 
         await sessionHelper.receiveChoices(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
