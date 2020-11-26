@@ -66,7 +66,7 @@ async function updateUserPreferences(userID) {
       preferences: myPreferences,
       pendingPreferences: []
     }
-  }
+  };
   await User.findOneAndUpdate(
     { id: userID }, 
     newValues,
@@ -74,15 +74,26 @@ async function updateUserPreferences(userID) {
 }
 
 /*
- * COMPLEX LOGIC
+ * BEGIN COMPLEX LOGIC
  */
+
+function applyPreferences(user, results, ties) {
+  for (let i = 0; i < ties; i++) {
+    if (user.preferences.includes(results[parseInt(i, 10)].idea.name.toLowerCase())) {
+      results[parseInt(i, 10)].score += 1;
+    }
+  }
+}
+
 async function sortSession(session) {
   /* Get list of participants */
   const participantIds = session.participants.map((p) => p.id);
   
   /* Sort the array of results based on number of votes */
   const results = session.results;
-  results.sort((a, b) => { b.score - a.score });
+  results.sort((a, b) => { 
+    return b.score - a.score;
+  });
 
   /* Now use past preferences to break ties */
 
@@ -93,18 +104,15 @@ async function sortSession(session) {
   /* For each participant, check their preferences to update the votes */
   for (const userId of participantIds) {
     const user = await User.findOne({ id: userId });
-    
-    for (let i = 0; i < numTied; i++) {
-      if (user.preferences.includes(results[parseInt(i, 10)].idea.name.toLowerCase())) {
-        results[parseInt(i, 10)].score += 1;
-      }
-    }
+    applyPreferences(user, results, numTied);
     /* Now that we are done with the user, add CURRENT session's choice to preference list */
     updateUserPreferences(userId);
   }
 
   /* Sort the tied first-place choices based on their new scores */
-  results.sort((a, b) => { b.score - a.score });
+  results.sort((a, b) => { 
+    return b.score - a.score 
+  });
 
   /* Now that the ties have been broken, restore the original scores */
   for (let i = 0; i < numTied; i++) {
@@ -112,6 +120,10 @@ async function sortSession(session) {
   }
   return session;
 }
+
+/*
+ * END COMPLEX LOGIC
+ */
 
 module.exports = {
   getSession: async (req, res) => {
