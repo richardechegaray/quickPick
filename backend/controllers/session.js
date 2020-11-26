@@ -111,7 +111,7 @@ async function sortSession(session) {
 
   /* Sort the tied first-place choices based on their new scores */
   results.sort((a, b) => { 
-    return b.score - a.score 
+    return b.score - a.score;
   });
 
   /* Now that the ties have been broken, restore the original scores */
