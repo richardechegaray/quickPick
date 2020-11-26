@@ -21,19 +21,109 @@ function randomString(length, chars) {
 }
 
 /*
-Helper function for sorting a sessions results
-Parameters:
-Returns:
-*/
-function sortSession(session) {
-  var results = session.results;
-  results.sort(function (a, b) {
+ * Takes a list of choices (just the lowercase names of each) and appends
+ * them to the user's preference list. Keeps only the 20 most recent choices.
+ */
+async function queueUserPreferences(userID, choices) {
+  const myUser = await User.findOne({ id: userID });
+  let myPreferences = myUser.pendingPreferences;
+  
+  /* If user doesn't have a pending preference list, create one */
+  if (!myPreferences) {
+    myPreferences = [];
+  }
+  /* Add new choices to preference list */
+  myPreferences.push(...choices);
+  const newValues = { 
+    $set: { 
+      pendingPreferences: myPreferences 
+    }
+  };
+  await User.findOneAndUpdate({ id: userID }, newValues);
+}
+
+async function updateUserPreferences(userID) {
+  const MAX_TRACKED = 20;
+  const myUser = await User.findOne({ id: userID });
+  let myPreferences = myUser.preferences;
+  let newPreferences = myUser.pendingPreferences;
+  
+  /* If user doesn't have a preference list, create one */
+  if (!myPreferences) {
+    myPreferences = [];
+  }
+
+  /* Add new choices to preference list */
+  myPreferences = myPreferences.concat(...newPreferences);
+  
+  /* Delete oldest elements to maintain size */
+  while (myPreferences.length > MAX_TRACKED) {
+    myPreferences.shift();
+  }
+
+  const newValues = { 
+    $set: { 
+      preferences: myPreferences,
+      pendingPreferences: []
+    }
+  };
+  await User.findOneAndUpdate(
+    { id: userID }, 
+    newValues,
+  );
+}
+
+/*
+ * BEGIN COMPLEX LOGIC
+ */
+
+function applyPreferences(user, results, ties) {
+  for (let i = 0; i < ties; i++) {
+    if (user.preferences.includes(results[parseInt(i, 10)].idea.name.toLowerCase())) {
+      results[parseInt(i, 10)].score += 1;
+    }
+  }
+}
+
+async function sortSession(session) {
+  /* Get list of participants */
+  const participantIds = session.participants.map((p) => p.id);
+  
+  /* Sort the array of results based on number of votes */
+  const results = session.results;
+  results.sort((a, b) => { 
     return b.score - a.score;
   });
-  session.results = results;
+
+  /* Now use past preferences to break ties */
+
+  /* Get the number of choices tied for first, and their score */
+  const maxVotes = results[0].score;
+  const numTied = results.filter((choice) => choice.score === maxVotes).length; 
+
+  /* For each participant, check their preferences to update the votes */
+  for (const userId of participantIds) {
+    const user = await User.findOne({ id: userId });
+    applyPreferences(user, results, numTied);
+    /* Now that we are done with the user, add CURRENT session's choice to preference list */
+    updateUserPreferences(userId);
+  }
+
+  /* Sort the tied first-place choices based on their new scores */
+  results.sort((a, b) => { 
+    return b.score - a.score;
+  });
+
+  /* Now that the ties have been broken, restore the original scores */
+  for (let i = 0; i < numTied; i++) {
+    results[parseInt(i, 10)].score = maxVotes;
+  }
   return session;
 }
 
+/*
+ * END COMPLEX LOGIC
+ */
 
 module.exports = {
   getSession: async (req, res) => {
@@ -142,9 +232,13 @@ module.exports = {
       return;
     }
 
+    //Update user's preference list with their choices
+    const chosenIdeas = req.body.choices.filter((c) => c.choice); // List of accepted ideas
+    await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
+
     //Iterate through responses, and also session to find idea names that match
-    req.body.choices.forEach((choice) => {
-      currentSession.results.forEach((result) => {
+    req.body.choices.forEach(async (choice) => {
+      currentSession.results.forEach(async (result) => {
         //If they match and the response is positive, then increment the record
         if (choice.idea.name === result.idea.name && choice.choice) {
           result.score += 1;
@@ -157,7 +251,7 @@ module.exports = {
     let newValues;
     if (newComplete === currentSession.participants.length) {
       currentSession.status = "complete";
-      currentSession = sortSession(currentSession);
+      currentSession = await sortSession(currentSession);
       let firebaseMessage = {
         session: currentSession,
       };
@@ -210,7 +304,7 @@ module.exports = {
 
     /* Assert user isn't in session */
     for (const index in session.participants) {
-      if (user.id === session.participants[parseInt(index)].id) {
+      if (user.id === session.participants[parseInt(index, 10)].id) {
         res.status(400).send({ ok: false, message: "User is already in session" });
         return;
       }
