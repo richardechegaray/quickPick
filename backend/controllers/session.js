@@ -38,7 +38,7 @@ async function queueUserPreferences(userID, choices) {
     $set: { 
       pendingPreferences: myPreferences 
     }
-  }
+  };
   await User.findOneAndUpdate({ id: userID }, newValues);
 }
 
@@ -82,9 +82,7 @@ async function sortSession(session) {
   
   /* Sort the array of results based on number of votes */
   const results = session.results;
-  results.sort((a, b) => {
-    return b.score - a.score;
-  });
+  results.sort((a, b) => { b.score - a.score });
 
   /* Now use past preferences to break ties */
 
@@ -106,9 +104,7 @@ async function sortSession(session) {
   }
 
   /* Sort the tied first-place choices based on their new scores */
-  results.sort((a, b) => {
-    return b.score - a.score;
-  });
+  results.sort((a, b) => { b.score - a.score });
 
   /* Now that the ties have been broken, restore the original scores */
   for (let i = 0; i < numTied; i++) {
