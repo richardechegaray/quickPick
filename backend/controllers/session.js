@@ -21,6 +21,52 @@ function randomString(length, chars) {
 }
 
 /*
+ * Takes a list of choices (just the lowercase names of each) and appends
+ * them to the user's preference list. Keeps only the 20 most recent choices.
+ */
+async function queueUserPreferences(userID, choices) {
+  const myUser = await User.findOne({ id: userID });
+  let myPreferences = myUser.pendingPreferences;
+  
+  /* If user doesn't have a pending preference list, create one */
+  if (!myPreferences) {
+    myPreferences = [];
+  }
+  /* Add new choices to preference list */
+  myPreferences.push(...choices);
+  newValues = { 
+    $set: { 
+      pendingPreferences: myPreferences 
+    }
+  }
+  await User.findOneAndUpdate({ id: userID }, newValues);
+}
+
+async function updateUserPreferences(userID) {
+  const MAX_TRACKED = 20;
+  const myUser = await User.findOne({ id: userID });
+  let myPreferences = myUser.preferences;
+  let newPreferences = myUser.pendingPreferences;
+  
+  /* If user doesn't have a preference list, create one */
+  if (!myPreferences) {
+    myPreferences = [];
+  }
+
+  /* Add new choices to preference list */
+  myPreferences = myPreferences.concat(...newPreferences);
+  
+  /* Delete oldest elements to maintain size */
+  while (myPreferences.length > MAX_TRACKED) {
+    myPreferences.shift();
+  }
+  await User.findOneAndUpdate(
+    { id: userID }, 
+    newValues,
+  );
+}
+
+/*
  * COMPLEX LOGIC
  */
 async function sortSession(session) {
@@ -44,8 +90,8 @@ async function sortSession(session) {
     const user = await User.findOne({ id: userId });
     
     for (let i = 0; i < numTied; i++) {
-      if (user.preferences.includes(results[parseInt(i)].idea.name.toLowerCase())) {
-        results[parseInt(i)].score += 1;
+      if (user.preferences.includes(results[parseInt(i, 10)].idea.name.toLowerCase())) {
+        results[parseInt(i, 10)].score += 1;
       }
     }
     /* Now that we are done with the user, add CURRENT session's choice to preference list */
@@ -59,56 +105,10 @@ async function sortSession(session) {
 
   /* Now that the ties have been broken, restore the original scores */
   for (let i = 0; i < numTied; i++) {
-    results[parseInt(i)].score = maxVotes;
+    results[parseInt(i, 10)].score = maxVotes;
   }
-  console.log(session.results.map((r) => r.idea.name));
   return session;
 }
-
-/*
- * Takes a list of choices (just the lowercase names of each) and appends
- * them to the user's preference list. Keeps only the 20 most recent choices.
- */
-async function queueUserPreferences(userID, choices) {
-  const myUser = await User.findOne({ id: userID });
-  let myPreferences = myUser.pendingPreferences;
-  
-  /* If user doesn't have a pending preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
-  /* Add new choices to preference list */
-  myPreferences.push(...choices);
-  await User.findOneAndUpdate({ id: userID }, { $set: { pendingPreferences: myPreferences }});
-}
-
-async function updateUserPreferences(userID) {
-  const MAX_TRACKED = 20
-  const myUser = await User.findOne({ id: userID });
-  let myPreferences = myUser.preferences;
-  let newPreferences = myUser.pendingPreferences;
-  
-  /* If user doesn't have a preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
-
-  /* Add new choices to preference list */
-  myPreferences = myPreferences.concat(...newPreferences);
-  
-  /* Delete oldest elements to maintain size */
-  while (myPreferences.length > MAX_TRACKED) {
-    myPreferences.shift();
-  }
-  await User.findOneAndUpdate(
-    { id: userID }, 
-    { $set: { 
-      preferences: myPreferences,
-      pendingPreferences: []
-    }
-  });
-}
-
 
 module.exports = {
   getSession: async (req, res) => {
@@ -289,7 +289,7 @@ module.exports = {
 
     /* Assert user isn't in session */
     for (const index in session.participants) {
-      if (user.id === session.participants[parseInt(index)].id) {
+      if (user.id === session.participants[parseInt(index, 10)].id) {
         res.status(400).send({ ok: false, message: "User is already in session" });
         return;
       }
