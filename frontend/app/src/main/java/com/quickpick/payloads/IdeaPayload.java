@@ -43,6 +43,13 @@ public class IdeaPayload {
         this.picture = idea.picture;
     }
 
+    public IdeaPayload(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.picture = "";
+        // TODO: get picture for this
+    }
+
     public String getPicture() {
         return Optional.ofNullable(picture).orElse("");
     }

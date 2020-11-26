@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.quickpick.payloads.IdeaPayload;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class CreateNewListActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
 
@@ -44,18 +44,10 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
 
         addEntries.setOnClickListener(view -> adapter.add(idea));
 
-
-        // TODO: do we need this or not?
-        List<IdeaPayload> example = new ArrayList<>();
-        IdeaPayload ex = new IdeaPayload();
-        ex.setDescription("test");
-        ex.setName("name");
-        example.add(ex);
-
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_entries);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyRecyclerViewAdapter(this, new ArrayList<>()); // need to pass in editview data here ?
+        adapter = new MyRecyclerViewAdapter(this, new ArrayList<>(), new HashMap<>()); // need to pass in editview data here ?
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
     }
@@ -65,7 +57,7 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
         Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
-    // TODO:Delete if not using
+    // TODO: Delete if not using
     private void addEntriesDialog() {
         AlertDialog dialog = new AlertDialog.Builder(CreateNewListActivity.this)
                 .setTitle(getString(R.string.add_entries_title))
