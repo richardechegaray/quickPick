@@ -34,7 +34,7 @@ async function queueUserPreferences(userID, choices) {
   }
   /* Add new choices to preference list */
   myPreferences.push(...choices);
-  newValues = { 
+  const newValues = { 
     $set: { 
       pendingPreferences: myPreferences 
     }
@@ -59,6 +59,13 @@ async function updateUserPreferences(userID) {
   /* Delete oldest elements to maintain size */
   while (myPreferences.length > MAX_TRACKED) {
     myPreferences.shift();
+  }
+
+  const newValues = { 
+    $set: { 
+      preferences: myPreferences,
+      pendingPreferences: []
+    }
   }
   await User.findOneAndUpdate(
     { id: userID }, 
