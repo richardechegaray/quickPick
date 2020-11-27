@@ -1,6 +1,23 @@
 const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
 
+/* Helper function to check a user's access to a list */
+function checkListAccess(list, access, res) {
+    /* Check that the list exists */
+    if (!list) {
+        console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
+        res.status(404).send({});
+        return false;
+    }
+    /* User must own the list, unless they are trying to read a default list */
+    if (!(list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin"))) {
+        console.log("DEBUG: Attempted to access another user's list");
+        res.status(403).send({});
+        return false;
+    }
+    return true;
+}
+
 module.exports = {
     /* Returns all lists where the userID field matches the user making the request */
     getMyLists: async (req, res) => {
@@ -11,8 +28,8 @@ module.exports = {
         let listResponseObj = { lists: [] };
 
         myLists.forEach((ideaList) => {
-            let listSimplified = { name: ideaList.name, _id: ideaList._id };
-            listResponseObj.lists.push(listSimplified);
+            // let listSimplified = { name: ideaList.name, _id: ideaList._id };
+            listResponseObj.lists.push(ideaList);
         });
 
         res.status(200).send(listResponseObj);
@@ -41,23 +58,58 @@ module.exports = {
             res.status(201).send(newList);
         }
     },
+    
+    /* Takes the list from the request body updates the list matching the id */
+    updateList: async (req, res) => {
+        console.log(`DEBUG: Get request to list/${req.params.id}`);
+        const myList = await List.findById(req.params.id).catch(() => null);
+        
+        /* updates cannot be null*/
+        let updates = req.body.list;
+        if (!updates) {
+            console.log("DEBUG: List in body is null");
+            res.status(400).send({});
+            return;
+        }
+
+        if (checkListAccess(myList, "write", res)){
+            /* Add an image url to each idea on the list */
+            for (let i = 0; i < updates.ideas.length; i++) {
+                let imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
+                updates.ideas[parseInt(i, 10)].picture = imgUrl;
+            }
+            /* Set user making request as the list's owner */
+            updates.userID = res.locals.id;
+            const newValues = {
+                $set: {
+                    ideas: updates,
+                }
+            }
+            await List.findByIdAndUpdate(req.params.id, newValues);
+            res.status(201).send(newList);
+        }
+    },
 
     /* Finds a list matching the id and returns it if the the list belongs to the user */
     getList: async (req, res) => {
-        console.log("DEBUG: Get request to list");
+        console.log(`DEBUG: Get request to list/${req.params.id}`);
+        /* Find the list matching the id */
+        const myList = await List.findById(req.params.id).catch(() => null);
+        
+        if (checkListAccess(myList, "read", res)) {
+            res.status(200).send(myList);
+        }
+    },
+    
+    /* Deletes a list matching the id if the the list belongs to the user */
+    deleteList: async (req, res) => {
+        console.log(`DEBUG: Delete request to list/${req.params.id}`);
         /* Find the list matching the id */
         const myList = await List.findById(req.params.id).catch(() => null);
 
-        if (myList == null) {
-            console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
-            res.status(404).send({});
-        }
-        else if (myList.userID !== res.locals.id && myList.userID !== "quickpick.admin") {
-            console.log("DEBUG: Attempted to access another user's list");
-            res.status(403).send({});
-        }
-        else {
-            res.status(200).send(myList);
+        if (checkListAccess(myList, "write", res)) {
+            await List.findByIdAndDelete(req.params.id);
+            res.status(200).send();
         }
     }
 };

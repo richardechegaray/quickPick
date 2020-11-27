@@ -15,4 +15,10 @@ router.post("/", auth.checkFB, catchErrors(listController.createList));
 /* Finds a list matching the id and returns it if the the list belongs to the user */
 router.get("/:id", auth.checkFB, catchErrors(listController.getList));
 
+/* Deletes a list matching the id and returns it if the the list belongs to the user */
+router.delete("/:id", auth.checkFB, catchErrors(listController.deleteList));
+
+/* Updates a list matching the id and returns it if the the list belongs to the user */
+router.put("/:id", auth.checkFB, catchErrors(listController.updateList));
+
 module.exports = router;
