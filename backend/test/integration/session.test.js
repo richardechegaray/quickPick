@@ -23,7 +23,8 @@ describe("Session Integration", function () {
 
         let newUser = {
             name: "Buyonacy Changstein",
-            id: "100722321844479"
+            id: "100722321844479",
+            preferences: Array(20).fill("Pizza"), // Max out preference list for coverage
         }
         await User.create(newUser);
 

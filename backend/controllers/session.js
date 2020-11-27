@@ -55,7 +55,6 @@ async function updateUserPreferences(userID) {
 
   /* Add new choices to preference list */
   myPreferences = myPreferences.concat(...newPreferences);
-  
   /* Delete oldest elements to maintain size */
   while (myPreferences.length > MAX_TRACKED) {
     myPreferences.shift();
@@ -106,7 +105,7 @@ async function sortSession(session) {
     const user = await User.findOne({ id: userId });
     applyPreferences(user, results, numTied);
     /* Now that we are done with the user, add CURRENT session's choice to preference list */
-    updateUserPreferences(userId);
+    await updateUserPreferences(userId);
   }
 
   /* Sort the tied first-place choices based on their new scores */
@@ -224,7 +223,7 @@ module.exports = {
       }
     });
 
-    //Assert user is not in session
+    //Assert user is in session
     if (!isInSession) {
       res
         .status(403)
