@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="75dp"
-            android:scaleType="centerInside" />
+            android:scaleType="centerCrop" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/first_place"
@@ -42,12 +42,12 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constrainedWidth="true"
                 app:layout_constrainedHeight="true"
-                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toTopOf="@+id/first_place_description"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.05"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,11 +57,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constrainedWidth="true"
                 app:layout_constrainedHeight="true"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintHorizontal_chainStyle="packed"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/first_place_idea_text"
                 app:layout_constraintTop_toBottomOf="@+id/first_place_idea_text" />
 
@@ -71,11 +71,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constrainedWidth="true"
                 app:layout_constrainedHeight="true"
-                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constrainedWidth="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.9"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/first_place_idea_text" />
 
@@ -97,11 +97,11 @@
             android:id="@+id/second_place_idea_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.9"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/second_place_idea" />
 
@@ -109,12 +109,12 @@
             android:id="@+id/second_place_idea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@+id/second_place_idea_description"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -122,11 +122,11 @@
             android:id="@+id/second_place_idea_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/second_place_idea"
             app:layout_constraintTop_toBottomOf="@+id/second_place_idea" />
 
@@ -137,10 +137,10 @@
         android:layout_width="338dp"
         android:layout_height="wrap_content"
         app:layout_constrainedWidth="true"
-        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintBottom_toTopOf="@+id/return_to_main_activity_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/second_place"
         app:layout_constraintVertical_bias="0.0">
@@ -149,11 +149,11 @@
             android:id="@+id/third_place_idea_score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.90"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/third_place_idea" />
 
@@ -161,12 +161,12 @@
             android:id="@+id/third_place_idea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
-            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@+id/third_place_idea_description"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -174,11 +174,11 @@
             android:id="@+id/third_place_idea_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constrainedWidth="true"
             app:layout_constrainedHeight="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/third_place_idea"
             app:layout_constraintTop_toBottomOf="@+id/third_place_idea" />
 

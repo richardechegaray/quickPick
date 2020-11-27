@@ -13,16 +13,21 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.quickpick.payloads.IdeaPayload;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
     private final List<IdeaPayload> mData;
     private final LayoutInflater mInflater;
 
+    private final Set<ViewHolder> boundedViewHolders;
+
     // data is passed into the constructor
     MyRecyclerViewAdapter(Context context, List<IdeaPayload> data) {
         this.mInflater = LayoutInflater.from(context);
+        this.boundedViewHolders = new HashSet<>();
         this.mData = new ArrayList<>();
         // Do a deep copy just in case
         for (IdeaPayload payload : data) {
@@ -42,6 +47,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.onBind(mData.get(position), position);
+        boundedViewHolders.add(holder);
     }
 
     @Override
@@ -49,6 +55,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
         // write the data in the EditText back when recycled
         super.onViewRecycled(holder);
         holder.updateIdeaPayload();
+        boundedViewHolders.remove(holder);
     }
 
     void addNewListEntry() {
@@ -60,6 +67,16 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
         mData.remove(position);
         notifyDataSetChanged();
     }
+
+    List<IdeaPayload> getListEntries() {
+        boundedViewHolders.forEach(ViewHolder::updateIdeaPayload);
+        List<IdeaPayload> entries = new ArrayList<>();
+        for (IdeaPayload payload : mData) { // deep copy
+            entries.add(new IdeaPayload(payload));
+        }
+        return entries;
+    }
+
 
     // total number of rows
     @Override
@@ -99,14 +116,6 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
             idea.setName(name.getText().toString());
             idea.setDescription(description.getText().toString());
         }
-    }
-
-    List<IdeaPayload> getmData() {
-        List<IdeaPayload> data = new ArrayList<>();
-        for (IdeaPayload payload : mData) { // deep copy
-            data.add(new IdeaPayload(payload));
-        }
-        return data;
     }
 
 }

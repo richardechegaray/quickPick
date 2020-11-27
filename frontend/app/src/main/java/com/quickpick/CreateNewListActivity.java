@@ -54,9 +54,10 @@ public class CreateNewListActivity extends AppCompatActivity {
         createList = findViewById(R.id.create_list_create_list_button);
 
         createList.setOnClickListener(view -> {
-            ListPayload lp = new ListPayload(editName.toString(), editDescription.toString(), adapter.getmData());
+            // TODO: Add checking for empty name
+            ListPayload lp = new ListPayload(editName.getText().toString(), editDescription.getText().toString(), adapter.getListEntries());
 
-            ListRepository.getInstance().callCreateList(() -> finish(),
+            ListRepository.getInstance().callCreateList(this::finish,
                     RunnableUtils.showToast(this, "failing"),
                     accessToken.getToken(),
                     new CreateListRequest(lp));
