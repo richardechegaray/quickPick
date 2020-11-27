@@ -1,22 +1,16 @@
 package com.quickpick;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.quickpick.payloads.IdeaPayload;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class CreateNewListActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
+public class CreateNewListActivity extends AppCompatActivity {
 
     // TODO: figure out whether or not these private variables will be used in multiple methods
     private Button addEntries;
@@ -40,30 +34,13 @@ public class CreateNewListActivity extends AppCompatActivity implements MyRecycl
 
         addEntries = findViewById(R.id.create_list_add_entries_button);
 
-        IdeaPayload idea = new IdeaPayload();
-
-        addEntries.setOnClickListener(view -> adapter.add(idea));
+        addEntries.setOnClickListener(view -> adapter.addNewListEntry());
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_entries);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new MyRecyclerViewAdapter(this, new ArrayList<>(), new HashMap<>()); // need to pass in editview data here ?
-        adapter.setClickListener(this);
+        adapter = new MyRecyclerViewAdapter(this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
-    }
-
-    // TODO: Delete if not using
-    private void addEntriesDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(CreateNewListActivity.this)
-                .setTitle(getString(R.string.add_entries_title))
-                .setView(R.layout.dialog_add_entries)
-                .create();
-        dialog.show();
     }
 
 }

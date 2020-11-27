@@ -4,34 +4,36 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.quickpick.payloads.IdeaPayload;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
 
-    private List<IdeaPayload> mData;
-    private HashMap<Button, IdeaPayload> buttonHm;
-    private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
+    private final List<IdeaPayload> mData;
+    private final LayoutInflater mInflater;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapter(Context context, List<IdeaPayload> data, HashMap<Button, IdeaPayload> hm) {
+    MyRecyclerViewAdapter(Context context, List<IdeaPayload> data) {
         this.mInflater = LayoutInflater.from(context);
-        this.mData = data;
-        this.buttonHm = hm;
+        this.mData = new ArrayList<>();
+        // Do a deep copy just in case
+        for (IdeaPayload payload : data) {
+            mData.add(new IdeaPayload(payload));
+        }
     }
 
     // inflates the row layout from xml when needed
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.recycler_view_entries, parent, false);
         return new ViewHolder(view);
     }
@@ -39,10 +41,24 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String entry = mData.get(position).getName();
-        String description = mData.get(position).getDescription();
-        holder.myEntry.setText(entry);
-        holder.myEntry.setText(description);
+        holder.onBind(mData.get(position), position);
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        // write the data in the EditText back when recycled
+        super.onViewRecycled(holder);
+        holder.updateIdeaPayload();
+    }
+
+    void addNewListEntry() {
+        mData.add(new IdeaPayload());
+        notifyDataSetChanged();
+    }
+
+    private void deleteListEntry(int position) {
+        mData.remove(position);
+        notifyDataSetChanged();
     }
 
     // total number of rows
@@ -52,67 +68,37 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
     }
 
     // stores and recycles views as they are scrolled off screen
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        EditText myEntry;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        private final EditText name;
+        private final EditText description;
 
-        EditText myDescription;
+        private int position;
 
-        Button myButton;
+        private IdeaPayload idea;
 
-        ViewHolder(View itemView) {
+        private ViewHolder(View itemView) {
             super(itemView);
-            myEntry = (TextInputEditText) itemView.findViewById(R.id.rv_entry);
-            myDescription = (TextInputEditText) itemView.findViewById(R.id.rv_description);
-            myButton = itemView.findViewById(R.id.rv_entries_delete_button);
-//            itemView.setOnClickListener(this);
-            IdeaPayload myIdea = new IdeaPayload(myEntry.toString(), myDescription.toString());
-//            mData.add(myIdea);
-            for (IdeaPayload idea : mData) {
-                if (myIdea.equals(idea)) {
-                    myIdea = idea;
-                    break;
-                }
-            }
-            buttonHm.put(myButton, myIdea);
-            myButton.setOnClickListener(view -> {
-                mData.remove(buttonHm.get(myButton));
-                buttonHm.remove(myButton);
-                notifyDataSetChanged();
-            });
+            position = 0;
+            idea = null;
+            name = (TextInputEditText) itemView.findViewById(R.id.rv_entry);
+            description = (TextInputEditText) itemView.findViewById(R.id.rv_description);
+            itemView.findViewById(R.id.rv_entries_delete_button).setOnClickListener(view ->
+                    deleteListEntry(position)
+            );
         }
 
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+        private void onBind(IdeaPayload idea, int position) {
+            this.idea = idea;
+            this.position = position;
+            name.setText(idea.getName());
+            description.setText(idea.getDescription());
+
         }
 
-        EditText getMyEntry() {
-            return myEntry;
-        }
-
-        EditText getMyDescription() {
-            return  myDescription;
+        private void updateIdeaPayload() {
+            idea.setName(name.getText().toString());
+            idea.setDescription(description.getText().toString());
         }
     }
 
-    // convenience method for getting data at click position
-    IdeaPayload getItem(int id) {
-        return mData.get(id);
-    }
-
-    void add(IdeaPayload idea) {
-        mData.add(idea);
-        notifyDataSetChanged();
-    }
-
-
-    // allows clicks events to be caught
-    void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
-    }
 }
