@@ -81,8 +81,10 @@ public class ViewEditListsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ListPayloadViewHolder holder, int position) {
-            String userName = lists.get(position).getName();
-            holder.textView.setText(userName);
+            String listName = lists.get(position).getName();
+            String listDescription = lists.get(position).getDescription();
+            holder.name.setText(listName);
+            holder.description.setText(listDescription);
             holder.setPosition(position);
         }
 
@@ -103,13 +105,15 @@ public class ViewEditListsActivity extends AppCompatActivity {
         }
 
         private class ListPayloadViewHolder extends RecyclerView.ViewHolder {
-            private final TextView textView;
+            private final TextView name;
+            private final TextView description;
 
             private int position;
 
             public ListPayloadViewHolder(@NonNull View view) {
                 super(view);
-                this.textView = view.findViewById(R.id.list_name_text_view);
+                this.name = view.findViewById(R.id.list_name_text_view);
+                this.description = view.findViewById(R.id.list_description_text_view);
                 this.position = 0;
                 view.findViewById(R.id.list_delete_button).setOnClickListener(button -> deleteList(position));
             }
