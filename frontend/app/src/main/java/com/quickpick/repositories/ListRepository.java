@@ -66,4 +66,9 @@ public class ListRepository {
         }, failureCallback, LIST_DEBUG));
     }
 
+    public void callDeleteList(Runnable successCallback, Runnable failureCallback, String facebookToken, String listId) {
+        Call<Void> deleteListCall = listApi.deleteList(facebookToken, listId);
+        deleteListCall.enqueue(new RepositoryCallback<>(response -> successCallback.run(), failureCallback, LIST_DEBUG));
+    }
+
 }

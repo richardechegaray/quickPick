@@ -6,6 +6,7 @@ import com.quickpick.payloads.ListsPayload;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -18,6 +19,9 @@ public interface ListApi {
 
     @POST("list")
     Call<ListPayload> createList(@Header("facebooktoken") String facebookToken, @Body CreateListRequest request);
+
+    @DELETE("list/{listId}")
+    Call<Void> deleteList(@Header("facebooktoken") String facebookToken, @Path("listId") String listId);
 
     @GET("list")
     Call<ListsPayload> getLists(@Header("facebooktoken") String facebookToken);

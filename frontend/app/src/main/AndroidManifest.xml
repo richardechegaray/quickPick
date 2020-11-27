@@ -29,7 +29,9 @@
         <activity
             android:name=".SummaryActivity"
             android:label="Results" />
-        <activity android:name=".ViewEditListsActivity" />
+        <activity
+            android:name=".ViewEditListsActivity"
+            android:label="View Lists" />
         <activity android:name=".ViewOldSessionsActivity" />
         <activity
             android:name=".CreateNewListActivity"
