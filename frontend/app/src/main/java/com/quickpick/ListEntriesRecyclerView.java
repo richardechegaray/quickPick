@@ -101,4 +101,12 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
         }
     }
 
+    List<IdeaPayload> getmData() {
+        List<IdeaPayload> data = new ArrayList<>();
+        for (IdeaPayload payload : mData) { // deep copy
+            data.add(new IdeaPayload(payload));
+        }
+        return data;
+    }
+
 }
