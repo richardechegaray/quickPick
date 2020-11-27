@@ -9,16 +9,12 @@
     <string name="view_edit_lists_text">View/Edit Lists</string>
     <string name="create_new_list_text">Create New List</string>
     <string name="enter_session_id_title">Enter Session ID</string>
-    <string name="add_entries_title">Add Entries:</string>
     <string name="facebook_app_id">822865601801621</string>
     <string name="fb_login_protocol_scheme">fb822865601801621</string>
     <string name="session_id_edit_text_hint">Session ID</string>
-    <string name="add_entries_edit_text_hint">Add Entries:</string>
     <string name="dialog_join_button_text">Join</string>
     <string name="dialog_cancel_button_text">Cancel</string>
     <string name="dialog_select_button_text">Select</string>
-    <string name="add_this_entry_button_text">Add this entry</string>
-    <string name="done_adding_entries_button_text">Done</string>
     <string name="session_list_text">Select a list</string>
     <string name="start_swiping_button">Start Swiping!</string>
     <string name="session_code_string_format">Session Code: %s</string>
@@ -37,7 +33,6 @@
     <string name="get_list_failed">Failed to get list for swiping</string>
     <string name="get_lists_failed">Failed to get lists</string>
     <string name="invalid_code">Invalid code</string>
-    <string name="create_list_title_prompt_text">Please enter the following fields\nfor your custom list:</string>
     <string name="create_list_name_prompt">List Name:</string>
     <string name="create_list_description_name_prompt">List Description:</string>
     <string name="create_list_add_entries_button_text">Add Entries</string>
@@ -45,7 +40,6 @@
     <string name="create_list_entries_text">Entries:</string>
     <string name="logout">Logout</string>
     <string name="missing_list">Select a list first!</string>
-    <string name="rv_entries_delete_button_text">x</string>
     <string name="rv_description_hint">Entry Description:</string>
     <string name="rv_entry_hint">Entry Name:</string>
 </resources>
