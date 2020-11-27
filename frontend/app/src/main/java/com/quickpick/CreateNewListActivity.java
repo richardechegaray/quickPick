@@ -36,6 +36,12 @@ public class CreateNewListActivity extends AppCompatActivity {
 
         addEntries.setOnClickListener(view -> adapter.addNewListEntry());
 
+        createList = findViewById(R.id.create_list_create_list_button);
+
+        createList.setOnClickListener(view -> {
+
+        });
+
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_entries);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

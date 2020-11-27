@@ -8,4 +8,8 @@ public class CreateListRequest {
         this.list = list;
     }
 
+    public ListPayload getList() {
+        return list;
+    }
+
 }
