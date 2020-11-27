@@ -7,10 +7,10 @@ import java.util.Optional;
 public class IdeaPayload {
 
     @Nullable
-    private final String name;
+    private String name;
 
     @Nullable
-    private final String description;
+    private String description;
 
     @Nullable
     private final String picture;
@@ -23,6 +23,14 @@ public class IdeaPayload {
         return Optional.ofNullable(description).orElse("");
     }
 
+    public void setName(String newName) {
+        this.name = newName;
+    }
+
+    public void setDescription(String newDescription) {
+        this.description = newDescription;
+    }
+
     public IdeaPayload() {
         name = "";
         description = "";
@@ -33,6 +41,13 @@ public class IdeaPayload {
         this.name = idea.name;
         this.description = idea.description;
         this.picture = idea.picture;
+    }
+
+    public IdeaPayload(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.picture = "";
+        // TODO: get picture for this
     }
 
     public String getPicture() {

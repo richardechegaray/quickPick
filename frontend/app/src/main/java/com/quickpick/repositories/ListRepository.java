@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.quickpick.apis.ListApi;
 import com.quickpick.apis.RetrofitUtils;
+import com.quickpick.payloads.CreateListRequest;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ListsPayload;
 
@@ -52,6 +53,14 @@ public class ListRepository {
     public void callGetList(Runnable successCallback, Runnable failureCallback, String facebookToken, String listId) {
         Call<ListPayload> getListCall = listApi.getList(facebookToken, listId);
         getListCall.enqueue(new RepositoryCallback<>(listPayload -> {
+            list.setValue(listPayload);
+            successCallback.run();
+        }, failureCallback, LIST_DEBUG));
+    }
+
+    public void callCreateList(Runnable successCallback, Runnable failureCallback, String facebookToken, CreateListRequest listRequest) {
+        Call<ListPayload> createListCall = listApi.createList(facebookToken, listRequest);
+        createListCall.enqueue(new RepositoryCallback<>(listPayload -> {
             list.setValue(listPayload);
             successCallback.run();
         }, failureCallback, LIST_DEBUG));
