@@ -37,7 +37,7 @@
         app:layout_constraintTop_toBottomOf="@+id/create_list_name_edit_text_layout"
         app:layout_constraintWidth_min="250dp">
 
-<!--        TODO: hard cap this at 3 lines-->
+        <!--        TODO: hard cap this at 3 lines-->
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/create_list_description_edit_text"
             android:layout_width="match_parent"
@@ -65,7 +65,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view" />
+        app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view"
+        app:layout_constraintWidth_percent="0.8" />
 
     <Button
         android:id="@+id/create_list_add_entries_button"

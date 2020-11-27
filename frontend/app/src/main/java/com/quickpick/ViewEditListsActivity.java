@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,8 +37,10 @@ public class ViewEditListsActivity extends AppCompatActivity {
     private void setUpRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.list_recycler_view);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation()));
         adapter = new ListPayloadAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
     }

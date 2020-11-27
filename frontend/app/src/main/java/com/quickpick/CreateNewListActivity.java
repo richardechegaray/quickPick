@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,7 +45,10 @@ public class CreateNewListActivity extends AppCompatActivity {
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_entries);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation()));
         adapter = new MyRecyclerViewAdapter(this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
     }
