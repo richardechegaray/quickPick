@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.quickpick.apis.RetrofitUtils;
 import com.quickpick.apis.SessionApi;
-import com.quickpick.payloads.BasicResponse;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.PostChoicesRequest;
@@ -73,12 +72,12 @@ public class SessionRepository {
     }
 
     public void startSession(Runnable callback, String facebookToken) {
-        Call<BasicResponse> startSessionCall = sessionApi.startSession(facebookToken, getCurrentSessionId());
+        Call<Void> startSessionCall = sessionApi.startSession(facebookToken, getCurrentSessionId());
         startSessionCall.enqueue(new RepositoryCallback<>(basicResponse -> callback.run(), SESSION_DEBUG));
     }
 
     public void postChoices(Runnable callback, String facebookToken, List<ChoicePayload> choices) {
-        Call<BasicResponse> postChoicesCall = sessionApi.postChoices(facebookToken, getCurrentSessionId(), new PostChoicesRequest(choices));
+        Call<Void> postChoicesCall = sessionApi.postChoices(facebookToken, getCurrentSessionId(), new PostChoicesRequest(choices));
         postChoicesCall.enqueue(new RepositoryCallback<>(basicResponse -> callback.run(), SESSION_DEBUG));
     }
 
