@@ -61,7 +61,7 @@ public class ListRepository {
     public void callCreateList(Runnable successCallback, Runnable failureCallback, String facebookToken, CreateListRequest listRequest) {
         Call<ListPayload> createListCall = listApi.createList(facebookToken, listRequest);
         createListCall.enqueue(new RepositoryCallback<>(listPayload -> {
-            list.setValue(listRequest.getList());
+            list.setValue(listPayload);
             successCallback.run();
         }, failureCallback, LIST_DEBUG));
     }
