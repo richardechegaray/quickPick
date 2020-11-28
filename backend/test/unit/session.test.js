@@ -112,6 +112,17 @@ afterAll(async () => {
 Module Tests!
 */
 describe("Create Session", function () {
+    it("User has not logged in before", async (done) => {
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = "murphy1234";
+
+        await sessionHelper.createSession(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        done();
+    });
+
     it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
@@ -141,7 +152,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = "murphy";
-        req.params.pin = "abcd";
+        req.params.id = "abcd";
 
         await sessionHelper.getSession(req, res);
 
@@ -153,7 +164,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
-        req.params.pin = "abcd"
+        req.params.id = "abcd"
 
         await sessionHelper.getSession(req, res);
 
@@ -187,6 +198,32 @@ describe("Add user to session", function () {
         done();
     });
 
+    it("Session has started", async (done) => {
+        let newSession = {
+            pin: "abcde",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            }]
+        };
+        await Session.create(newSession);
+
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID2;
+        req.params.id = "abcde";
+
+        await sessionHelper.addUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(400);
+        done();
+    });
+
     it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
@@ -213,12 +250,25 @@ describe("Update session list", function () {
         done();
     });
 
+    it("List does not exist", async (done) => {
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID;
+        req.params.id = "abcd";
+        req.body.listID = "44444f31dcd5af2ff413441b"; //Theres a tiny chance this will actually pass by accident
+
+        await sessionHelper.updateList(req, res);
+        expect(res.status).toHaveBeenCalledWith(404);
+        done();
+    });
+
     it("Session doesn't exist", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "10000";
         req.body.listID = list_id.toString();
+        console.log(req.body.listID);
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(404);
@@ -247,6 +297,17 @@ describe("Get session list", function () {
 
         await sessionHelper.getList(req, res);
         expect(res.status).toHaveBeenCalledWith(401);
+        done();
+    });
+
+    it("Success does not exist", async (done) => {
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID;
+        req.params.id = "abcde";
+
+        await sessionHelper.getList(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
         done();
     });
 
@@ -286,6 +347,17 @@ describe("Start session", function () {
         done();
     });
 
+    it("Invalid list ID", async (done) => {
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID;
+        req.params.id = "abcd";
+
+        await sessionHelper.startSession(req, res);
+        expect(res.status).toHaveBeenCalledWith(400);
+        done();
+    });
+
     it("Success", async (done) => {
         const req = mockRequest();
         const res = mockResponse();
@@ -311,11 +383,89 @@ describe("Receive choices", function () {
         done();
     });
 
-    it("Success", async (done) => {
+    it("User is not in session", async (done) => {
+        let newSession = {
+            pin: "abcde",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [{idea: {name: "Italian"}, score: 0}, {idea: {name: "French"}, score: 0}, {idea: {name: "Mexican"}, score: 0}],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            }]
+        };
+        await Session.create(newSession);
+
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = "murphy123";
+        req.params.id = "abcde";
+
+        await sessionHelper.receiveChoices(req, res);
+        expect(res.status).toHaveBeenCalledWith(403);
+        done();
+    });
+
+    it("Success, complete", async (done) => {
+        let newSession = {
+            pin: "abcde",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [{idea: {name: "Italian"}, score: 0}, {idea: {name: "French"}, score: 0}, {idea: {name: "Mexican"}, score: 0}],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            }]
+        };
+        await Session.create(newSession);
+
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
-        req.params.id = "abcd";
+        req.params.id = "abcde";
+        req.body.choices = [
+            {
+                idea: { name: "Italian" }, choice: true
+            },
+            {
+                idea: { name: "French" }, choice: false
+            },
+            {
+                idea: { name: "Mexican" }, choice: true
+            },
+        ];
+
+        await sessionHelper.receiveChoices(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        done();
+    });
+
+    it("Success, not complete", async (done) => {
+        let newSession = {
+            pin: "abcde",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [{idea: {name: "Italian"}, score: 0}, {idea: {name: "French"}, score: 0}, {idea: {name: "Mexican"}, score: 0}],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            },{
+                name: "him",
+                id: TestUserID2
+            }]
+        };
+        await Session.create(newSession);
+
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID;
+        req.params.id = "abcde";
         req.body.choices = [
             {
                 idea: { name: "Italian" }, choice: true
