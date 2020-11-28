@@ -65,9 +65,10 @@ public class SessionActivity extends AppCompatActivity {
         sessionReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
 
         ViewModelProvider provider = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory());
-        observeSession(provider.get(SessionViewModel.class));
+        SessionViewModel sessionViewModel = provider.get(SessionViewModel.class);
+        observeSession(sessionViewModel);
         setUpListEditText(provider.get(ListViewModel.class));
-        setOnClickListeners();
+        setUpStartSwipingButton(sessionViewModel);
         setUpRecyclerView();
     }
 
@@ -134,9 +135,10 @@ public class SessionActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private void setOnClickListeners() {
+    private void setUpStartSwipingButton(SessionViewModel sessionViewModel) {
         startSwipingButton.setOnClickListener(view -> {
-            if (listEditText.getText().toString().isEmpty()) {
+            SessionPayload payload = sessionViewModel.getSession().getValue();
+            if (payload == null || payload.getListId() == null || payload.getListId().isEmpty()) {
                 RunnableUtils.showToast(this, getString(R.string.missing_list)).run();
             } else {
                 SessionRepository.getInstance().startSession(

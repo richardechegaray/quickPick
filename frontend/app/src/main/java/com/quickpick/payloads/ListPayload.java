@@ -16,11 +16,20 @@ public class ListPayload implements Serializable {
     private String name;
 
     @Nullable
+    private String description;
+
+    @Nullable
     @SerializedName("_id")
     private String id;
 
     @Nullable
     private List<IdeaPayload> ideas;
+
+    public ListPayload(String name, String description, List<IdeaPayload> ideas) {
+        this.name = name;
+        this.description = description;
+        this.ideas = ideas;
+    }
 
     public List<IdeaPayload> getIdeas() {
         return Collections.unmodifiableList(Optional.ofNullable(ideas).orElse(new ArrayList<>()));
@@ -32,6 +41,10 @@ public class ListPayload implements Serializable {
 
     public String getId() {
         return Optional.ofNullable(id).orElse("");
+    }
+
+    public String getDescription() {
+        return Optional.ofNullable(description).orElse("");
     }
 
 }
