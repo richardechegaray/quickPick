@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const listSchema = new Schema({
     name: String, // String is shorthand for {type: String}
+    description: String,
     ideas: [{ 
         name: String, 
         description: String,
