@@ -60,7 +60,8 @@ beforeEach(async () => {
 
     let newUser = {
         name: "me",
-        id: TestUserID
+        id: TestUserID,
+        preferences: Array(20).fill("Pizza"), // Max out preference list for coverage
     }
     await User.create(newUser);
     let newUser1 = {
@@ -141,7 +142,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = "murphy";
-        req.params.pin = "abcd";
+        req.params.id = "abcd";
 
         await sessionHelper.getSession(req, res);
 
@@ -153,7 +154,7 @@ describe("Get Session", function () {
         const req = mockRequest();
         const res = mockResponse();
         res.locals.id = TestUserID;
-        req.params.pin = "abcd"
+        req.params.id = "abcd";
 
         await sessionHelper.getSession(req, res);
 
@@ -327,6 +328,37 @@ describe("Receive choices", function () {
                 idea: { name: "Mexican" }, choice: true
             },
         ];
+        const myResults = [{
+                "idea": {
+                    "name": "Italian",
+                    "description": "The best",
+                },
+                "score": 0
+            }, 
+            {
+                "idea": {
+                    "name": "French",
+                    "description": "Good for cleaning",
+                },
+                "score": 0
+            }, 
+            {
+                "idea": {
+                    "name": "Mexican",
+                    "description": "Makes you taller",
+                },
+                "score": 0
+            }
+        ];
+        const newValues = {
+            $set: {
+                results: myResults,
+            }
+        }
+        await Session.findOneAndUpdate( 
+            { "pin": "abcd"},
+            newValues
+        );
 
         await sessionHelper.receiveChoices(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
