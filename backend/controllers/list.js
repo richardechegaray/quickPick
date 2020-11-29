@@ -65,8 +65,8 @@ module.exports = {
         const myList = await List.findById(req.params.id).catch(() => null);
         
         /* updates cannot be null*/
-        let updates = req.body.list;
-        if (!updates) {
+        const updates = req.body.list;
+        if (!updates || !updates.ideas) {
             console.log("DEBUG: List in body is null");
             res.status(400).send({});
             return;
@@ -75,20 +75,28 @@ module.exports = {
         if (checkListAccess(myList, "write", res)){
             /* Add an image url to each idea on the list */
             for (let i = 0; i < updates.ideas.length; i++) {
-                let imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
+                const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
                 updates.ideas[parseInt(i, 10)].picture = imgUrl;
             }
-            /* Set user making request as the list's owner */
-            updates.userID = res.locals.id;
+            
+            /* Update the name and description too if there are changes present */
+            const myName = (updates.name) ? updates.name : myList.name;
+            const myDesc = updates.description;
+
             const newValues = {
                 $set: {
-                    ideas: updates,
+                    ideas: updates.ideas,
+                    description: myDesc,
+                    name: myName,
                 }
             };
             await List.findByIdAndUpdate(req.params.id, newValues);
-            const newList = [...myList];
-            newList.ideas = updates;
-            res.status(201).send(newList);
+            
+            /* Add updates to returned list */
+            myList.ideas = updates.ideas;
+            myList.description = myDesc;
+            myList.name = myName;
+            res.status(200).send(myList);
         }
     },
 
