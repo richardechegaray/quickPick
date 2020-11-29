@@ -34,11 +34,12 @@
     <string name="get_lists_failed">Failed to get lists</string>
     <string name="delete_list_failed">Failed to delete list</string>
     <string name="invalid_code">Invalid code</string>
-    <string name="create_list_name_prompt">List Name:</string>
-    <string name="create_list_description_name_prompt">List Description:</string>
-    <string name="create_list_add_entries_button_text">Add Entries</string>
-    <string name="create_list_button">Create List</string>
-    <string name="create_list_entries_text">Entries:</string>
+    <string name="create_or_update_list_name_prompt">List Name:</string>
+    <string name="create_or_update_list_description_name_prompt">List Description:</string>
+    <string name="create_or_update_list_add_entries_button_text">Add Entries</string>
+    <string name="create_or_update_list_create_button_text">Create List</string>
+    <string name="create_or_update_list_update_button_text">Update List</string>
+    <string name="create_or_update_list_entries_text">Entries:</string>
     <string name="logout">Logout</string>
     <string name="missing_list">Select a list first!</string>
     <string name="rv_description_hint">Entry Description:</string>

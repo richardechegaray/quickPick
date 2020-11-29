@@ -23,7 +23,9 @@ import com.quickpick.viewmodels.ListViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewEditListsActivity extends AppCompatActivity {
+public class ViewOrUpdateListsActivity extends AppCompatActivity {
+
+    public static final String IS_UPDATE_LIST = "IS_UPDATE_LIST";
 
     private ListPayloadAdapter adapter;
 
@@ -32,7 +34,7 @@ public class ViewEditListsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_edit_lists);
+        setContentView(R.layout.activity_view_or_update_lists);
 
         accessToken = AccessToken.getCurrentAccessToken();
         if (accessToken == null || accessToken.isExpired()) {
@@ -48,6 +50,17 @@ public class ViewEditListsActivity extends AppCompatActivity {
             adapter.updateLists(newListOfLists.getLists());
             adapter.notifyDataSetChanged();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Retrieve the lists again as they can change upon return from editting
+        ListRepository.getInstance().callGetLists(
+                RunnableUtils.DO_NOTHING,
+                RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
+                accessToken.getToken()
+        );
     }
 
     private void setUpRecyclerView() {
@@ -92,9 +105,18 @@ public class ViewEditListsActivity extends AppCompatActivity {
             ListRepository.getInstance().callDeleteList(
                     () -> ListRepository.getInstance().callGetLists(
                             RunnableUtils.DO_NOTHING,
-                            RunnableUtils.showToast(ViewEditListsActivity.this, getString(R.string.get_lists_failed)),
+                            RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.get_lists_failed)),
                             accessToken.getToken()),
-                    RunnableUtils.showToast(ViewEditListsActivity.this, getString(R.string.delete_list_failed)),
+                    RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.delete_list_failed)),
+                    accessToken.getToken(),
+                    lists.get(position).getId());
+        }
+
+        private void editList(int position) {
+            ListRepository.getInstance().callGetList(
+                    () -> startActivity(new Intent(ViewOrUpdateListsActivity.this, CreateOrUpdateListActivity.class)
+                            .putExtra(IS_UPDATE_LIST, true)),
+                    RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.get_list_failed)),
                     accessToken.getToken(),
                     lists.get(position).getId());
         }
@@ -116,6 +138,7 @@ public class ViewEditListsActivity extends AppCompatActivity {
                 this.description = view.findViewById(R.id.list_description_text_view);
                 this.position = 0;
                 view.findViewById(R.id.list_delete_button).setOnClickListener(button -> deleteList(position));
+                view.findViewById(R.id.list_edit_button).setOnClickListener(button -> editList(position));
             }
 
             private void setPosition(int position) {

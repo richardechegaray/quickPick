@@ -30,12 +30,10 @@
             android:name=".SummaryActivity"
             android:label="Results" />
         <activity
-            android:name=".ViewEditListsActivity"
+            android:name=".ViewOrUpdateListsActivity"
             android:label="View Lists" />
         <activity android:name=".ViewOldSessionsActivity" />
-        <activity
-            android:name=".CreateNewListActivity"
-            android:label="Create a New List" />
+        <activity android:name=".CreateOrUpdateListActivity" />
         <activity
             android:name=".MainActivity"
             android:label="Main Menu" />
