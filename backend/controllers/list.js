@@ -5,7 +5,7 @@ const imgUtil = require("../plugins/unsplash");
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
-        console.log(`DEBUG: Did not find a list matching _id: ${req.params.id}`);
+        console.log(`DEBUG: Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
     }
@@ -84,8 +84,10 @@ module.exports = {
                 $set: {
                     ideas: updates,
                 }
-            }
+            };
             await List.findByIdAndUpdate(req.params.id, newValues);
+            const newList = [...myList];
+            newList.ideas = updates;
             res.status(201).send(newList);
         }
     },
