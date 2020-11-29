@@ -208,6 +208,154 @@ describe("List Integration Tests", () => {
     
         expect(response.statusCode).toBe(500);
     });
+    it("Update List - Basic", async () => {
+        const newList = {
+            name: "newName",
+            description: "Where'd the cat go?",
+            ideas: [
+                {
+                    name: "dog",
+                    description: "Someone get me a dog",
+                    picture: "https://replacethis.com", // cached
+                },
+                {
+                    name: "bird",
+                    description: "Someone get me a bird",
+                    picture: "https://replacethis.com", // not in cache
+                },
+            ],
+        };
+        // List we are going to update
+        const myList = await List.findOne({name: "CreatedList1"});
 
+        const response = await request(app)
+                            .put(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({
+                                list: newList,
+                            });
+        
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(updatedList); // Not null
+        expect(updatedList.name).toEqual("newName");
+        expect(updatedList.ideas.map((i) => i.name).toObject()).toEqual(["dog", "bird"]);
+        expect(updatedList.description).toEqual("Where'd the cat go?");
+        expect(response.statusCode).toBe(200);
+    });
+
+    it("Update List - No Name", async () => {
+        const newList = {
+            name: "",
+            description: "Where'd the cat go?",
+            ideas: [
+                {
+                    name: "dog",
+                    description: "Someone get me a dog",
+                    picture: "https://replacethis.com", // cached
+                },
+                {
+                    name: "bird",
+                    description: "Someone get me a bird",
+                    picture: "https://replacethis.com", // not in cache
+                },
+            ],
+        };
+        // List we are going to update
+        const myList = await List.findOne({name: "newName"});
+
+        const response = await request(app)
+                            .put(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({
+                                list: newList,
+                            });
+        
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(updatedList); // Not null
+        expect(updatedList.name).toEqual("newName"); // Unchanged
+        expect(updatedList.ideas.map((i) => i.name).toObject()).toEqual(["dog", "bird"]);
+        expect(updatedList.description).toEqual("Where'd the cat go?");
+        expect(response.statusCode).toBe(200);
+    });
+    
+    it("Update List - No Access", async () => {
+        const newList = {
+            name: "newName",
+            description: "Where'd the cat go?",
+            ideas: [
+                {
+                    name: "dog",
+                    description: "Someone get me a dog",
+                    picture: "https://replacethis.com", // cached
+                },
+                {
+                    name: "bird",
+                    description: "Someone get me a bird",
+                    picture: "https://replacethis.com", // not in cache
+                },
+            ],
+        };
+        // List we are going to update
+        const myList = await List.findOne({name: "TestList2"});
+
+        const response = await request(app)
+                            .put(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({
+                                list: newList,
+                            });
+        
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(updatedList); // Not null
+        expect(updatedList.name).toEqual("TestList2"); // unchanged
+        expect(response.statusCode).toBe(403);
+    });
+    it("Update List - Bad Parameters", async () => {
+        const newList = {
+            name: "newName2",
+            description: "Should not be this",
+        };
+        // List we are going to update
+        const myList = await List.findOne({name: "newName"});
+
+        const response = await request(app)
+                            .put(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({
+                                list: newList,
+                            });
+        
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(updatedList); // Not null
+        expect(updatedList.name).toEqual("newName"); // unchanged
+        expect(updatedList.description).toEqual("Where'd the cat go?"); //unchanged
+        expect(response.statusCode).toBe(400);
+    });
+    it("Delete List - Basic", async () => {
+        // List we are going to update
+        const myList = await List.findOne({name: "newName"});
+
+        const response = await request(app)
+                            .delete(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({});
+
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(!updatedList); // null
+        expect(response.statusCode).toBe(200);
+    });
+    it("Delete List - Access Denied", async () => {
+        // List we are going to update
+        const myList = await List.findOne({name: "TestList2"});
+
+        const response = await request(app)
+                            .delete(`/list/${myList._id}`)
+                            .set("facebookToken", testToken)
+                            .send({});
+
+        const updatedList = await List.findById(myList._id).catch(() => null);
+        expect(updatedList); // not null
+        expect(response.statusCode).toBe(403);
+    });
 });
 

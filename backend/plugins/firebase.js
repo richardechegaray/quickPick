@@ -26,12 +26,8 @@ module.exports = {
                 },
             };
 
-            if (body.list) {
-                msg.data.list = JSON.stringify(body.list);
-            }
-
             let response = await admin.messaging().sendMulticast(msg);
-            console.log(response.successCount + " messages were sent successfully");
+            console.log(`${response.successCount} messages were sent successfully`);
 
         } catch (error) {
             console.log(error);

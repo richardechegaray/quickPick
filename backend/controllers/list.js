@@ -119,7 +119,7 @@ module.exports = {
 
         if (checkListAccess(myList, "write", res)) {
             await List.findByIdAndDelete(req.params.id);
-            res.status(200).send();
+            res.status(200).send({});
         }
     }
 };

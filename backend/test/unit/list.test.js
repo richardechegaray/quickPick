@@ -66,6 +66,32 @@ const testList3 = {
     ],
 };
 
+const testList4 = {
+    userID: "UpdateTester",
+    name: "Changemyname",
+    description: "Changemeplease",
+    ideas: [
+        {
+            name: "Idea1",
+            description: "This is an idea",
+            picture: "https://fakeimage.com",
+        },
+    ],
+};
+
+const testList5 = {
+    userID: "DeleteTester",
+    name: "Deleteme",
+    description: "IwantToBeFree",
+    ideas: [
+        {
+            name: "Idea1",
+            description: "This is an idea",
+            picture: "https://fakeimage.com",
+        },
+    ],
+};
+
 beforeAll(async () => {
     await dbHelper.connect();
 
@@ -81,6 +107,8 @@ beforeAll(async () => {
     
     await List.create(testList1);
     await List.create(testList2);
+    await List.create(testList4);
+    await List.create(testList5);
 });
 
 afterAll(async () => {
@@ -161,7 +189,6 @@ describe("Create a List", () => {
         
         expect(res.status).toHaveBeenCalledWith(201);
         expect(res.body.name).toEqual(testList3.name);
-        console.log(res.body);
     });
 
     it("Null Parameter", async () => {
@@ -175,6 +202,132 @@ describe("Create a List", () => {
         await listHelper.createList(req, res);
         
         expect(res.status).toHaveBeenCalledWith(400);
-        console.log(res.body);
+    });
+});
+
+describe("Update a List", () => {
+    it("Success - Basic", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": "Changemyname"});
+
+        req.body.list = {
+            name: "newName",
+            description: "newDesc",
+            ideas: [
+                {
+                    name: "newIdeaName"
+                }
+            ]
+        };
+        req.params.id = myList._id;
+        res.locals.id = "UpdateTester";
+
+        await listHelper.updateList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.body.name).toEqual("newName");
+        expect(res.body.description).toEqual("newDesc");
+        expect(res.body.ideas[0].name).toEqual("newIdeaName");
+    });
+    it("Success - No update to name", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": "newName"});
+
+        req.body.list = {
+            name: "",
+            description: "newDesc",
+            ideas: [
+                {
+                    name: "newIdeaName"
+                }
+            ]
+        };
+        req.params.id = myList._id;
+        res.locals.id = "UpdateTester";
+
+        await listHelper.updateList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.body.name).toEqual("newName");
+        expect(res.body.description).toEqual("newDesc");
+        expect(res.body.ideas[0].name).toEqual("newIdeaName");
+    });
+    it("Attempt to update someone else's list", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": "TestList-FakeID"});
+
+        req.body.list = {
+            name: "newName",
+            description: "newDesc",
+            ideas: [
+                {
+                    name: "newIdeaName"
+                }
+            ]
+        };
+        req.params.id = myList._id;
+        res.locals.id = "UpdateTester";
+
+        await listHelper.updateList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    it("Null list argument", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": "TestList-FakeID"});
+
+        req.params.id = myList._id;
+        res.locals.id = "UpdateTester";
+
+        await listHelper.updateList(req, res);
+        
+        expect(res.status).toHaveBeenCalledWith(400);
+    });
+});
+
+describe("Delete a List", () => {
+    it("Success", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": testList5.name});
+
+        req.params.id = myList._id;
+        res.locals.id = "DeleteTester";
+
+        await listHelper.deleteList(req, res);
+        
+        const ghostList = await List.findOne({"name": testList5.name}).catch(() => {null});
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(ghostList).toEqual(null);
+    });
+
+    it("Attempt to delete someone else's list", async () => {
+        /* Mock the Request and Response objects */
+        const req = mockRequest();
+        const res = mockResponse();
+
+        const myList = await List.findOne({"name": testList1.name});
+
+        req.params.id = myList._id;
+        res.locals.id = "DeleteTester";
+
+        await listHelper.deleteList(req, res);
+        expect(res.status).toHaveBeenCalledWith(403);
     });
 });
