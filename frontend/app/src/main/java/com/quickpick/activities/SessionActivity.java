@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.AccessToken;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.quickpick.MyFirebaseMessagingService;
 import com.quickpick.R;
 import com.quickpick.payloads.ListPayload;
@@ -49,6 +50,7 @@ public class SessionActivity extends AppCompatActivity {
     private Button startSwipingButton;
 
     private TextInputEditText listEditText;
+    private TextInputLayout listEditTextLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class SessionActivity extends AppCompatActivity {
         }
         startSwipingButton = findViewById(R.id.start_swiping_button);
         listEditText = findViewById(R.id.session_list_edit_text);
+        listEditTextLayout = findViewById(R.id.session_list_text_field);
 
         sessionReceiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);
 
@@ -94,7 +97,13 @@ public class SessionActivity extends AppCompatActivity {
             sessionUserCount.setText(String.format(getString(R.string.session_user_count_format), newSession.getParticipants().size()));
             listEditText.setText(newSession.getListName());
             listEditText.setEnabled(isOwner);
-            startSwipingButton.setEnabled(isOwner);
+            if (newSession.getListName().isEmpty() && isOwner) {
+                listEditTextLayout.setError("Select a list");
+                startSwipingButton.setEnabled(false);
+            } else {
+                listEditTextLayout.setError(null);
+                startSwipingButton.setEnabled(isOwner);
+            }
             sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
@@ -112,7 +121,7 @@ public class SessionActivity extends AppCompatActivity {
                     new MaterialAlertDialogBuilder(this)
                             .setTitle(getString(R.string.session_list_text))
                             .setNeutralButton(getString(R.string.dialog_cancel_button_text),
-                                    (dialog, which) -> RunnableUtils.showToast(this, getString(R.string.select_list_cancelled)).run())
+                                    (dialog, which) -> {})
                             .setPositiveButton(getString(R.string.dialog_select_button_text),
                                     (dialog, which) -> SessionRepository.getInstance().updateList(RunnableUtils.DO_NOTHING,
                                             RunnableUtils.showToast(this, getString(R.string.select_list_failed)),

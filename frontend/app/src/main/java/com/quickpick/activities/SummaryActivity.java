@@ -69,6 +69,7 @@ public class SummaryActivity extends AppCompatActivity {
     }
 
     private void showResults(List<ResultPayload> results) {
+        firstPlaceImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
         if (results.size() > 0) {
             ResultPayload firstPlace = results.get(0);
 
@@ -95,7 +96,6 @@ public class SummaryActivity extends AppCompatActivity {
             }
         } else {
             String noResultsFoundUrl = "https://cdn.dribbble.com/users/1242216/screenshots/9326781/media/6384fef8088782664310666d3b7d4bf2.png";
-            firstPlaceImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             Glide.with(getApplicationContext()).load(noResultsFoundUrl)
                     .into(firstPlaceImage);
             ((TextView) findViewById(R.id.first_place_idea_text)).setText(R.string.no_results_found_text);

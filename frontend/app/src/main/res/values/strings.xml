@@ -29,7 +29,6 @@
     <string name="quick_text">quick</string>
     <string name="pick_text">Pick</string>
     <string name="selected_list_text">Selected List</string>
-    <string name="select_list_cancelled">Did not select new list</string>
     <string name="select_list_failed">List update failed, try again</string>
     <string name="get_list_failed">Failed to get list for swiping</string>
     <string name="get_lists_failed">Failed to get lists</string>
