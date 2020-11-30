@@ -17,7 +17,7 @@ Mongodb setup*/
 
 let TestUserID = "FacebookId123";
 let TestUserID2 = "murphy";
-let list_id = "";
+let testListID = "";
 
 const mockRequest = () => {
     const req = {
@@ -62,7 +62,7 @@ beforeEach(async () => {
         name: "me",
         id: TestUserID,
         preferences: Array(20).fill("Pizza"), // Max out preference list for coverage
-    }
+    };
     await User.create(newUser);
     let newUser1 = {
         name: "me2",
@@ -88,7 +88,7 @@ beforeEach(async () => {
     await List.create(list);
 
     let foundList = await List.findOne({});
-    list_id = foundList._id;
+    testListID = foundList._id;
 
     let newSession = {
         pin: "abcd",
@@ -268,7 +268,7 @@ describe("Update session list", function () {
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "10000";
-        req.body.listID = list_id.toString();
+        req.body.listID = testListID.toString();
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(404);
@@ -280,7 +280,7 @@ describe("Update session list", function () {
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
-        req.body.listID = list_id.toString();
+        req.body.listID = testListID.toString();
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
@@ -316,7 +316,7 @@ describe("Get session list", function () {
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
-        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: list_id });
+        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: testListID });
 
         await sessionHelper.getList(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
@@ -363,7 +363,7 @@ describe("Start session", function () {
         const res = mockResponse();
         res.locals.id = TestUserID;
         req.params.id = "abcd";
-        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: list_id });
+        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: testListID });
 
         await sessionHelper.startSession(req, res);
         expect(res.status).toHaveBeenCalledWith(200);

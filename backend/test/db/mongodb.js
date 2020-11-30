@@ -16,4 +16,4 @@ module.exports = {
         await mongoose.connection.close();
         await mongod.stop();
     }
-}
+};

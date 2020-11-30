@@ -149,7 +149,7 @@ module.exports = {
     let uniquePin = false;
     while (!uniquePin) {
       let foundSessions = await Session.find({ pin: rString });
-      if (foundSessions.length == 0) {
+      if (foundSessions.length === 0) {
         uniquePin = true;
       } else {
         rString = randomString(
@@ -286,8 +286,6 @@ module.exports = {
       res.status(400).send({ ok: false });
       return;
     }
-
-
 
     /* Assert user isn't in session */
     for (const index in session.participants) {
