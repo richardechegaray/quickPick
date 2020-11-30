@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Console = require("Console");
 
 const ENDPOINT = process.env.MONGO_URL;
 
@@ -10,5 +11,5 @@ mongoose.connect(ENDPOINT, {
 });
 
 mongoose.connection.once("open", () => {
-    console.log(`Connected to database at ${ENDPOINT}`);
+    Console.success(`Connected to database at ${ENDPOINT}`);
 });

@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const Console = require("Console");
 // Initialize Firebase
 const admin = require("firebase-admin");
 const serviceAccount = require("../quickpick-7f20f-firebase-adminsdk-hvb4p-96107c2f64.json");
@@ -27,10 +28,10 @@ module.exports = {
             };
 
             let response = await admin.messaging().sendMulticast(msg);
-            console.log(`${response.successCount} messages were sent successfully`);
+            Console.debug(`${response.successCount} messages were sent successfully`);
 
         } catch (error) {
-            console.log(error);
+            Console.debug(error);
         }
     }
 };

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/thomaslapadat/quickpick_server#readme",
   "dependencies": {
     "@shelf/jest-mongodb": "^1.2.3",
+    "Console": "^1.1.0",
     "axios": "^0.20.0",
     "bufferutil": "^4.0.2",
     "canvas": "^2.6.1",
@@ -27,6 +28,7 @@
     "jest": "26.6.1",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.14",
+    "morgan": "^1.10.0",
     "performance": "^1.4.0",
     "supertest": "^6.0.1",
     "ts-node": "^9.0.0",

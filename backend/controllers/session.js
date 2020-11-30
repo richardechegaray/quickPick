@@ -3,6 +3,7 @@ const firebaseUtil = require("../plugins/firebase");
 const Session = require("../models/session");
 const User = require("../models/user");
 const List = require("../models/list");
+const Console = require("Console");
 
 /*
 ----------Helper functions
@@ -117,7 +118,6 @@ async function sortSession(session) {
 
 module.exports = {
   getSession: async (req, res) => {
-    console.log("DEBUG: Get request to /session/" + req.params.id);
     let session = await Session.findOne({ pin: req.params.id });
     //Assert session is found
     if (typeof session === "undefined" || session === null) {
@@ -140,8 +140,6 @@ module.exports = {
   },
 
   createSession: async (req, res) => {
-    console.log("DEBUG: Post request to /session");
-
     let rString = randomString(
       5,
       "023456789abcdefghjkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ"
@@ -185,9 +183,6 @@ module.exports = {
   },
 
   receiveChoices: async (req, res) => {
-    console.log(
-      "DEBUG: post request to /session/" + req.params.id + "/choices"
-    );
     //Find session
     let query = { pin: req.params.id };
     let currentSession = await Session.findOne(query);
@@ -266,23 +261,19 @@ module.exports = {
   },
 
   addUser: async (req, res) => {
-    console.log("DEBUG: Post request to /session/" + req.params.id);
-
     let session = await Session.findOne({ pin: req.params.id });
     let user = await User.findOne({ id: String(res.locals.id) });
 
     //Assert session is found
     if (session == null || user == null) {
-      console.log("No session exists with ID: " + req.params.id);
+      Console.warn("No session exists with ID: " + req.params.id);
       res.status(404).send({ ok: false });
       return;
     }
 
     //Assert session has not started
     if (session.status !== "lobby") {
-      console.log(
-        "Session " + req.params.id + " is no longer accepting new participants"
-      );
+      Console.warn("Session " + req.params.id + " is no longer accepting new participants");
       res.status(400).send({ ok: false });
       return;
     }
@@ -317,7 +308,6 @@ module.exports = {
   },
 
   startSession: async (req, res) => {
-    console.log("DEBUG: Post request to /session/" + req.params.id + "/run");
     //Find session
     let session = await Session.findOne({ pin: req.params.id });
 
@@ -372,7 +362,6 @@ module.exports = {
   },
 
   updateList: async (req, res) => {
-    console.log("DEBUG: Put request to /session/" + req.params.id);
     //Assert session exists
     let checkSession = await Session.findOne({ pin: req.params.id });
     if (checkSession === null) {
@@ -411,7 +400,6 @@ module.exports = {
   },
 
   getList: async (req, res) => {
-    console.log("DEBUG: Get request to session/" + req.params.id + "/list");
     let session = await Session.findOne({ pin: req.params.id });
 
     //Assert session id is valid

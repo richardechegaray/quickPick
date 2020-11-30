@@ -1,16 +1,17 @@
 const axios = require("axios");
 const Image = require("../models/image");
+const Console = require("Console");
 
 module.exports = {
     getImage: async (searchString) => {
         let searchResult = await Image.findOne({name: searchString.toLowerCase()}).catch(() => null);
         
         if (searchResult !== null) {
-            console.log("Found cached image.");
+			Console.debug(`Found cached image for ${searchString.toLowerCase()}`);
             return searchResult.urls;
         }
         else {
-            console.log("No cached image, making external API call.");
+			Console.debug(`No cached image for ${searchString.toLowerCase()}, making external API call`);
             let unsplashParameters = { 
                 "query": searchString, 
                 "per_page": 1, 

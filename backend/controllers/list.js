@@ -1,5 +1,6 @@
 const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
+const Console = require("Console");
 
 /* Checks ownership of list */
 function isOwnedByUser(list, access, res) {
@@ -10,13 +11,13 @@ function isOwnedByUser(list, access, res) {
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
-        console.log(`DEBUG: Did not find a list matching _id: ${res.locals.id}`);
+		Console.warn(`Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
     } 
     /* User must own the list, unless they are trying to read a default list */
     else if (!isOwnedByUser(list, access, res)) {
-        console.log("DEBUG: Attempted to access another user's list");
+		Console.warn("Attempted to access another user's list");
         res.status(403).send({});
         return false;
     }
@@ -26,7 +27,6 @@ function checkListAccess(list, access, res) {
 module.exports = {
     /* Returns all lists where the userID field matches the user making the request */
     getMyLists: async (req, res) => {
-        console.log("DEBUG: Get request to lists");
         const myLists = await List.find({ userID: { $in: [res.locals.id, "quickpick.admin"] } })
             .sort({ name: 1 });
 
@@ -42,12 +42,11 @@ module.exports = {
     },
     /* Takes the list from the request body and puts it into the DB */
     createList: async (req, res) => {
-        console.log("DEBUG: Post request to lists");
         let newList = req.body.list;
 
         /* newList cannot be null*/
         if (!newList) {
-            console.log("DEBUG: List in body is null");
+			Console.warn("List in body is null");
             res.status(400).send({});
         }
         else {
@@ -66,13 +65,12 @@ module.exports = {
     
     /* Takes the list from the request body updates the list matching the id */
     updateList: async (req, res) => {
-        console.log(`DEBUG: Get request to list/${req.params.id}`);
         const myList = await List.findById(req.params.id).catch(() => null);
         
         /* updates cannot be null*/
         const updates = req.body.list;
         if (!updates || !updates.ideas) {
-            console.log("DEBUG: List in body is null");
+			Console.warn("List in body is null");
             res.status(400).send({});
             return;
         }
@@ -107,7 +105,6 @@ module.exports = {
 
     /* Finds a list matching the id and returns it if the the list belongs to the user */
     getList: async (req, res) => {
-        console.log(`DEBUG: Get request to list/${req.params.id}`);
         /* Find the list matching the id */
         const myList = await List.findById(req.params.id).catch(() => null);
         
@@ -118,7 +115,6 @@ module.exports = {
     
     /* Deletes a list matching the id if the the list belongs to the user */
     deleteList: async (req, res) => {
-        console.log(`DEBUG: Delete request to list/${req.params.id}`);
         /* Find the list matching the id */
         const myList = await List.findById(req.params.id).catch(() => null);
 
