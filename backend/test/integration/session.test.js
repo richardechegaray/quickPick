@@ -14,7 +14,8 @@ const facebookToken = "EAALsZAFPkrZAUBAO5AdNmEesraFKVzn5shZBtUJIFZAMjA2r6dDgZAHR
 let sessionPin = "";
 let newUser = {
     name: "Buyonacy Changstein",
-    id: "100722321844479"
+    id: "100722321844479",
+    preferences: Array(20).fill("Pizza"),
 };
 let testListID = "";
 
@@ -259,6 +260,41 @@ describe("Receive choices", function () {
                 },
                 {
                     idea: { name: "Mexican" }, choice: true
+                }
+            ]
+        });
+        expect(response.status).toBe(200);
+        done();
+    });
+
+    it("Success, complete, preferences", async (done) => {
+        await Session.findOneAndUpdate({ pin: "abcd" }, { status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
+        let response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
+            choices: [
+                {
+                    idea: { name: "Italian" }, choice: true
+                },
+                {
+                    idea: { name: "French" }, choice: false
+                },
+                {
+                    idea: { name: "Mexican" }, choice: true
+                }
+            ]
+        });
+        expect(response.status).toBe(200);
+
+        await Session.findOneAndUpdate({ pin: "abcd" }, { complete: 0, status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
+        response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
+            choices: [
+                {
+                    idea: { name: "Italian" }, choice: true
+                },
+                {
+                    idea: { name: "French" }, choice: true
+                },
+                {
+                    idea: { name: "Mexican" }, choice: false
                 }
             ]
         });
