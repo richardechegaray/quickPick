@@ -387,7 +387,7 @@ module.exports = {
     try {
       foundList = await List.findById(req.body.listID);
     } catch (error) {
-      res.status(400).send({ ok: false, message: "List ID is not a valid ID" })
+      res.status(400).send({ ok: false, message: "List ID is not a valid ID" });
       return;
     }
     //Assert list is found

@@ -103,9 +103,6 @@ beforeEach(async () => {
         }]
     };
     await Session.create(newSession);
-    console.log("yeet");
-    let testuserfind = await User.findOne({});
-    console.log(testuserfind);
 });
 
 afterAll(async () => {
@@ -272,7 +269,6 @@ describe("Update session list", function () {
         res.locals.id = TestUserID;
         req.params.id = "10000";
         req.body.listID = list_id.toString();
-        console.log(req.body.listID);
 
         await sessionHelper.updateList(req, res);
         expect(res.status).toHaveBeenCalledWith(404);

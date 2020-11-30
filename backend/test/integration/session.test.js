@@ -269,35 +269,23 @@ describe("Receive choices", function () {
 
     it("Success, complete, preferences", async (done) => {
         await Session.findOneAndUpdate({ pin: "abcd" }, { status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
-        let response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
-            choices: [
-                {
-                    idea: { name: "Italian" }, choice: true
-                },
-                {
-                    idea: { name: "French" }, choice: false
-                },
-                {
-                    idea: { name: "Mexican" }, choice: true
-                }
-            ]
-        });
+        let choices = [
+            {
+                idea: { name: "Italian" }, choice: true
+            },
+            {
+                idea: { name: "French" }, choice: false
+            },
+            {
+                idea: { name: "Mexican" }, choice: true
+            }
+        ];
+
+        let response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({choices});
         expect(response.status).toBe(200);
 
         await Session.findOneAndUpdate({ pin: "abcd" }, { complete: 0, status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
-        response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
-            choices: [
-                {
-                    idea: { name: "Italian" }, choice: true
-                },
-                {
-                    idea: { name: "French" }, choice: true
-                },
-                {
-                    idea: { name: "Mexican" }, choice: false
-                }
-            ]
-        });
+        response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({choices});
         expect(response.status).toBe(200);
         done();
     });
