@@ -28,7 +28,7 @@
             android:label="New Session" />
         <activity
             android:name=".activities.SummaryActivity"
-            android:label="Results" />
+            android:label="Session Results" />
         <activity
             android:name=".activities.ViewOrUpdateListsActivity"
             android:label="View Lists" />
