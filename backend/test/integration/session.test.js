@@ -59,7 +59,7 @@ beforeEach(async () => {
             name: "Buyonacy Changstein",
             id: newUser.id,
         }]
-    }
+    };
     testListID = myList._id;
     await Session.create(newSession);
     

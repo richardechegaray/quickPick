@@ -149,7 +149,7 @@ module.exports = {
     let uniquePin = false;
     while (!uniquePin) {
       let foundSessions = await Session.find({ pin: rString });
-      if (foundSessions.length == 0) {
+      if (foundSessions.length === 0) {
         uniquePin = true;
       } else {
         rString = randomString(
@@ -279,22 +279,12 @@ module.exports = {
     }
 
     //Assert session has not started
-    if (session.status !== "lobby") {
+    if (session.status !== "lobby" || session.participants.includes(user)) {
       console.log(
         "Session " + req.params.id + " is no longer accepting new participants"
       );
-      res.status(400).send({ ok: false });
+      res.status(400).send({ ok: false, message: "Session has started/user is in session already" });
       return;
-    }
-
-
-
-    /* Assert user isn't in session */
-    for (const index in session.participants) {
-      if (user.id === session.participants[parseInt(index, 10)].id) {
-        res.status(400).send({ ok: false, message: "User is already in session" });
-        return;
-      }
     }
 
     /* Create new person and insert */
@@ -375,12 +365,6 @@ module.exports = {
 
   updateList: async (req, res) => {
     console.log("DEBUG: Put request to /session/" + req.params.id);
-    //Assert session exists
-    let checkSession = await Session.findOne({ pin: req.params.id });
-    if (checkSession === null) {
-      res.status(404).send({ ok: false, message: "Session does not exist" });
-      return;
-    }
 
     //Assert parameters are valid
     let foundList = null;
@@ -391,8 +375,8 @@ module.exports = {
       return;
     }
     //Assert list is found
-    if (foundList == null) {
-      res.status(404).send({ ok: false, message: "List was not found" });
+    if (foundList === null || checkSession === null) {
+      res.status(404).send({ ok: false, message: "List/session was not found" });
       return;
     }
 
