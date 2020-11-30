@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
+import com.quickpick.MyFirebaseMessagingService;
+import com.quickpick.R;
 import com.quickpick.payloads.ResultPayload;
 import com.quickpick.payloads.SessionPayload;
 import com.quickpick.receivers.FirebaseIntentReceiver;

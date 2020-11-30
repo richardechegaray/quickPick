@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SummaryActivity">
+    tools:context=".activities.SummaryActivity">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/first_place_card"

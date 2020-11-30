@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.facebook.AccessToken;
 import com.mindorks.placeholderview.SwipeDecor;
 import com.mindorks.placeholderview.SwipePlaceHolderView;
+import com.quickpick.R;
 import com.quickpick.payloads.ChoicePayload;
 import com.quickpick.payloads.IdeaPayload;
 import com.quickpick.repositories.SessionRepository;

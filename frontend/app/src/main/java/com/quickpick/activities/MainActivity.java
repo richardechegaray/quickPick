@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.quickpick.R;
 import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
