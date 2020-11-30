@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.AccessToken;
+import com.quickpick.R;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.RunnableUtils;

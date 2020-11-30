@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateOrUpdateListActivity">
+    tools:context=".activities.CreateOrUpdateListActivity">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/create_or_update_list_name_edit_text_layout"

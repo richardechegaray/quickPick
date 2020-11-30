@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.AccessToken;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.quickpick.MyFirebaseMessagingService;
+import com.quickpick.R;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ListsPayload;
 import com.quickpick.payloads.ParticipantPayload;

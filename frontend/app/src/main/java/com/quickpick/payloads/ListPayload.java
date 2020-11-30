@@ -1,5 +1,6 @@
 package com.quickpick.payloads;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
@@ -37,18 +38,22 @@ public class ListPayload implements Serializable {
         this.ideas = ideas;
     }
 
+    @NonNull
     public List<IdeaPayload> getIdeas() {
         return Collections.unmodifiableList(Optional.ofNullable(ideas).orElse(new ArrayList<>()));
     }
 
+    @NonNull
     public String getName() {
         return Optional.ofNullable(name).orElse("");
     }
 
+    @NonNull
     public String getId() {
         return Optional.ofNullable(id).orElse("");
     }
 
+    @NonNull
     public String getDescription() {
         return Optional.ofNullable(description).orElse("");
     }

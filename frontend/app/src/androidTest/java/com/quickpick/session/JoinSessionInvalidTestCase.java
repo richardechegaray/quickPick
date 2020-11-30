@@ -8,8 +8,8 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import com.quickpick.MainActivity;
 import com.quickpick.R;
+import com.quickpick.activities.MainActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

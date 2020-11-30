@@ -1,10 +1,11 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.AccessToken;
+import com.quickpick.R;
 import com.quickpick.payloads.CreateOrUpdateListRequest;
 import com.quickpick.payloads.IdeaPayload;
 import com.quickpick.payloads.ListPayload;
@@ -20,14 +22,15 @@ import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.viewmodels.ListViewModel;
 
 import java.util.List;
+import java.util.Optional;
 
-import static com.quickpick.ViewOrUpdateListsActivity.IS_UPDATE_LIST;
+import static com.quickpick.activities.ViewOrUpdateListsActivity.IS_UPDATE_LIST;
 
 public class CreateOrUpdateListActivity extends AppCompatActivity {
 
     private AccessToken accessToken;
 
-    private MyRecyclerViewAdapter adapter;
+    private ListEntriesRecyclerViewAdapter adapter;
 
     private EditText listName;
     private EditText listDescription;
@@ -47,16 +50,17 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         }
         ListPayload currentListToDisplay;
         boolean isUpdateList = getIntent().getBooleanExtra(IS_UPDATE_LIST, false);
+        Optional<ActionBar> actionBar = Optional.ofNullable(getSupportActionBar());
 
         findViews();
 
         if (isUpdateList) {
-            getSupportActionBar().setTitle("Update List");
+            actionBar.ifPresent(bar -> bar.setTitle("Update List"));
             currentListToDisplay = new ViewModelProvider.NewInstanceFactory()
                     .create(ListViewModel.class).getList().getValue();
             submitListButton.setText(R.string.create_or_update_list_update_button_text);
         } else {
-            getSupportActionBar().setTitle("Create List");
+            actionBar.ifPresent(bar -> bar.setTitle("Create List"));
             currentListToDisplay = new ListPayload();
             submitListButton.setText(R.string.create_or_update_list_create_button_text);
         }
@@ -64,6 +68,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         listDescription.setText(currentListToDisplay.getDescription());
 
         setUpOnClickListeners(isUpdateList, currentListToDisplay.getId());
+
         setUpRecyclerView(currentListToDisplay.getIdeas());
     }
 
@@ -102,7 +107,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation()));
-        adapter = new MyRecyclerViewAdapter(this, ideasToDisplay);
+        adapter = new ListEntriesRecyclerViewAdapter(this, ideasToDisplay);
         recyclerView.setAdapter(adapter);
     }
 }
