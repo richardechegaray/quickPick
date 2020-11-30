@@ -8,9 +8,9 @@ function checkListAccess(list, access, res) {
         console.log(`DEBUG: Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
-    }
+    } 
     /* User must own the list, unless they are trying to read a default list */
-    if (!(list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin"))) {
+    else if (!(list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin"))) {
         console.log("DEBUG: Attempted to access another user's list");
         res.status(403).send({});
         return false;
