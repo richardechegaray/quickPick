@@ -1,7 +1,12 @@
 const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
 
-/* Helper function to check a user's access to a list */
+/* Checks ownership of list */
+function isOwnedByUser(list, access, res) {
+    return list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin");
+}
+
+/* Helper function to check if a user has access to a list, and verifies that the list has been passed */
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
@@ -16,10 +21,6 @@ function checkListAccess(list, access, res) {
         return false;
     }
     return true;
-}
-
-function isOwnedByUser(list, access, res) {
-    return list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin");
 }
 
 module.exports = {
