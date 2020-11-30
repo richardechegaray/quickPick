@@ -219,8 +219,8 @@ describe("List Integration Tests", () => {
                     picture: "https://replacethis.com", // cached
                 },
                 {
-                    name: "bird",
-                    description: "Someone get me a bird",
+                    name: "27464826483647252936473946", // should be populated with the default img
+                    description: "Someone get me a 27464826483647252936473946",
                     picture: "https://replacethis.com", // not in cache
                 },
             ],
@@ -238,7 +238,7 @@ describe("List Integration Tests", () => {
         const updatedList = await List.findById(myList._id).catch(() => null);
         expect(updatedList); // Not null
         expect(updatedList.name).toEqual("newName");
-        expect(updatedList.ideas.map((i) => i.name).toObject()).toEqual(["dog", "bird"]);
+        expect(updatedList.ideas.map((i) => i.name).toObject()).toEqual(["dog", "27464826483647252936473946"]);
         expect(updatedList.description).toEqual("Where'd the cat go?");
         expect(response.statusCode).toBe(200);
     });

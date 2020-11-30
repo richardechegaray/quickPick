@@ -1,16 +1,21 @@
 const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
 
-/* Helper function to check a user's access to a list */
+/* Checks ownership of list */
+function isOwnedByUser(list, access, res) {
+    return list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin");
+}
+
+/* Helper function to check if a user has access to a list, and verifies that the list has been passed */
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
         console.log(`DEBUG: Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
-    }
+    } 
     /* User must own the list, unless they are trying to read a default list */
-    if (!(list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin"))) {
+    else if (!isOwnedByUser(list, access, res)) {
         console.log("DEBUG: Attempted to access another user's list");
         res.status(403).send({});
         return false;
