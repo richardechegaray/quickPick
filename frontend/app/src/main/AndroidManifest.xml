@@ -32,7 +32,6 @@
         <activity
             android:name=".activities.ViewOrUpdateListsActivity"
             android:label="View Lists" />
-        <activity android:name=".activities.ViewOldSessionsActivity" />
         <activity android:name=".activities.CreateOrUpdateListActivity" />
         <activity
             android:name=".activities.MainActivity"

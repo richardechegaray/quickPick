@@ -64,10 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.join_session_button).setOnClickListener(view -> showAlertDialog());
 
-        findViewById(R.id.view_old_sessions_button).setOnClickListener(view ->
-                startActivity(new Intent(getBaseContext(), ViewOldSessionsActivity.class))
-        );
-
         findViewById(R.id.create_session_button).setOnClickListener(view ->
                 SessionRepository.getInstance().createSession(this::navigateToSessionActivity, facebookAccessToken)
         );
