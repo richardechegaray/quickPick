@@ -6,11 +6,9 @@ module.exports = {
         let searchResult = await Image.findOne({name: searchString.toLowerCase()}).catch(() => null);
         
         if (searchResult !== null) {
-            console.log("Found cached image.");
             return searchResult.urls;
         }
         else {
-            console.log("No cached image, making external API call.");
             let unsplashParameters = { 
                 "query": searchString, 
                 "per_page": 1, 

@@ -27,6 +27,7 @@
     "jest": "26.6.1",
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.14",
+    "morgan": "^1.10.0",
     "performance": "^1.4.0",
     "supertest": "^6.0.1",
     "ts-node": "^9.0.0",
