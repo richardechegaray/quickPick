@@ -7,8 +7,8 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Add logging for HTTP Requests
-const  morgan = require('morgan');
-app.use(morgan('dev'));
+const  morgan = require("morgan");
+app.use(morgan("dev"));
 
 // Import routes
 const loginRouter = require("./routes/login");
