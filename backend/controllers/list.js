@@ -10,12 +10,16 @@ function checkListAccess(list, access, res) {
         return false;
     } 
     /* User must own the list, unless they are trying to read a default list */
-    else if (!(list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin"))) {
+    else if (!isOwnedByUser(list, access, res)) {
         console.log("DEBUG: Attempted to access another user's list");
         res.status(403).send({});
         return false;
     }
     return true;
+}
+
+function isOwnedByUser(list, access, res) {
+    return list.userID === res.locals.id || (access === "read" && list.userID === "quickpick.admin");
 }
 
 module.exports = {
