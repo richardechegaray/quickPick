@@ -3,6 +3,7 @@ package com.quickpick.activities;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY;
 
 public class SessionActivity extends AppCompatActivity {
 
@@ -94,7 +97,7 @@ public class SessionActivity extends AppCompatActivity {
                         RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
                         accessToken.getToken());
             }
-            sessionUserCount.setText(String.format(getString(R.string.session_user_count_format), newSession.getParticipants().size()));
+            sessionUserCount.setText(Html.fromHtml(String.format(getString(R.string.session_user_count_format), newSession.getParticipants().size()), FROM_HTML_MODE_LEGACY));
             listEditText.setText(newSession.getListName());
             listEditText.setEnabled(isOwner);
             if (newSession.getListName().isEmpty() && isOwner) {
@@ -104,7 +107,7 @@ public class SessionActivity extends AppCompatActivity {
                 listEditTextLayout.setError(null);
                 startSwipingButton.setEnabled(isOwner);
             }
-            sessionKeyView.setText(String.format(getString(R.string.session_code_string_format), newSession.getPin()));
+            sessionKeyView.setText(Html.fromHtml(String.format(getString(R.string.session_code_string_format), newSession.getPin()), FROM_HTML_MODE_LEGACY));
             adapter.updateUsers(newSession.getParticipants());
             adapter.notifyDataSetChanged();
         });
