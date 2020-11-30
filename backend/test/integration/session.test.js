@@ -16,6 +16,7 @@ let newUser = {
     name: "Buyonacy Changstein",
     id: "100722321844479"
 };
+let testListID = "";
 
 beforeEach(async () => {
     await dbHelper.connect();
@@ -52,12 +53,13 @@ beforeEach(async () => {
         status: "lobby",
         creator: newUser.id,
         complete: 0,
-        results: [],
+        results: [{idea: {name: "Mexican"}, score: 0},{idea: {name: "Italian"}, score: 0},{idea: {name: "French"}, score: 0},],
         participants: [{
             name: "Buyonacy Changstein",
             id: newUser.id,
         }]
     }
+    testListID = myList._id;
     await Session.create(newSession);
     
 });
@@ -150,6 +152,8 @@ describe("Update session list", function () {
     });
 
     it("Success", async (done) => {
+        await Session.findOneAndUpdate({ pin: "abcd" }, {listID: "" });
+        const response = await request(app).put("/session/abcd").set({facebookToken}).send({listID: testListID});
         expect(response.status).toBe(200);
         done();
     });
@@ -191,6 +195,8 @@ describe("Start session", function () {
     });
 
     it("Invalid list ID", async (done) => {
+        await Session.findOneAndUpdate({ pin: "abcd" }, { listID: "" });
+        const response = await request(app).post("/session/abcd/run").set({ facebookToken });
         expect(response.status).toBe(400);
         done();
     });

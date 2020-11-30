@@ -16,7 +16,7 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,20 +24,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SessionActivity"
+            android:name=".activities.SessionActivity"
             android:label="New Session" />
         <activity
-            android:name=".SummaryActivity"
+            android:name=".activities.SummaryActivity"
             android:label="Results" />
-        <activity android:name=".ViewEditListsActivity" />
-        <activity android:name=".ViewOldSessionsActivity" />
         <activity
-            android:name=".CreateNewListActivity"
-            android:label="Create a New List" />
+            android:name=".activities.ViewOrUpdateListsActivity"
+            android:label="View Lists" />
+        <activity android:name=".activities.ViewOldSessionsActivity" />
+        <activity android:name=".activities.CreateOrUpdateListActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="Main Menu" />
-        <activity android:name=".SwipeActivity" />
+        <activity android:name=".activities.SwipeActivity" />
 
         <service
             android:name=".MyFirebaseMessagingService"

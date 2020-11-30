@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateNewListActivity">
+    tools:context=".activities.CreateOrUpdateListActivity">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/create_list_name_edit_text_layout"
+        android:id="@+id/create_or_update_list_name_edit_text_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/create_list_name_prompt"
-        app:layout_constraintBottom_toTopOf="@+id/create_list_description_edit_text_layout"
+        android:hint="@string/create_or_update_list_name_prompt"
+        app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_description_edit_text_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,40 +20,40 @@
         app:layout_constraintWidth_min="250dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/create_list_name_edit_text"
+            android:id="@+id/create_or_update_list_name_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/create_list_description_edit_text_layout"
+        android:id="@+id/create_or_update_list_description_edit_text_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/create_list_description_name_prompt"
-        app:layout_constraintBottom_toTopOf="@+id/create_list_entries_text_view"
+        android:hint="@string/create_or_update_list_description_name_prompt"
+        app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_entries_text_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_name_edit_text_layout"
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_name_edit_text_layout"
         app:layout_constraintWidth_min="250dp">
 
         <!--        TODO: hard cap this at 3 lines-->
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/create_list_description_edit_text"
+            android:id="@+id/create_or_update_list_description_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/create_list_entries_text_view"
+        android:id="@+id/create_or_update_list_entries_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_list_entries_text"
+        android:text="@string/create_or_update_list_entries_text"
         app:layout_constraintBottom_toTopOf="@+id/rv_entries"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.15"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_description_edit_text_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_description_edit_text_layout" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_entries"
@@ -61,33 +61,32 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/create_list_add_entries_button"
+        app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_add_entries_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_entries_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_entries_text_view"
         app:layout_constraintWidth_percent="0.8" />
 
     <Button
-        android:id="@+id/create_list_add_entries_button"
+        android:id="@+id/create_or_update_list_add_entries_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_list_add_entries_button_text"
-        app:layout_constraintBottom_toTopOf="@+id/create_list_create_list_button"
+        android:text="@string/create_or_update_list_add_entries_button_text"
+        app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_submit_list_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rv_entries" />
 
     <Button
-        android:id="@+id/create_list_create_list_button"
+        android:id="@+id/create_or_update_list_submit_list_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/create_list_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_list_add_entries_button" />
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_add_entries_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

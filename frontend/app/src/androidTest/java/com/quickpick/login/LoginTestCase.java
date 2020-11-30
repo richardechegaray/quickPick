@@ -9,8 +9,8 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 
-import com.quickpick.LoginActivity;
 import com.quickpick.R;
+import com.quickpick.activities.LoginActivity;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;

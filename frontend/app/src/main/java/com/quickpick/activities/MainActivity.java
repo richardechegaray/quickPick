@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.quickpick.R;
 import com.quickpick.repositories.ListRepository;
 import com.quickpick.repositories.RunnableUtils;
 import com.quickpick.repositories.SessionRepository;
@@ -50,12 +51,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setOnClickListeners() {
         findViewById(R.id.create_new_list_button).setOnClickListener(view ->
-                startActivity(new Intent(getApplicationContext(), CreateNewListActivity.class))
+                startActivity(new Intent(getApplicationContext(), CreateOrUpdateListActivity.class))
         );
 
         findViewById(R.id.view_edit_lists_button).setOnClickListener(view ->
                 ListRepository.getInstance().callGetLists(
-                        () -> startActivity(new Intent(getApplicationContext(), ViewEditListsActivity.class)),
+                        () -> startActivity(new Intent(getApplicationContext(), ViewOrUpdateListsActivity.class)),
                         RunnableUtils.showToast(this, getString(R.string.get_lists_failed)),
                         facebookAccessToken
                 )

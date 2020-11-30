@@ -1,8 +1,10 @@
-package com.quickpick;
+package com.quickpick.activities;
+
+import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.quickpick.R;
 
 public class ViewOldSessionsActivity extends AppCompatActivity {
 

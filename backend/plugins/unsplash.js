@@ -3,7 +3,7 @@ const Image = require("../models/image");
 
 module.exports = {
     getImage: async (searchString) => {
-        let searchResult = await Image.findOne({name: searchString.toLowerCase()});
+        let searchResult = await Image.findOne({name: searchString.toLowerCase()}).catch(() => null);
         
         if (searchResult !== null) {
             console.log("Found cached image.");
@@ -19,14 +19,18 @@ module.exports = {
             const unsplashResult = await axios.get(
                 "https://api.unsplash.com/search/photos",
                 { params: unsplashParameters });
+            
+            const newImage = (unsplashResult.data.results[0]) ? 
+                unsplashResult.data.results[0].urls.small : 
+                "https://envision.design/wp-content/uploads/2019/12/image-coming-soon.jpg";
 
             await Image.create(
                 {
                     name: searchString.toLowerCase(),
-                    urls: unsplashResult.data.results[0].urls.small
+                    urls: newImage
                 });
 
-            return String(unsplashResult.data.results[0].urls.small);
+            return String(newImage);
         }
     }
 };

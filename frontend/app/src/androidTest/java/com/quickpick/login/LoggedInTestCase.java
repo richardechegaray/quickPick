@@ -3,7 +3,7 @@ package com.quickpick.login;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.quickpick.LoginActivity;
+import com.quickpick.activities.LoginActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.quickpick;
+package com.quickpick.activities;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.quickpick.R;
 import com.quickpick.payloads.IdeaPayload;
 
 import java.util.ArrayList;
@@ -17,21 +18,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
+public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEntriesRecyclerViewAdapter.ViewHolder> {
 
-    private final List<IdeaPayload> mData;
+    private final List<IdeaPayload> ideaPayloads;
     private final LayoutInflater mInflater;
 
     private final Set<ViewHolder> boundedViewHolders;
 
     // data is passed into the constructor
-    MyRecyclerViewAdapter(Context context, List<IdeaPayload> data) {
+    public ListEntriesRecyclerViewAdapter(Context context, List<IdeaPayload> data) {
         this.mInflater = LayoutInflater.from(context);
         this.boundedViewHolders = new HashSet<>();
-        this.mData = new ArrayList<>();
+        this.ideaPayloads = new ArrayList<>();
         // Do a deep copy just in case
         for (IdeaPayload payload : data) {
-            mData.add(new IdeaPayload(payload));
+            ideaPayloads.add(new IdeaPayload(payload));
         }
     }
 
@@ -46,7 +47,7 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.onBind(mData.get(position), position);
+        holder.onBind(ideaPayloads.get(position), position);
         boundedViewHolders.add(holder);
     }
 
@@ -58,34 +59,33 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
         boundedViewHolders.remove(holder);
     }
 
-    void addNewListEntry() {
-        mData.add(new IdeaPayload());
+    public void addNewListEntry() {
+        ideaPayloads.add(new IdeaPayload());
         notifyDataSetChanged();
     }
 
     private void deleteListEntry(int position) {
-        mData.remove(position);
+        ideaPayloads.remove(position);
         notifyDataSetChanged();
     }
 
-    List<IdeaPayload> getListEntries() {
+    public List<IdeaPayload> getListEntries() {
         boundedViewHolders.forEach(ViewHolder::updateIdeaPayload);
         List<IdeaPayload> entries = new ArrayList<>();
-        for (IdeaPayload payload : mData) { // deep copy
+        for (IdeaPayload payload : ideaPayloads) { // deep copy
             entries.add(new IdeaPayload(payload));
         }
         return entries;
     }
 
-
     // total number of rows
     @Override
     public int getItemCount() {
-        return mData.size();
+        return ideaPayloads.size();
     }
 
     // stores and recycles views as they are scrolled off screen
-    class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final EditText name;
         private final EditText description;
 
@@ -117,5 +117,4 @@ class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.V
             idea.setDescription(description.getText().toString());
         }
     }
-
 }
