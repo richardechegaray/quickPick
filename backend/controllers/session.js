@@ -266,14 +266,14 @@ module.exports = {
 
     //Assert session is found
     if (session == null || user == null) {
-	  Console.warn("No session exists with ID: " + req.params.id);
+      Console.warn("No session exists with ID: " + req.params.id);
       res.status(404).send({ ok: false });
       return;
     }
 
     //Assert session has not started
     if (session.status !== "lobby") {
-	  Console.warn("Session " + req.params.id + " is no longer accepting new participants");
+      Console.warn("Session " + req.params.id + " is no longer accepting new participants");
       res.status(400).send({ ok: false });
       return;
     }
