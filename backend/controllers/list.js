@@ -1,5 +1,6 @@
 const List = require("../models/list");
 const imgUtil = require("../plugins/unsplash");
+const Console = require("Console");
 
 /* Checks ownership of list */
 function isOwnedByUser(list, access, res) {
@@ -10,11 +11,13 @@ function isOwnedByUser(list, access, res) {
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
+		Console.warn(`Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
     } 
     /* User must own the list, unless they are trying to read a default list */
     else if (!isOwnedByUser(list, access, res)) {
+		Console.warn("Attempted to access another user's list");
         res.status(403).send({});
         return false;
     }
@@ -43,6 +46,7 @@ module.exports = {
 
         /* newList cannot be null*/
         if (!newList) {
+			Console.warn("List in body is null");
             res.status(400).send({});
         }
         else {
@@ -66,6 +70,7 @@ module.exports = {
         /* updates cannot be null*/
         const updates = req.body.list;
         if (!updates || !updates.ideas) {
+			Console.warn("List in body is null");
             res.status(400).send({});
             return;
         }
