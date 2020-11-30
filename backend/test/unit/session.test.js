@@ -103,6 +103,9 @@ beforeEach(async () => {
         }]
     };
     await Session.create(newSession);
+    console.log("yeet");
+    let testuserfind = await User.findOne({});
+    console.log(testuserfind);
 });
 
 afterAll(async () => {
@@ -440,6 +443,77 @@ describe("Receive choices", function () {
             },
         ];
 
+        await sessionHelper.receiveChoices(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        done();
+    });
+
+    it("Success, complete, preferences", async (done) => {
+        let newSession1 = {
+            pin: "abcde",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [{idea: {name: "Italian"}, score: 0}, {idea: {name: "French"}, score: 0}, {idea: {name: "Mexican"}, score: 0}],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            }]
+        };
+        let newSession2 = {
+            pin: "12345",
+            listID: "",
+            status: "running",
+            creator: TestUserID,
+            complete: 0,
+            results: [{idea: {name: "Italian"}, score: 0}, {idea: {name: "French"}, score: 0}, {idea: {name: "Mexican"}, score: 0}],
+            participants: [{
+                name: "me",
+                id: TestUserID,
+            },{
+                name: "notme",
+                id: TestUserID2
+            }]
+        };
+        await Session.create(newSession1);
+        await Session.create(newSession2);
+        
+
+        const req = mockRequest();
+        const res = mockResponse();
+        res.locals.id = TestUserID;
+        req.params.id = "abcde";
+        req.body.choices = [
+            {
+                idea: { name: "Italian" }, choice: true
+            },
+            {
+                idea: { name: "French" }, choice: false
+            },
+            {
+                idea: { name: "Mexican" }, choice: true
+            },
+        ];
+
+        await sessionHelper.receiveChoices(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        
+        req.params.id = "12345";
+        req.body.choices = [
+            {
+                idea: { name: "Italian" }, choice: true
+            },
+            {
+                idea: { name: "French" }, choice: true
+            },
+            {
+                idea: { name: "Mexican" }, choice: false
+            },
+        ];
+        await sessionHelper.receiveChoices(req, res);
+        expect(res.status).toHaveBeenCalledWith(200);
+        res.locals.id = TestUserID2;
         await sessionHelper.receiveChoices(req, res);
         expect(res.status).toHaveBeenCalledWith(200);
         done();

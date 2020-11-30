@@ -28,10 +28,6 @@ async function queueUserPreferences(userID, choices) {
   const myUser = await User.findOne({ id: userID });
   let myPreferences = myUser.pendingPreferences;
 
-  /* If user doesn't have a pending preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
   /* Add new choices to preference list */
   myPreferences.push(...choices);
   const newValues = {
@@ -47,11 +43,6 @@ async function updateUserPreferences(userID) {
   const myUser = await User.findOne({ id: userID });
   let myPreferences = myUser.preferences;
   let newPreferences = myUser.pendingPreferences;
-
-  /* If user doesn't have a preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
 
   /* Add new choices to preference list */
   myPreferences = myPreferences.concat(...newPreferences);
