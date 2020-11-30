@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.quickpick.apis.ListApi;
 import com.quickpick.apis.RetrofitUtils;
-import com.quickpick.payloads.CreateListRequest;
+import com.quickpick.payloads.CreateOrUpdateListRequest;
 import com.quickpick.payloads.ListPayload;
 import com.quickpick.payloads.ListsPayload;
 
@@ -58,12 +58,26 @@ public class ListRepository {
         }, failureCallback, LIST_DEBUG));
     }
 
-    public void callCreateList(Runnable successCallback, Runnable failureCallback, String facebookToken, CreateListRequest listRequest) {
+    public void callCreateList(Runnable successCallback, Runnable failureCallback, String facebookToken, CreateOrUpdateListRequest listRequest) {
         Call<ListPayload> createListCall = listApi.createList(facebookToken, listRequest);
         createListCall.enqueue(new RepositoryCallback<>(listPayload -> {
             list.setValue(listPayload);
             successCallback.run();
         }, failureCallback, LIST_DEBUG));
+    }
+
+    public void callUpdateList(Runnable successCallback, Runnable failureCallback,
+                               String facebookToken, String listId, CreateOrUpdateListRequest listRequest) {
+        Call<ListPayload> updateListCall = listApi.updateList(facebookToken, listId, listRequest);
+        updateListCall.enqueue(new RepositoryCallback<>(listPayload -> {
+            list.setValue(listPayload);
+            successCallback.run();
+        }, failureCallback, LIST_DEBUG));
+    }
+
+    public void callDeleteList(Runnable successCallback, Runnable failureCallback, String facebookToken, String listId) {
+        Call<Void> deleteListCall = listApi.deleteList(facebookToken, listId);
+        deleteListCall.enqueue(new RepositoryCallback<>(response -> successCallback.run(), failureCallback, LIST_DEBUG));
     }
 
 }

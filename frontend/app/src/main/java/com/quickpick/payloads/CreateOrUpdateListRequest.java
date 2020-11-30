@@ -1,10 +1,10 @@
 package com.quickpick.payloads;
 
-public class CreateListRequest {
+public class CreateOrUpdateListRequest {
 
     private final ListPayload list;
 
-    public CreateListRequest(ListPayload list) {
+    public CreateOrUpdateListRequest(ListPayload list) {
         this.list = list;
     }
 
