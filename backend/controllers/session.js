@@ -27,16 +27,12 @@ function randomString(length, chars) {
 async function queueUserPreferences(userID, choices) {
   const myUser = await User.findOne({ id: userID });
   let myPreferences = myUser.pendingPreferences;
-  
-  /* If user doesn't have a pending preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
+
   /* Add new choices to preference list */
   myPreferences.push(...choices);
-  const newValues = { 
-    $set: { 
-      pendingPreferences: myPreferences 
+  const newValues = {
+    $set: {
+      pendingPreferences: myPreferences
     }
   };
   await User.findOneAndUpdate({ id: userID }, newValues);
@@ -47,11 +43,6 @@ async function updateUserPreferences(userID) {
   const myUser = await User.findOne({ id: userID });
   let myPreferences = myUser.preferences;
   let newPreferences = myUser.pendingPreferences;
-  
-  /* If user doesn't have a preference list, create one */
-  if (!myPreferences) {
-    myPreferences = [];
-  }
 
   /* Add new choices to preference list */
   myPreferences = myPreferences.concat(...newPreferences);
@@ -60,14 +51,14 @@ async function updateUserPreferences(userID) {
     myPreferences.shift();
   }
 
-  const newValues = { 
-    $set: { 
+  const newValues = {
+    $set: {
       preferences: myPreferences,
       pendingPreferences: []
     }
   };
   await User.findOneAndUpdate(
-    { id: userID }, 
+    { id: userID },
     newValues,
   );
 }
@@ -87,10 +78,10 @@ function applyPreferences(user, results, ties) {
 async function sortSession(session) {
   /* Get list of participants */
   const participantIds = session.participants.map((p) => p.id);
-  
+
   /* Sort the array of results based on number of votes */
   const results = session.results;
-  results.sort((a, b) => { 
+  results.sort((a, b) => {
     return b.score - a.score;
   });
 
@@ -98,7 +89,7 @@ async function sortSession(session) {
 
   /* Get the number of choices tied for first, and their score */
   const maxVotes = results[0].score;
-  const numTied = results.filter((choice) => choice.score === maxVotes).length; 
+  const numTied = results.filter((choice) => choice.score === maxVotes).length;
 
   /* For each participant, check their preferences to update the votes */
   for (const userId of participantIds) {
@@ -109,7 +100,7 @@ async function sortSession(session) {
   }
 
   /* Sort the tied first-place choices based on their new scores */
-  results.sort((a, b) => { 
+  results.sort((a, b) => {
     return b.score - a.score;
   });
 
@@ -129,8 +120,8 @@ module.exports = {
     console.log("DEBUG: Get request to /session/" + req.params.id);
     let session = await Session.findOne({ pin: req.params.id });
     //Assert session is found
-    if (session == null) {
-      res.status(404).send({ ok: false, message: "Invalid session ID" });
+    if (typeof session === "undefined" || session === null) {
+      res.status(404).send({ ok: false, message: "Invalid session" });
       return;
     }
 
@@ -144,10 +135,7 @@ module.exports = {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
     }
-    if (typeof session === "undefined" || session === null) {
-      res.status(400).send({ ok: false, message: "Invalid session" });
-      return;
-    }
+
     res.status(200).send(session);
   },
 
@@ -394,22 +382,18 @@ module.exports = {
       return;
     }
 
-    //Find list that matches
-    await console.log(typeof (req.body.listID));
-
     //Assert parameters are valid
-    if (
-      req.params.id === null ||
-      typeof (req.body.listID) !== "string"
-    ) {
-      res.status(400).send({ ok: false, message: "Invalid parameters" });
+    let foundList = null;
+    try {
+      foundList = await List.findById(req.body.listID);
+    } catch (error) {
+      res.status(400).send({ ok: false, message: "List ID is not a valid ID" });
       return;
     }
-
-    let foundList = await List.findById(req.body.listID);
     //Assert list is found
     if (foundList == null) {
       res.status(404).send({ ok: false, message: "List was not found" });
+      return;
     }
 
     //Update database
