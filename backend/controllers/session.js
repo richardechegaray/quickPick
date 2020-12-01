@@ -73,7 +73,7 @@ async function isUserInSession(userID, session) {
   return false;
 }
 
-async function updateScores(choices, results){
+async function updateScores(choices, results) {
   await choices.forEach(async (choice) => {
     await results.forEach(async (result) => {
       //If they match and the response is positive, then increment the record
@@ -85,9 +85,9 @@ async function updateScores(choices, results){
   return results;
 }
 
-async function assertUserCanJoin(user, session, res){
+async function assertUserCanJoin(user, session, res) {
   //Assert session is found
-  if (session == null || user == null) {
+  if (await checkIfNull(user, session)) {
     res.status(404).send({ ok: false });
     return false;
   }
@@ -95,8 +95,29 @@ async function assertUserCanJoin(user, session, res){
     res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
     return false;
   }
-  else{
+  else {
     return true;
+  }
+}
+
+async function assertSessionCanStart(userID, session) {
+  if (
+    session.creator !== String(userID) ||
+    session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
+  ) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+async function checkIfNull(firstCheck, secondCheck) {
+  if (firstCheck === null || secondCheck === null) {
+    return true;
+  }
+  else {
+    return false;
   }
 }
 /*
@@ -155,18 +176,17 @@ module.exports = {
   getSession: async (req, res) => {
     let session = await Session.findOne({ pin: req.params.id });
     //Assert session is found
-    if (typeof session === "undefined" || session === null) {
+    if (session === null) {
       res.status(404).send({ ok: false, message: "Invalid session" });
       return;
     }
-
-    let inSession = await isUserInSession(res.locals.id, session);
-    if (!inSession) {
+    else if (!(await isUserInSession(res.locals.id, session))) {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
     }
-
-    res.status(200).send(session);
+    else {
+      res.status(200).send(session);
+    }
   },
 
   createSession: async (req, res) => {
@@ -218,7 +238,7 @@ module.exports = {
     let currentSession = await Session.findOne(query);
 
     //Assert session exists
-    if (currentSession === null || typeof req.body.choices !== "object") {
+    if (await checkIfNull(currentSession, req.body.choices)) {
       res
         .status(400)
         .send({
@@ -233,43 +253,44 @@ module.exports = {
         .send({ ok: false, message: "User ID is not in the session" });
       return;
     }
+    else {
+      //Update user's preference list with their choices
+      const chosenIdeas = req.body.choices.filter((c) => c.choice); // List of accepted ideas
+      await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
 
-    //Update user's preference list with their choices
-    const chosenIdeas = req.body.choices.filter((c) => c.choice); // List of accepted ideas
-    await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
+      //Iterate through responses, and also session to find idea names that match
+      currentSession.results = await updateScores(req.body.choices, currentSession.results);
 
-    //Iterate through responses, and also session to find idea names that match
-    currentSession.results = await updateScores(req.body.choices, currentSession.results);
-
-    //Push firebase notification if everyone has submitted their results
-    let newComplete = currentSession.complete + 1;
-    let newValues = {
-      $set: { results: currentSession.results, complete: newComplete },
-    };
-
-    if (newComplete === currentSession.participants.length) {
-      currentSession.status = "complete";
-      currentSession = await sortSession(currentSession);
-      let firebaseMessage = {
-        session: currentSession,
+      //Push firebase notification if everyone has submitted their results
+      let newComplete = currentSession.complete + 1;
+      let newValues = {
+        $set: { results: currentSession.results, complete: newComplete },
       };
-      firebaseUtil.sendFirebase(firebaseMessage);
-      //Include the updated session status to the database update
-      newValues = {
-        $set: {
-          results: currentSession.results,
-          complete: newComplete,
-          status: "complete",
-        },
-      };
+
+      if (newComplete === currentSession.participants.length) {
+        currentSession.status = "complete";
+        currentSession = await sortSession(currentSession);
+        let firebaseMessage = {
+          session: currentSession,
+        };
+        firebaseUtil.sendFirebase(firebaseMessage);
+        //Include the updated session status to the database update
+        newValues = {
+          $set: {
+            results: currentSession.results,
+            complete: newComplete,
+            status: "complete",
+          },
+        };
+      }
+      currentSession.complete++;
+
+      //Update database with new values
+      await Session.updateOne(query, newValues);
+
+      res.status(200).send({ ok: true });
+      return;
     }
-    currentSession.complete++;
-
-    //Update database with new values
-    await Session.updateOne(query, newValues);
-
-    res.status(200).send({ ok: true });
-    return;
   },
 
   addUser: async (req, res) => {
@@ -277,35 +298,36 @@ module.exports = {
     let user = await User.findOne({ id: String(res.locals.id) });
 
     //Assert session is found
-    if(!(await assertUserCanJoin(user, session, res))){
+    if (!(await assertUserCanJoin(user, session, res))) {
       return;
     }
+    else {
+      /* Create new person and insert */
+      let newPerson = { name: user.name, id: String(res.locals.id) };
+      let participants = session.participants;
+      participants.push(newPerson);
+      session.participants = participants;
 
-    /* Create new person and insert */
-    let newPerson = { name: user.name, id: String(res.locals.id) };
-    let participants = session.participants;
-    participants.push(newPerson);
-    session.participants = participants;
+      const sessionUpdates = {
+        $set: {
+          participants
+        }
+      };
 
-    const sessionUpdates = {
-      $set: {
-        participants
-      }
-    };
+      /* Update db */
+      await Session.updateOne(
+        { pin: req.params.id },
+        sessionUpdates
+      );
 
-    /* Update db */
-    await Session.updateOne(
-      { pin: req.params.id },
-      sessionUpdates
-    );
-
-    /* Push firebase message to each user in the session */
-    let firebaseMessage = {
-      session,
-    };
-    firebaseUtil.sendFirebase(firebaseMessage);
-    res.status(200).send({ ok: true });
-    return;
+      /* Push firebase message to each user in the session */
+      let firebaseMessage = {
+        session,
+      };
+      firebaseUtil.sendFirebase(firebaseMessage);
+      res.status(200).send({ ok: true });
+      return;
+    }
   },
 
   startSession: async (req, res) => {
@@ -318,14 +340,12 @@ module.exports = {
       return;
     }
     //Assert user has rights to start
-    else if (
-      session.creator !== String(res.locals.id) ||
-      session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
+    else if (!(await assertSessionCanStart(res.locals.id, session))
     ) {
       res.status(400).send({
-          ok: false,
-          message: "User is not the creator / session has started / invalid list",
-        });
+        ok: false,
+        message: "User is not the creator / session has started / invalid list",
+      });
       return;
     }
 
