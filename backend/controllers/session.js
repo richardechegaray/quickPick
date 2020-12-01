@@ -134,12 +134,7 @@ module.exports = {
       return;
     }
 
-    let inSession = false;
-    session.participants.forEach((user) => {
-      if (user.id === res.locals.id) {
-        inSession = true;
-      }
-    });
+    let inSession = await isUserInSession(res.locals.id, session);
     if (!inSession) {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
@@ -398,13 +393,7 @@ module.exports = {
       return;
     }
 
-    let inSession = false;
-    //Assert user is in session
-    session.participants.forEach((user) => {
-      if (user.id === res.locals.id) {
-        inSession = true;
-      }
-    });
+    let inSession = await isUserInSession(res.locals.id, session);
     if (!inSession) {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
