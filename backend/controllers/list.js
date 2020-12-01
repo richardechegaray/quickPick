@@ -24,6 +24,18 @@ function checkListAccess(list, access, res) {
     return true;
 }
 
+/* Checks that the ideas passed to updateList are not null */
+function checkIdeasExist(updates, res) {
+    if (!updates || !updates.ideas) {
+        Console.warn("List in body is null");
+        res.status(400).send({});
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
 module.exports = {
     /* Returns all lists where the userID field matches the user making the request */
     getMyLists: async (req, res) => {
@@ -66,41 +78,34 @@ module.exports = {
     /* Takes the list from the request body updates the list matching the id */
     updateList: async (req, res) => {
         const myList = await List.findById(req.params.id).catch(() => null);
+        const updates = req.body.list;
 
-        if (checkListAccess(myList, "write", res)) {
-            /* updates cannot be null*/
-            const updates = req.body.list;
-            if (!updates || !updates.ideas) {
-                Console.warn("List in body is null");
-                res.status(400).send({});
-                return;
+        /* Must have access to a valid list, with non-null updates*/
+        if (checkListAccess(myList, "write", res) && checkIdeasExist(updates, res)) {
+            /* Add an image url to each idea on the list */
+            for (let i = 0; i < updates.ideas.length; i++) {
+                const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
+                updates.ideas[parseInt(i, 10)].picture = imgUrl;
             }
-            else {
-                /* Add an image url to each idea on the list */
-                for (let i = 0; i < updates.ideas.length; i++) {
-                    const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
-                    updates.ideas[parseInt(i, 10)].picture = imgUrl;
+
+            /* Update the name and description too if there are changes present */
+            const myName = (updates.name) ? updates.name : myList.name;
+            const myDesc = updates.description;
+
+            const newValues = {
+                $set: {
+                    ideas: updates.ideas,
+                    description: myDesc,
+                    name: myName,
                 }
+            };
+            await List.findByIdAndUpdate(req.params.id, newValues);
 
-                /* Update the name and description too if there are changes present */
-                const myName = (updates.name) ? updates.name : myList.name;
-                const myDesc = updates.description;
-
-                const newValues = {
-                    $set: {
-                        ideas: updates.ideas,
-                        description: myDesc,
-                        name: myName,
-                    }
-                };
-                await List.findByIdAndUpdate(req.params.id, newValues);
-
-                /* Add updates to returned list */
-                myList.ideas = updates.ideas;
-                myList.description = myDesc;
-                myList.name = myName;
-                res.status(200).send(myList);
-            }
+            /* Add updates to returned list */
+            myList.ideas = updates.ideas;
+            myList.description = myDesc;
+            myList.name = myName;
+            res.status(200).send(myList);
         }
     },
 
