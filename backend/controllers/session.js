@@ -346,7 +346,7 @@ module.exports = {
       return;
     }
     let newResults = [];
-    let foundList = await List.findOne({ _id: ObjectId(session.listID) });
+    let foundList = await List.findById(session.listID);
 
     foundList.ideas.forEach((foundIdea) => {
       newResults.push({ idea: foundIdea, score: 0 });
