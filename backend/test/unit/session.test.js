@@ -574,7 +574,7 @@ describe("Receive choices", function () {
             $set: {
                 results: myResults,
             }
-        }
+        };
         await Session.findOneAndUpdate( 
             { "pin": "abcd"},
             newValues
