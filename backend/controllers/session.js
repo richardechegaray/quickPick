@@ -73,6 +73,18 @@ async function isUserInSession(userID, session) {
   return false;
 }
 
+async function updateScores(choices, results){
+  await choices.forEach(async (choice) => {
+    await results.forEach(async (result) => {
+      //If they match and the response is positive, then increment the record
+      if (choice.idea.name === result.idea.name && choice.choice) {
+        result.score += 1;
+      }
+    });
+  });
+  return results;
+}
+
 /*
  * BEGIN COMPLEX LOGIC
  */
@@ -216,14 +228,7 @@ module.exports = {
     await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
 
     //Iterate through responses, and also session to find idea names that match
-    req.body.choices.forEach(async (choice) => {
-      currentSession.results.forEach(async (result) => {
-        //If they match and the response is positive, then increment the record
-        if (choice.idea.name === result.idea.name && choice.choice) {
-          result.score += 1;
-        }
-      });
-    });
+    currentSession.results = await updateScores(req.body.choices, currentSession.results);
 
     //Push firebase notification if everyone has submitted their results
     let newComplete = currentSession.complete + 1;
