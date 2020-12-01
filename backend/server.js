@@ -1,4 +1,5 @@
 const app = require("./app.js");
+const Console = require("Console");
 
 // Import the database connection
 require("./database/mongodb");
@@ -7,5 +8,5 @@ require("./database/mongodb");
 var server = app.listen(process.env.PORT, function () {
     var host = server.address().address;
     var port = server.address().port;
-    console.log("Listening at http://%s:%s", host, port);
+    Console.success("Listening at http://%s:%s", host, port);
 });

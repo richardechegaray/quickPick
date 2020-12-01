@@ -31,7 +31,7 @@ module.exports = {
             Console.debug(`${response.successCount} messages were sent successfully`);
 
         } catch (error) {
-            Console.debug(error);
+            Console.warn(error);
         }
     }
 };

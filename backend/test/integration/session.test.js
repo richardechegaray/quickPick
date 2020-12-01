@@ -214,13 +214,22 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/1234/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: { 
+                        name: "Italian" 
+                    }, 
+                    choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: { 
+                        name: "French" 
+                    }, 
+                    choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: { 
+                        name: "Mexican" 
+                    }, 
+                    choice: true
                 }
             ]
         });
