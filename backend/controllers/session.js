@@ -292,10 +292,16 @@ module.exports = {
     participants.push(newPerson);
     session.participants = participants;
 
+    const sessionUpdates = { 
+      $set: { 
+        participants 
+      } 
+    };
+
     /* Update db */
     await Session.updateOne(
       { pin: req.params.id },
-      { $set: { participants } }
+      sessionUpdates
     );
 
     /* Push firebase message to each user in the session */

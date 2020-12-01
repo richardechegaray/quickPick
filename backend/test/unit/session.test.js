@@ -67,7 +67,7 @@ beforeEach(async () => {
     let newUser1 = {
         name: "me2",
         id: TestUserID2
-    }
+    };
     await User.create(newUser1);
 
     let list = {

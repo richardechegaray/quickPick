@@ -311,7 +311,8 @@ describe("Delete a List", () => {
 
         await listHelper.deleteList(req, res);
         
-        const ghostList = await List.findOne({"name": testList5.name}).catch(() => {null});
+        const ghostList = await List.findOne({"name": testList5.name})
+                                    .catch(() => { return null; });
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(ghostList).toEqual(null);

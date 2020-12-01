@@ -212,15 +212,25 @@ describe("Start session", function () {
 describe("Receive choices", function () {
     it("Invalid params", async (done) => {
         const response = await request(app).post("/session/1234/choices").set({ facebookToken }).send({
+            
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    choice: true,
+                    idea: { 
+                        name: "Italian" 
+                    }, 
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    choice: false,
+                    idea: { 
+                        name: "French" 
+                    }, 
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    choice: true,
+                    idea: { 
+                        name: "Mexican" 
+                    }, 
                 }
             ]
         });
