@@ -64,12 +64,12 @@ async function updateUserPreferences(userID) {
   );
 }
 
-function isUserInSession(userID, session) {
-  session.participants.forEach(function (participantUser) {
-    if (userID === participantUser.id) {
+async function isUserInSession(userID, session) {
+  for (const index in session.participants) {
+    if (userID === session.participants[parseInt(index, 10)].id) {
       return true;
     }
-  });
+  }
   return false;
 }
 
@@ -208,7 +208,8 @@ module.exports = {
     }
 
     //Assert user is in session
-    if (!isUserInSession(res.locals.id, currentSession)) {
+    let inSession = await isUserInSession(res.locals.id, currentSession);
+    if (!inSession) {
       res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
@@ -272,7 +273,8 @@ module.exports = {
     }
 
     //Assert session has not started
-    if (session.status !== "lobby" || isUserInSession(user.id, session)) {
+    let inSession = await isUserInSession(user.id, session);
+    if (session.status !== "lobby" || inSession) {
       Console.warn("Session " + req.params.id + " is no longer accepting new participants");
       res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
       return;
