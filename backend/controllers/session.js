@@ -85,6 +85,20 @@ async function updateScores(choices, results){
   return results;
 }
 
+async function assertUserCanJoin(user, session, res){
+  //Assert session is found
+  if (session == null || user == null) {
+    res.status(404).send({ ok: false });
+    return false;
+  }
+  else if (session.status !== "lobby" || await isUserInSession(user.id, session)) {
+    res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
+    return false;
+  }
+  else{
+    return true;
+  }
+}
 /*
  * BEGIN COMPLEX LOGIC
  */
@@ -213,10 +227,7 @@ module.exports = {
         });
       return;
     }
-
-    //Assert user is in session
-    let inSession = await isUserInSession(res.locals.id, currentSession);
-    if (!inSession) {
+    else if (!(await isUserInSession(res.locals.id, currentSession))) {
       res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
@@ -266,17 +277,7 @@ module.exports = {
     let user = await User.findOne({ id: String(res.locals.id) });
 
     //Assert session is found
-    if (session == null || user == null) {
-      Console.warn("No session exists with ID: " + req.params.id);
-      res.status(404).send({ ok: false });
-      return;
-    }
-
-    //Assert session has not started
-    let inSession = await isUserInSession(user.id, session);
-    if (session.status !== "lobby" || inSession) {
-      Console.warn("Session " + req.params.id + " is no longer accepting new participants");
-      res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
+    if(!(await assertUserCanJoin(user, session, res))){
       return;
     }
 
@@ -317,7 +318,7 @@ module.exports = {
       return;
     }
     //Assert user has rights to start
-    if (
+    else if (
       session.creator !== String(res.locals.id) ||
       session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
     ) {
