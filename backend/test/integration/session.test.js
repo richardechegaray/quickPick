@@ -244,13 +244,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: { name: "Italian", }, choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: { name: "French", }, choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: { name: "Mexican", }, choice: true
                 }
             ]
         });
@@ -263,13 +263,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: { name: "Italian", }, choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: { name: "French", }, choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: { name: "Mexican", }, choice: true
                 }
             ]
         });
@@ -281,13 +281,13 @@ describe("Receive choices", function () {
         await Session.findOneAndUpdate({ pin: "abcd" }, { status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
         let choices = [
             {
-                idea: { name: "Italian" }, choice: true
+                idea: { name: "Italian", }, choice: true
             },
             {
-                idea: { name: "French" }, choice: false
+                idea: { name: "French", }, choice: false
             },
             {
-                idea: { name: "Mexican" }, choice: true
+                idea: { name: "Mexican", }, choice: true
             }
         ];
 
@@ -305,13 +305,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: { name: "Italian", }, choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: { name: "French", }, choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: { name: "Mexican", }, choice: true
                 }
             ]
         });
