@@ -11,13 +11,13 @@ function isOwnedByUser(list, access, res) {
 function checkListAccess(list, access, res) {
     /* Check that the list exists */
     if (!list) {
-		Console.warn(`Did not find a list matching _id: ${res.locals.id}`);
+        Console.warn(`Did not find a list matching _id: ${res.locals.id}`);
         res.status(404).send({});
         return false;
-    } 
+    }
     /* User must own the list, unless they are trying to read a default list */
     else if (!isOwnedByUser(list, access, res)) {
-		Console.warn("Attempted to access another user's list");
+        Console.warn("Attempted to access another user's list");
         res.status(403).send({});
         return false;
     }
@@ -46,7 +46,7 @@ module.exports = {
 
         /* newList cannot be null*/
         if (!newList) {
-			Console.warn("List in body is null");
+            Console.warn("List in body is null");
             res.status(400).send({});
         }
         else {
@@ -62,44 +62,45 @@ module.exports = {
             res.status(201).send(newList);
         }
     },
-    
+
     /* Takes the list from the request body updates the list matching the id */
     updateList: async (req, res) => {
         const myList = await List.findById(req.params.id).catch(() => null);
-        
-        /* updates cannot be null*/
-        const updates = req.body.list;
-        if (!updates || !updates.ideas) {
-			Console.warn("List in body is null");
-            res.status(400).send({});
-            return;
-        }
 
-        if (checkListAccess(myList, "write", res)){
-            /* Add an image url to each idea on the list */
-            for (let i = 0; i < updates.ideas.length; i++) {
-                const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
-                updates.ideas[parseInt(i, 10)].picture = imgUrl;
+        if (checkListAccess(myList, "write", res)) {
+            /* updates cannot be null*/
+            const updates = req.body.list;
+            if (!updates || !updates.ideas) {
+                Console.warn("List in body is null");
+                res.status(400).send({});
+                return;
             }
-            
-            /* Update the name and description too if there are changes present */
-            const myName = (updates.name) ? updates.name : myList.name;
-            const myDesc = updates.description;
-
-            const newValues = {
-                $set: {
-                    ideas: updates.ideas,
-                    description: myDesc,
-                    name: myName,
+            else {
+                /* Add an image url to each idea on the list */
+                for (let i = 0; i < updates.ideas.length; i++) {
+                    const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
+                    updates.ideas[parseInt(i, 10)].picture = imgUrl;
                 }
-            };
-            await List.findByIdAndUpdate(req.params.id, newValues);
-            
-            /* Add updates to returned list */
-            myList.ideas = updates.ideas;
-            myList.description = myDesc;
-            myList.name = myName;
-            res.status(200).send(myList);
+
+                /* Update the name and description too if there are changes present */
+                const myName = (updates.name) ? updates.name : myList.name;
+                const myDesc = updates.description;
+
+                const newValues = {
+                    $set: {
+                        ideas: updates.ideas,
+                        description: myDesc,
+                        name: myName,
+                    }
+                };
+                await List.findByIdAndUpdate(req.params.id, newValues);
+
+                /* Add updates to returned list */
+                myList.ideas = updates.ideas;
+                myList.description = myDesc;
+                myList.name = myName;
+                res.status(200).send(myList);
+            }
         }
     },
 
@@ -107,12 +108,12 @@ module.exports = {
     getList: async (req, res) => {
         /* Find the list matching the id */
         const myList = await List.findById(req.params.id).catch(() => null);
-        
+
         if (checkListAccess(myList, "read", res)) {
             res.status(200).send(myList);
         }
     },
-    
+
     /* Deletes a list matching the id if the the list belongs to the user */
     deleteList: async (req, res) => {
         /* Find the list matching the id */
