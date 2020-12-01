@@ -91,15 +91,13 @@ async function assertUserCanJoin(user, session, res){
     res.status(404).send({ ok: false });
     return false;
   }
-
-  //Assert session has not started
-  let inSession = await isUserInSession(user.id, session);
-  if (session.status !== "lobby" || inSession) {
+  else if (session.status !== "lobby" || await isUserInSession(user.id, session)) {
     res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
     return false;
   }
-
-  return true;
+  else{
+    return true;
+  }
 }
 /*
  * BEGIN COMPLEX LOGIC
