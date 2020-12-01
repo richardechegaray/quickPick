@@ -27,9 +27,7 @@ module.exports = {
                 },
             };
 
-            let response = await admin.messaging().sendMulticast(msg);
-            Console.debug(`${response.successCount} messages were sent successfully`);
-
+            await admin.messaging().sendMulticast(msg);
         } catch (error) {
             Console.warn(error);
         }
