@@ -183,9 +183,7 @@ module.exports = {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
     }
-    else {
-      res.status(200).send(session);
-    }
+    res.status(200).send(session);
   },
 
   createSession: async (req, res) => {
@@ -282,11 +280,8 @@ module.exports = {
           },
         };
       }
-      currentSession.complete++;
-
       //Update database with new values
       await Session.updateOne(query, newValues);
-
       res.status(200).send({ ok: true });
       return;
     }
@@ -347,27 +342,26 @@ module.exports = {
       });
       return;
     }
+    else {
+      let newResults = [];
+      let foundList = await List.findOne({ _id: ObjectId(session.listID) });
 
-    let newResults = [];
-    let foundList = await List.findOne({ _id: ObjectId(session.listID) });
+      foundList.ideas.forEach((foundIdea) => {
+        newResults.push({ idea: foundIdea, score: 0 });
+      });
 
-    foundList.ideas.forEach((foundIdea) => {
-      newResults.push({ idea: foundIdea, score: 0 });
-    });
+      session.status = "running";
+      session.results = newResults;
+      await session.save(); //
 
-    session.status = "running";
-    session.results = newResults;
-    var newvalues = { $set: { status: "running", results: newResults } };
-    //Update session database
-    await session.save(); //
-
-    //Respond to http request and send firebase notification
-    res.status(200).send({ ok: true });
-    var firebaseMessage = {
-      session,
-    };
-    firebaseUtil.sendFirebase(firebaseMessage);
-    return;
+      //Respond to http request and send firebase notification
+      res.status(200).send({ ok: true });
+      var firebaseMessage = {
+        session,
+      };
+      firebaseUtil.sendFirebase(firebaseMessage);
+      return;
+    }
   },
 
   updateList: async (req, res) => {
