@@ -227,10 +227,7 @@ module.exports = {
         });
       return;
     }
-
-    //Assert user is in session
-    let inSession = await isUserInSession(res.locals.id, currentSession);
-    if (!inSession) {
+    else if (!(await isUserInSession(res.locals.id, currentSession))) {
       res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
@@ -321,7 +318,7 @@ module.exports = {
       return;
     }
     //Assert user has rights to start
-    if (
+    else if (
       session.creator !== String(res.locals.id) ||
       session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
     ) {
