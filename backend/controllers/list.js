@@ -22,7 +22,7 @@ function checkListAccess(list, access, res) {
         return false;
     }
     return true;
-};
+}
 
 /* Checks that the ideas passed to updateList are not null */
 function checkIdeasExist(updates, res) {
