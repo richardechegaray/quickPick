@@ -39,9 +39,9 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/create_or_update_list_description_edit_text"
-            android:maxLines="1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
@@ -49,6 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_or_update_list_entries_text"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/rv_entries"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.15"
