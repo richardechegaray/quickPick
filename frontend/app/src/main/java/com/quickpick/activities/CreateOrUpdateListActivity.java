@@ -74,6 +74,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
 
     private void findViews() {
         listName = findViewById(R.id.create_or_update_list_name_edit_text);
+        listName.addTextChangedListener(new NameEditTextWatcher(listName));
         listDescription = findViewById(R.id.create_or_update_list_description_edit_text);
         addEntriesButton = findViewById(R.id.create_or_update_list_add_entries_button);
         submitListButton = findViewById(R.id.create_or_update_list_submit_list_button);

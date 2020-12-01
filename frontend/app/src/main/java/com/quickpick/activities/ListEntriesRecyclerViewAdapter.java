@@ -98,6 +98,7 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
             position = 0;
             idea = null;
             name = (TextInputEditText) itemView.findViewById(R.id.rv_entry);
+            name.addTextChangedListener(new NameEditTextWatcher(name));
             description = (TextInputEditText) itemView.findViewById(R.id.rv_description);
             itemView.findViewById(R.id.rv_entries_delete_button).setOnClickListener(view ->
                     deleteListEntry(position)
