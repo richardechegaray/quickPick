@@ -36,6 +36,11 @@ function checkUpdates(updates, res) {
 	}
 }
 
+/* Returns the new name if supplied, or the old name otherwise */
+function pickListName(updates, myList) {
+	return (updates.name) ? updates.name : myList.name;
+}
+
 module.exports = {
     /* Returns all lists where the userID field matches the user making the request */
     getMyLists: async (req, res) => {
@@ -90,7 +95,7 @@ module.exports = {
             }
             
             /* Update the name and description too if there are changes present */
-            const myName = (updates.name) ? updates.name : myList.name;
+            const myName = pickListName(updates, myList);
             const myDesc = updates.description;
 
             const newValues = {
