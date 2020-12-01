@@ -24,6 +24,18 @@ function checkListAccess(list, access, res) {
     return true;
 }
 
+/* Helper function to check if the updates passed are valid */
+function checkUpdates(updates, res) {
+	if (!updates || !updates.ideas) {
+		Console.warn("List in body is null");
+        res.status(400).send({});
+        return false;
+    }
+	else {
+		return true;
+	}
+}
+
 module.exports = {
     /* Returns all lists where the userID field matches the user making the request */
     getMyLists: async (req, res) => {
@@ -69,13 +81,8 @@ module.exports = {
         
         /* updates cannot be null*/
         const updates = req.body.list;
-        if (!updates || !updates.ideas) {
-			Console.warn("List in body is null");
-            res.status(400).send({});
-            return;
-        }
 
-        if (checkListAccess(myList, "write", res)){
+        if (checkUpdates(updates, res) && checkListAccess(myList, "write", res)){
             /* Add an image url to each idea on the list */
             for (let i = 0; i < updates.ideas.length; i++) {
                 const imgUrl = await imgUtil.getImage(updates.ideas[parseInt(i, 10)].name);
