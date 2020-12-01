@@ -85,6 +85,15 @@ async function updateScores(choices, results) {
   return results;
 }
 
+async function checkIfNull(firstCheck, secondCheck) {
+  if (firstCheck === null || secondCheck === null) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 async function assertUserCanJoin(user, session, res) {
   //Assert session is found
   if (await checkIfNull(user, session)) {
@@ -95,15 +104,13 @@ async function assertUserCanJoin(user, session, res) {
     res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
     return false;
   }
-  else {
-    return true;
-  }
+  return true;
 }
 
 async function assertSessionCanStart(userID, session) {
   if (
     session.creator !== String(userID) ||
-    session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
+    session.status !== "lobby" || session.listID === ""
   ) {
     return false;
   }
@@ -112,14 +119,6 @@ async function assertSessionCanStart(userID, session) {
   }
 }
 
-async function checkIfNull(firstCheck, secondCheck) {
-  if (firstCheck === null || secondCheck === null) {
-    return true;
-  }
-  else {
-    return false;
-  }
-}
 /*
  * BEGIN COMPLEX LOGIC
  */
@@ -360,7 +359,6 @@ module.exports = {
     session.results = newResults;
     var newvalues = { $set: { status: "running", results: newResults } };
     //Update session database
-
     await session.save(); //
 
     //Respond to http request and send firebase notification
