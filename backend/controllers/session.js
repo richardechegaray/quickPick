@@ -119,7 +119,7 @@ async function assertSessionCanStart(userID, session) {
   }
 }
 
-async function assertChoicesCanReceive(session, choices, userID, res){
+async function assertChoicesCanReceive(session, choices, userID, res) {
   //Assert session exists
   if (await checkIfNull(session, choices)) {
     res
@@ -255,7 +255,7 @@ module.exports = {
     let currentSession = await Session.findOne(query);
 
     //Assert session exists
-    if(!(await assertChoicesCanReceive(currentSession, req.body.choices, res.locals.id, res))){
+    if (!(await assertChoicesCanReceive(currentSession, req.body.choices, res.locals.id, res))) {
       return;
     }
     //Update user's preference list with their choices
@@ -301,33 +301,31 @@ module.exports = {
     if (!(await assertUserCanJoin(user, session, res))) {
       return;
     }
-    else {
-      /* Create new person and insert */
-      let newPerson = { name: user.name, id: String(res.locals.id) };
-      let participants = session.participants;
-      participants.push(newPerson);
-      session.participants = participants;
+    /* Create new person and insert */
+    let newPerson = { name: user.name, id: String(res.locals.id) };
+    let participants = session.participants;
+    participants.push(newPerson);
+    session.participants = participants;
 
-      const sessionUpdates = {
-        $set: {
-          participants
-        }
-      };
+    const sessionUpdates = {
+      $set: {
+        participants
+      }
+    };
 
-      /* Update db */
-      await Session.updateOne(
-        { pin: req.params.id },
-        sessionUpdates
-      );
+    /* Update db */
+    await Session.updateOne(
+      { pin: req.params.id },
+      sessionUpdates
+    );
 
-      /* Push firebase message to each user in the session */
-      let firebaseMessage = {
-        session,
-      };
-      firebaseUtil.sendFirebase(firebaseMessage);
-      res.status(200).send({ ok: true });
-      return;
-    }
+    /* Push firebase message to each user in the session */
+    let firebaseMessage = {
+      session,
+    };
+    firebaseUtil.sendFirebase(firebaseMessage);
+    res.status(200).send({ ok: true });
+    return;
   },
 
   startSession: async (req, res) => {
@@ -340,8 +338,7 @@ module.exports = {
       return;
     }
     //Assert user has rights to start
-    else if (!(await assertSessionCanStart(res.locals.id, session))
-    ) {
+    else if (!(await assertSessionCanStart(res.locals.id, session))) {
       res.status(400).send({
         ok: false,
         message: "User is not the creator / session has started / invalid list",
