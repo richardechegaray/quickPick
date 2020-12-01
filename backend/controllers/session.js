@@ -64,6 +64,27 @@ async function updateUserPreferences(userID) {
   );
 }
 
+async function isUserInSession(userID, session) {
+  for (const index in session.participants) {
+    if (userID === session.participants[parseInt(index, 10)].id) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function updateScores(choices, results){
+  await choices.forEach(async (choice) => {
+    await results.forEach(async (result) => {
+      //If they match and the response is positive, then increment the record
+      if (choice.idea.name === result.idea.name && choice.choice) {
+        result.score += 1;
+      }
+    });
+  });
+  return results;
+}
+
 /*
  * BEGIN COMPLEX LOGIC
  */
@@ -125,12 +146,7 @@ module.exports = {
       return;
     }
 
-    let inSession = false;
-    session.participants.forEach((user) => {
-      if (user.id === res.locals.id) {
-        inSession = true;
-      }
-    });
+    let inSession = await isUserInSession(res.locals.id, session);
     if (!inSession) {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
@@ -198,16 +214,9 @@ module.exports = {
       return;
     }
 
-    //Iterate through session and see if user is in
-    let isInSession = false;
-    currentSession.participants.forEach(function (participantUser) {
-      if (res.locals.id === participantUser.id) {
-        isInSession = true;
-      }
-    });
-
     //Assert user is in session
-    if (!isInSession) {
+    let inSession = await isUserInSession(res.locals.id, currentSession);
+    if (!inSession) {
       res
         .status(403)
         .send({ ok: false, message: "User ID is not in the session" });
@@ -219,18 +228,14 @@ module.exports = {
     await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
 
     //Iterate through responses, and also session to find idea names that match
-    req.body.choices.forEach(async (choice) => {
-      currentSession.results.forEach(async (result) => {
-        //If they match and the response is positive, then increment the record
-        if (choice.idea.name === result.idea.name && choice.choice) {
-          result.score += 1;
-        }
-      });
-    });
+    currentSession.results = await updateScores(req.body.choices, currentSession.results);
 
     //Push firebase notification if everyone has submitted their results
     let newComplete = currentSession.complete + 1;
-    let newValues;
+    let newValues = {
+      $set: { results: currentSession.results, complete: newComplete },
+    };
+
     if (newComplete === currentSession.participants.length) {
       currentSession.status = "complete";
       currentSession = await sortSession(currentSession);
@@ -245,10 +250,6 @@ module.exports = {
           complete: newComplete,
           status: "complete",
         },
-      };
-    } else {
-      newValues = {
-        $set: { results: currentSession.results, complete: newComplete },
       };
     }
     currentSession.complete++;
@@ -272,18 +273,11 @@ module.exports = {
     }
 
     //Assert session has not started
-    if (session.status !== "lobby") {
+    let inSession = await isUserInSession(user.id, session);
+    if (session.status !== "lobby" || inSession) {
       Console.warn("Session " + req.params.id + " is no longer accepting new participants");
-      res.status(400).send({ ok: false });
+      res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
       return;
-    }
-
-    /* Assert user isn't in session */
-    for (const index in session.participants) {
-      if (user.id === session.participants[parseInt(index, 10)].id) {
-        res.status(400).send({ ok: false, message: "User is already in session" });
-        return;
-      }
     }
 
     /* Create new person and insert */
@@ -292,10 +286,10 @@ module.exports = {
     participants.push(newPerson);
     session.participants = participants;
 
-    const sessionUpdates = { 
-      $set: { 
-        participants 
-      } 
+    const sessionUpdates = {
+      $set: {
+        participants
+      }
     };
 
     /* Update db */
@@ -325,22 +319,12 @@ module.exports = {
     //Assert user has rights to start
     if (
       session.creator !== String(res.locals.id) ||
-      session.status !== "lobby"
+      session.status !== "lobby" || session.listID === "" || typeof session.listID !== "string"
     ) {
-      res
-        .status(400)
-        .send({
+      res.status(400).send({
           ok: false,
-          message: "User is not the creator or session has started",
+          message: "User is not the creator / session has started / invalid list",
         });
-      return;
-    }
-
-    //Assert session references a valid list
-    if (session.listID === "" || typeof session.listID !== "string") {
-      res
-        .status(400)
-        .send({ ok: false, message: "Session contains an invalid list ID" });
       return;
     }
 
@@ -356,7 +340,7 @@ module.exports = {
     var newvalues = { $set: { status: "running", results: newResults } };
     //Update session database
 
-    await session.save(); //Session.updateOne({ pin: req.params.id }, newvalues);
+    await session.save(); //
 
     //Respond to http request and send firebase notification
     res.status(200).send({ ok: true });
@@ -414,13 +398,7 @@ module.exports = {
       return;
     }
 
-    let inSession = false;
-    //Assert user is in session
-    session.participants.forEach((user) => {
-      if (user.id === res.locals.id) {
-        inSession = true;
-      }
-    });
+    let inSession = await isUserInSession(res.locals.id, session);
     if (!inSession) {
       res.status(401).send({ ok: false, message: "User is not in session" });
       return;
