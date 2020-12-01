@@ -119,6 +119,26 @@ async function assertSessionCanStart(userID, session) {
   }
 }
 
+async function assertChoicesCanReceive(session, choices, userID, res){
+  //Assert session exists
+  if (await checkIfNull(session, choices)) {
+    res
+      .status(400)
+      .send({
+        ok: false,
+        message: "Session doesn't exist or choices are invalid",
+      });
+    return false;
+  }
+  else if (!(await isUserInSession(userID, session))) {
+    res
+      .status(403)
+      .send({ ok: false, message: "User ID is not in the session" });
+    return false;
+  }
+  return true;
+}
+
 /*
  * BEGIN COMPLEX LOGIC
  */
@@ -235,56 +255,42 @@ module.exports = {
     let currentSession = await Session.findOne(query);
 
     //Assert session exists
-    if (await checkIfNull(currentSession, req.body.choices)) {
-      res
-        .status(400)
-        .send({
-          ok: false,
-          message: "Session doesn't exist or choices are invalid",
-        });
+    if(!(await assertChoicesCanReceive(currentSession, req.body.choices, res.locals.id, res))){
       return;
     }
-    else if (!(await isUserInSession(res.locals.id, currentSession))) {
-      res
-        .status(403)
-        .send({ ok: false, message: "User ID is not in the session" });
-      return;
-    }
-    else {
-      //Update user's preference list with their choices
-      const chosenIdeas = req.body.choices.filter((c) => c.choice); // List of accepted ideas
-      await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
+    //Update user's preference list with their choices
+    const chosenIdeas = req.body.choices.filter((c) => c.choice); // List of accepted ideas
+    await queueUserPreferences(res.locals.id, chosenIdeas.map((c) => c.idea.name.toLowerCase()));
 
-      //Iterate through responses, and also session to find idea names that match
-      currentSession.results = await updateScores(req.body.choices, currentSession.results);
+    //Iterate through responses, and also session to find idea names that match
+    currentSession.results = await updateScores(req.body.choices, currentSession.results);
 
-      //Push firebase notification if everyone has submitted their results
-      let newComplete = currentSession.complete + 1;
-      let newValues = {
-        $set: { results: currentSession.results, complete: newComplete },
+    //Push firebase notification if everyone has submitted their results
+    let newComplete = currentSession.complete + 1;
+    let newValues = {
+      $set: { results: currentSession.results, complete: newComplete },
+    };
+
+    if (newComplete === currentSession.participants.length) {
+      currentSession.status = "complete";
+      currentSession = await sortSession(currentSession);
+      let firebaseMessage = {
+        session: currentSession,
       };
-
-      if (newComplete === currentSession.participants.length) {
-        currentSession.status = "complete";
-        currentSession = await sortSession(currentSession);
-        let firebaseMessage = {
-          session: currentSession,
-        };
-        firebaseUtil.sendFirebase(firebaseMessage);
-        //Include the updated session status to the database update
-        newValues = {
-          $set: {
-            results: currentSession.results,
-            complete: newComplete,
-            status: "complete",
-          },
-        };
-      }
-      //Update database with new values
-      await Session.updateOne(query, newValues);
-      res.status(200).send({ ok: true });
-      return;
+      firebaseUtil.sendFirebase(firebaseMessage);
+      //Include the updated session status to the database update
+      newValues = {
+        $set: {
+          results: currentSession.results,
+          complete: newComplete,
+          status: "complete",
+        },
+      };
     }
+    //Update database with new values
+    await Session.updateOne(query, newValues);
+    res.status(200).send({ ok: true });
+    return;
   },
 
   addUser: async (req, res) => {
@@ -342,26 +348,24 @@ module.exports = {
       });
       return;
     }
-    else {
-      let newResults = [];
-      let foundList = await List.findOne({ _id: ObjectId(session.listID) });
+    let newResults = [];
+    let foundList = await List.findOne({ _id: ObjectId(session.listID) });
 
-      foundList.ideas.forEach((foundIdea) => {
-        newResults.push({ idea: foundIdea, score: 0 });
-      });
+    foundList.ideas.forEach((foundIdea) => {
+      newResults.push({ idea: foundIdea, score: 0 });
+    });
 
-      session.status = "running";
-      session.results = newResults;
-      await session.save(); //
+    session.status = "running";
+    session.results = newResults;
+    await session.save(); //
 
-      //Respond to http request and send firebase notification
-      res.status(200).send({ ok: true });
-      var firebaseMessage = {
-        session,
-      };
-      firebaseUtil.sendFirebase(firebaseMessage);
-      return;
-    }
+    //Respond to http request and send firebase notification
+    res.status(200).send({ ok: true });
+    var firebaseMessage = {
+      session,
+    };
+    firebaseUtil.sendFirebase(firebaseMessage);
+    return;
   },
 
   updateList: async (req, res) => {
