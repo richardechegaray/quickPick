@@ -1,6 +1,5 @@
 package com.quickpick.activities;
 
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -35,8 +34,7 @@ public class SummaryActivity extends AppCompatActivity {
 
         firstPlaceImage = findViewById(R.id.first_place_image);
         findViewById(R.id.return_to_main_activity_button).setOnClickListener(
-                view -> startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK))
+                view -> finish()
         );
 
         receiver = new FirebaseIntentReceiver<>(FirebaseIntentReceiver.SESSION_RECEIVER_TAG, SessionPayload.INTENT_KEY);

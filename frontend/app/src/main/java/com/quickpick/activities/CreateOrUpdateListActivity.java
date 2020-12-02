@@ -74,7 +74,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
 
     private void findViews() {
         listName = findViewById(R.id.create_or_update_list_name_edit_text);
-        listName.addTextChangedListener(new NameEditTextWatcher(listName));
+        listName.addTextChangedListener(new NameEditTextWatcher(findViewById(R.id.create_or_update_list_name_edit_text_layout)));
         listDescription = findViewById(R.id.create_or_update_list_description_edit_text);
         addEntriesButton = findViewById(R.id.create_or_update_list_add_entries_button);
         submitListButton = findViewById(R.id.create_or_update_list_submit_list_button);
@@ -83,19 +83,18 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
     private void setUpOnClickListeners(boolean isUpdateList, String listId) {
         addEntriesButton.setOnClickListener(view -> adapter.addNewListEntry());
         submitListButton.setOnClickListener(view -> {
-            // TODO: Add checking for empty name, empty entries, missing entry name
             ListPayload newListPayload = new ListPayload(listName.getText().toString(),
                     listDescription.getText().toString(), adapter.getListEntries());
 
             if (isUpdateList) {
                 ListRepository.getInstance().callUpdateList(this::finish,
-                        RunnableUtils.showToast(this, "failing"),
+                        RunnableUtils.showToast(this, "Failed to update list"),
                         accessToken.getToken(),
                         listId,
                         new CreateOrUpdateListRequest(newListPayload));
             } else {
                 ListRepository.getInstance().callCreateList(this::finish,
-                        RunnableUtils.showToast(this, "failing"),
+                        RunnableUtils.showToast(this, "Failed to create list"),
                         accessToken.getToken(),
                         new CreateOrUpdateListRequest(newListPayload));
             }

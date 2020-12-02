@@ -2,12 +2,13 @@ package com.quickpick.activities;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.TextView;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 public class NameEditTextWatcher implements TextWatcher {
-    private TextView view;
+    private final TextInputLayout view;
 
-    public NameEditTextWatcher(TextView view) {
+    public NameEditTextWatcher(TextInputLayout view) {
         this.view = view;
     }
 
