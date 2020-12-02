@@ -67,7 +67,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         listName.setText(currentListToDisplay.getName());
         listDescription.setText(currentListToDisplay.getDescription());
 
-        setUpOnClickListeners(isUpdateList, currentListToDisplay.getId());
+        setUpOnClickListeners(isUpdateList, currentListToDisplay.getId(), currentListToDisplay.getUserId());
 
         setUpRecyclerView(currentListToDisplay.getIdeas());
     }
@@ -80,11 +80,13 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         submitListButton = findViewById(R.id.create_or_update_list_submit_list_button);
     }
 
-    private void setUpOnClickListeners(boolean isUpdateList, String listId) {
+    private void setUpOnClickListeners(boolean isUpdateList, String listId, String userId) {
         addEntriesButton.setOnClickListener(view -> adapter.addNewListEntry());
         submitListButton.setOnClickListener(view -> {
             ListPayload newListPayload = new ListPayload(listName.getText().toString(),
-                    listDescription.getText().toString(), adapter.getListEntries());
+                    listDescription.getText().toString(),
+                    adapter.getListEntries(),
+                    userId);
 
             if (isUpdateList) {
                 ListRepository.getInstance().callUpdateList(this::finish,
