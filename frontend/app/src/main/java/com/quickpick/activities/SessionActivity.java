@@ -103,7 +103,7 @@ public class SessionActivity extends AppCompatActivity {
             listEditText.setText(newSession.getListName());
             listEditText.setEnabled(isOwner);
             if (newSession.getListName().isEmpty() && isOwner) {
-                listEditTextLayout.setError("Select a list");
+                listEditTextLayout.setError("Please select a list");
                 startSwipingButton.setEnabled(false);
             } else {
                 listEditTextLayout.setError(null);
