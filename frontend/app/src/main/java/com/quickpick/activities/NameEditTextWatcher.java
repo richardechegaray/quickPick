@@ -13,7 +13,7 @@ public class NameEditTextWatcher implements TextWatcher {
 
     @Override
     public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
-
+        // intentionally empty
     }
 
     @Override
@@ -27,6 +27,7 @@ public class NameEditTextWatcher implements TextWatcher {
 
     @Override
     public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        // intentionally empty
     }
 }
 
