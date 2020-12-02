@@ -8,7 +8,6 @@ import android.widget.EditText;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -38,6 +37,8 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
     private Button addEntriesButton;
     private Button submitListButton;
 
+    private boolean canEditList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,8 +65,13 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
             currentListToDisplay = new ListPayload();
             submitListButton.setText(R.string.create_or_update_list_create_button_text);
         }
+        canEditList = !isUpdateList || currentListToDisplay.getUserId().equals(accessToken.getUserId());
+
         listName.setText(currentListToDisplay.getName());
+        listName.setEnabled(canEditList);
+
         listDescription.setText(currentListToDisplay.getDescription());
+        listDescription.setEnabled(canEditList);
 
         setUpOnClickListeners(isUpdateList, currentListToDisplay.getId(), currentListToDisplay.getUserId());
 
@@ -82,6 +88,7 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
 
     private void setUpOnClickListeners(boolean isUpdateList, String listId, String userId) {
         addEntriesButton.setOnClickListener(view -> adapter.addNewListEntry());
+        addEntriesButton.setEnabled(canEditList);
         submitListButton.setOnClickListener(view -> {
             ListPayload newListPayload = new ListPayload(listName.getText().toString(),
                     listDescription.getText().toString(),
@@ -101,15 +108,14 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
                         new CreateOrUpdateListRequest(newListPayload));
             }
         });
+        submitListButton.setEnabled(canEditList);
     }
 
     private void setUpRecyclerView(List<IdeaPayload> ideasToDisplay) {
         RecyclerView recyclerView = findViewById(R.id.rv_entries);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation()));
-        adapter = new ListEntriesRecyclerViewAdapter(this, ideasToDisplay);
+        adapter = new ListEntriesRecyclerViewAdapter(this, ideasToDisplay, canEditList);
         recyclerView.setAdapter(adapter);
     }
 }
