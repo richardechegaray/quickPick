@@ -31,7 +31,7 @@ async function getTokens(numTokens) {
         });
 }
 
-describe.skip("Non-functional Requirements Tests", function () {
+describe("Non-functional Requirements Tests", function () {
     it("should allow 50+ users to join the session", async () => {
         jest.setTimeout(55000);
         var numUsers = 55;
