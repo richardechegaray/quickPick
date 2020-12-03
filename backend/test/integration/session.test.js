@@ -122,9 +122,11 @@ describe("Add user to session", function () {
         done();
     });
 
-    it("User is already in session or full", async (done) => {
+    it("User is already in session", async (done) => {
+        let session = await Session.findOne({});
         const response = await request(app).post("/session/abcd").set({facebookToken}).send({});
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(200);
+        expect(session.toString()).toBe((await Session.findOne({})).toString());
         done();
     });
 
