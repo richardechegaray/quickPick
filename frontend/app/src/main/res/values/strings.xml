@@ -19,7 +19,7 @@
     <string name="accept_text">Accept</string>
     <string name="description_of_idea_text">description of idea</string>
     <string name="no_results_found_text">"No results found"</string>
-    <string name="return_to_main_activity_button_text">return to main menu</string>
+    <string name="return_to_main_activity_button_text">Return to Main Menu</string>
     <string name="quick_text">quick</string>
     <string name="pick_text">Pick</string>
     <string name="selected_list_text">Selected list</string>
