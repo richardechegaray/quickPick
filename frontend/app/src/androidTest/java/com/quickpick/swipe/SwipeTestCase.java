@@ -32,13 +32,11 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -58,7 +56,7 @@ public class SwipeTestCase {
     private void startMovieSession() {
         // create session
         ViewInteraction createSessionButton = onView(
-                allOf(withId(R.id.create_session_button), withText("Create Session"),
+                allOf(withId(R.id.create_session_button),
                         isDisplayed()));
         createSessionButton.perform(click());
 
@@ -100,7 +98,7 @@ public class SwipeTestCase {
     private void testSwipes() {
         // starts swiping
         ViewInteraction startSwipingButton = onView(
-                allOf(withId(R.id.start_swiping_button), withText("Start Swiping!"),
+                allOf(withId(R.id.start_swiping_button), withText(R.string.start_swiping_button),
                         childAtPosition(
                                 childAtPosition(
                                         withId(android.R.id.content),
@@ -109,16 +107,11 @@ public class SwipeTestCase {
                         isDisplayed()));
         startSwipingButton.perform(click());
 
-        sleep(1000);
+        sleep(1500);
 
         // like button
         ViewInteraction likeButton = onView(
                 allOf(withId(R.id.likeButton), withContentDescription("like button"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.FrameLayout")),
-                                        0),
-                                1),
                         isDisplayed()));
         likeButton.perform(click());
 
@@ -127,11 +120,6 @@ public class SwipeTestCase {
         // dislike button
         ViewInteraction dislikeButton = onView(
                 allOf(withId(R.id.dislikeButton), withContentDescription("dislike button"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.FrameLayout")),
-                                        0),
-                                0),
                         isDisplayed()));
         dislikeButton.perform(click());
 
@@ -146,16 +134,15 @@ public class SwipeTestCase {
             onView(withIndex(withId(R.id.card_view), 0)).perform(swipeRight());
         }
 
-        sleep(1000);
+        sleep(2000);
 
         // expect to see top three choices and return to main menu button
-        onView(withText("Horror")).check(matches(isDisplayed()));
-        onView(withText("Sci-Fi")).check(matches(isDisplayed()));
-        onView(withText("Musical")).check(matches(isDisplayed()));
-        onView(withText("Return to Main Menu")).check(matches(isDisplayed()));
+        onView(withText("1st - Action")).check(matches(isDisplayed()));
+        onView(withText("2nd - Sci-fi")).check(matches(isDisplayed()));
+        onView(withText("3rd - Musical")).check(matches(isDisplayed()));
 
         ViewInteraction returnToMainMenuButton = onView(
-                allOf(withId(R.id.return_to_main_activity_button), withText("Return to Main Menu"),
+                allOf(withId(R.id.return_to_main_activity_button),
                         childAtPosition(
                                 childAtPosition( // error here
                                         withId(android.R.id.content),

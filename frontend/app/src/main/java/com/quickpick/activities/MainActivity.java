@@ -95,9 +95,14 @@ public class MainActivity extends AppCompatActivity {
         }
         if (joinButton != null && sessionCode != null) {
             joinButton.setOnClickListener(button -> {
-                SessionRepository.getInstance().joinSession(this::navigateToSessionActivity,
-                        RunnableUtils.showToast(this, getString(R.string.invalid_code)),
-                        sessionCode.getText().toString(), facebookAccessToken);
+                String sessionPin = sessionCode.getText().toString();
+                if (!sessionPin.isEmpty()) {
+                    SessionRepository.getInstance().joinSession(this::navigateToSessionActivity,
+                            RunnableUtils.showToast(this, getString(R.string.invalid_code)),
+                            sessionCode.getText().toString(), facebookAccessToken);
+                } else {
+                    RunnableUtils.showToast(this, getString(R.string.invalid_code)).run();
+                }
                 dialog.dismiss();
             });
         }

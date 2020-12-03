@@ -45,7 +45,7 @@ public class JoinSessionInvalidTestCase {
     @Test
     public void joinSessionInvalidTestCase() {
         ViewInteraction joinSessionButton = onView(
-                allOf(withId(R.id.join_session_button), withText(R.string.join_session_text),
+                allOf(withId(R.id.join_session_button),
                         isDisplayed()));
         // Logged in user should see button to join session
         joinSessionButton.check(matches(isDisplayed()));
