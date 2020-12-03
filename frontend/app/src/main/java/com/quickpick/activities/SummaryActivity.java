@@ -73,21 +73,21 @@ public class SummaryActivity extends AppCompatActivity {
 
             Glide.with(getApplicationContext()).load(firstPlace.getIdea().getPicture())
                     .into(firstPlaceImage);
-            ((TextView) findViewById(R.id.first_place_idea_text)).setText(firstPlace.getIdea().getName());
+            ((TextView) findViewById(R.id.first_place_idea_text)).setText("1st - " + firstPlace.getIdea().getName());
             ((TextView) findViewById(R.id.first_place_description)).setText(firstPlace.getIdea().getDescription());
             ((TextView) findViewById(R.id.first_place_idea_score)).setText(String.valueOf(firstPlace.getScore()));
 
             if (results.size() > 1) {
                 ResultPayload secondPlace = results.get(1);
 
-                ((TextView) findViewById(R.id.second_place_idea)).setText(secondPlace.getIdea().getName());
+                ((TextView) findViewById(R.id.second_place_idea)).setText("2nd - " + secondPlace.getIdea().getName());
                 ((TextView) findViewById(R.id.second_place_idea_description)).setText(secondPlace.getIdea().getDescription());
                 ((TextView) findViewById(R.id.second_place_idea_score)).setText(String.valueOf(secondPlace.getScore()));
 
                 if (results.size() > 2) {
                     ResultPayload thirdPlace = results.get(2);
 
-                    ((TextView) findViewById(R.id.third_place_idea)).setText(thirdPlace.getIdea().getName());
+                    ((TextView) findViewById(R.id.third_place_idea)).setText("3rd - " + thirdPlace.getIdea().getName());
                     ((TextView) findViewById(R.id.third_place_idea_description)).setText(thirdPlace.getIdea().getDescription());
                     ((TextView) findViewById(R.id.third_place_idea_score)).setText(String.valueOf(thirdPlace.getScore()));
                 }
