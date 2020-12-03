@@ -100,8 +100,16 @@ async function assertUserCanJoin(user, session, res) {
     res.status(404).send({ ok: false });
     return false;
   }
-  else if (session.status !== "lobby" || await isUserInSession(user.id, session)) {
-    res.status(400).send({ ok: false, message: "Session has started/user is already in session" });
+  else if (session.status !== "lobby") {
+    res.status(400).send({ ok: false, message: "Session has started" });
+    return false;
+  }
+  else if (await isUserInSession(user.id, session)){
+    let firebaseMessage = {
+      session,
+    };
+    firebaseUtil.sendFirebase(firebaseMessage);
+    res.status(200).send({ ok: true });
     return false;
   }
   return true;
@@ -346,7 +354,7 @@ module.exports = {
       return;
     }
     let newResults = [];
-    let foundList = await List.findOne({ _id: ObjectId(session.listID) });
+    let foundList = await List.findById(session.listID);
 
     foundList.ideas.forEach((foundIdea) => {
       newResults.push({ idea: foundIdea, score: 0 });

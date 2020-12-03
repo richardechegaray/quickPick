@@ -103,14 +103,16 @@ public class ViewOrUpdateListsActivity extends AppCompatActivity {
         }
 
         private void deleteList(int position) {
-            ListRepository.getInstance().callDeleteList(
-                    () -> ListRepository.getInstance().callGetLists(
-                            RunnableUtils.DO_NOTHING,
-                            RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.get_lists_failed)),
-                            accessToken.getToken()),
-                    RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.delete_list_failed)),
-                    accessToken.getToken(),
-                    lists.get(position).getId());
+            if (userCanModifyList(position)) {
+                ListRepository.getInstance().callDeleteList(
+                        () -> ListRepository.getInstance().callGetLists(
+                                RunnableUtils.DO_NOTHING,
+                                RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.get_lists_failed)),
+                                accessToken.getToken()),
+                        RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.delete_list_failed)),
+                        accessToken.getToken(),
+                        lists.get(position).getId());
+            }
         }
 
         private void editList(int position) {
@@ -120,6 +122,15 @@ public class ViewOrUpdateListsActivity extends AppCompatActivity {
                     RunnableUtils.showToast(ViewOrUpdateListsActivity.this, getString(R.string.get_list_failed)),
                     accessToken.getToken(),
                     lists.get(position).getId());
+        }
+
+        private boolean userCanModifyList(int position) {
+            ListPayload payloadToBeModified = lists.get(position);
+            if (payloadToBeModified.getUserId().equals(accessToken.getUserId())) {
+                return true;
+            }
+            RunnableUtils.showToast(ViewOrUpdateListsActivity.this, "You can only delete lists created by you!").run();
+            return false;
         }
 
         @Override

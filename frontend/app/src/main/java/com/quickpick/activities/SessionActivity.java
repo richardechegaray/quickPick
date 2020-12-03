@@ -85,6 +85,8 @@ public class SessionActivity extends AppCompatActivity {
         TextView sessionUserCount = findViewById(R.id.session_user_count);
         sessionViewModel.getSession().observe(this, newSession ->
         {
+            SessionRepository.getInstance().callGetSessionList(RunnableUtils.DO_NOTHING, RunnableUtils.DO_NOTHING,
+                    accessToken.getToken());
             boolean isOwner = newSession.getCreator().equals(accessToken.getUserId());
             if ("running".equals(newSession.getStatus())) {
                 SessionRepository.getInstance().callGetSessionList(
@@ -136,6 +138,12 @@ public class SessionActivity extends AppCompatActivity {
                             .show();
                 }
         );
+        listViewModel.getSessionList().observe(this, newList -> {
+            // Set the description only if we know that a list has been selected
+            if (listEditTextLayout.getError() == null) {
+                listEditTextLayout.setHelperText(newList.getDescription());
+            }
+        });
     }
 
     private void setUpRecyclerView() {

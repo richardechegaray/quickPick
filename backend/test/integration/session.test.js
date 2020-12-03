@@ -19,6 +19,16 @@ let newUser = {
 };
 let testListID = "";
 
+/* Ideas used to test the food list */
+const frenchIdea = {
+    name: "French",
+};
+const mexicanIdea = {
+    name: "Mexican",
+};
+const italianIdea = {
+    name: "Italian",
+};
 beforeEach(async () => {
     await dbHelper.connect();
 
@@ -112,9 +122,11 @@ describe("Add user to session", function () {
         done();
     });
 
-    it("User is already in session or full", async (done) => {
+    it("User is already in session", async (done) => {
+        let session = await Session.findOne({});
         const response = await request(app).post("/session/abcd").set({facebookToken}).send({});
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(200);
+        expect(session.toString()).toBe((await Session.findOne({})).toString());
         done();
     });
 
@@ -216,21 +228,15 @@ describe("Receive choices", function () {
             choices: [
                 {
                     choice: true,
-                    idea: { 
-                        name: "Italian" 
-                    }, 
+                    idea: italianIdea, 
                 },
                 {
                     choice: false,
-                    idea: { 
-                        name: "French" 
-                    }, 
+                    idea: frenchIdea, 
                 },
                 {
                     choice: true,
-                    idea: { 
-                        name: "Mexican" 
-                    }, 
+                    idea: mexicanIdea, 
                 }
             ]
         });
@@ -244,22 +250,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { 
-                        name: "Italian" 
-                    }, 
-                    choice: true
+                    idea: italianIdea, choice: true
                 },
                 {
-                    idea: { 
-                        name: "French" 
-                    }, 
-                    choice: false
+                    idea: frenchIdea, choice: false
                 },
                 {
-                    idea: { 
-                        name: "Mexican" 
-                    }, 
-                    choice: true
+                    idea: mexicanIdea, choice: true
                 }
             ]
         });
@@ -272,13 +269,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: italianIdea, choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: frenchIdea, choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: mexicanIdea, choice: true
                 }
             ]
         });
@@ -290,13 +287,13 @@ describe("Receive choices", function () {
         await Session.findOneAndUpdate({ pin: "abcd" }, { status: "running", participants: [{name: "Buyonacy Changstein", id: newUser.id, }] });
         let choices = [
             {
-                idea: { name: "Italian" }, choice: true
+                idea: italianIdea, choice: true
             },
             {
-                idea: { name: "French" }, choice: false
+                idea: frenchIdea, choice: false
             },
             {
-                idea: { name: "Mexican" }, choice: true
+                idea: mexicanIdea, choice: true
             }
         ];
 
@@ -314,13 +311,13 @@ describe("Receive choices", function () {
         const response = await request(app).post("/session/abcd/choices").set({ facebookToken }).send({
             choices: [
                 {
-                    idea: { name: "Italian" }, choice: true
+                    idea: italianIdea, choice: true
                 },
                 {
-                    idea: { name: "French" }, choice: false
+                    idea: frenchIdea, choice: false
                 },
                 {
-                    idea: { name: "Mexican" }, choice: true
+                    idea: mexicanIdea, choice: true
                 }
             ]
         });

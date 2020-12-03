@@ -185,8 +185,9 @@ describe("Add user to session", function () {
         req.params.id = "abcd";
 
         await sessionHelper.addUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(400);
+        let session = await Session.findOne({});
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(session.toString()).toBe((await Session.findOne({})).toString());
         done();
     });
 

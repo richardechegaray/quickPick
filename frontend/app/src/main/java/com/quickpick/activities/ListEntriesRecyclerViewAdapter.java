@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -25,8 +26,10 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
 
     private final Set<ViewHolder> boundedViewHolders;
 
+    private final boolean canEdit;
+
     // data is passed into the constructor
-    public ListEntriesRecyclerViewAdapter(Context context, List<IdeaPayload> data) {
+    public ListEntriesRecyclerViewAdapter(Context context, List<IdeaPayload> data, boolean canEdit) {
         this.mInflater = LayoutInflater.from(context);
         this.boundedViewHolders = new HashSet<>();
         this.ideaPayloads = new ArrayList<>();
@@ -34,6 +37,7 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
         for (IdeaPayload payload : data) {
             ideaPayloads.add(new IdeaPayload(payload));
         }
+        this.canEdit = canEdit;
     }
 
     // inflates the row layout from xml when needed
@@ -41,7 +45,7 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.recycler_view_entries, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, canEdit);
     }
 
     // binds the data to the TextView in each row
@@ -93,15 +97,26 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
 
         private IdeaPayload idea;
 
-        private ViewHolder(View itemView) {
+        private ViewHolder(View itemView, boolean canEdit) {
             super(itemView);
             position = 0;
             idea = null;
+
             name = (TextInputEditText) itemView.findViewById(R.id.rv_entry);
+            name.setEnabled(canEdit);
+            name.addTextChangedListener(new NameEditTextWatcher(itemView.findViewById(R.id.rv_entry_layout)));
+
             description = (TextInputEditText) itemView.findViewById(R.id.rv_description);
-            itemView.findViewById(R.id.rv_entries_delete_button).setOnClickListener(view ->
-                    deleteListEntry(position)
-            );
+            description.setEnabled(canEdit);
+
+            Button deleteButton = itemView.findViewById(R.id.rv_entries_delete_button);
+            if (canEdit) {
+                deleteButton.setOnClickListener(view ->
+                        deleteListEntry(position)
+                );
+            } else {
+                deleteButton.setEnabled(false);
+            }
         }
 
         private void onBind(IdeaPayload idea, int position) {
@@ -109,7 +124,6 @@ public class ListEntriesRecyclerViewAdapter extends RecyclerView.Adapter<ListEnt
             this.position = position;
             name.setText(idea.getName());
             description.setText(idea.getDescription());
-
         }
 
         private void updateIdeaPayload() {
