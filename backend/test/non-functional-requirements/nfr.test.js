@@ -41,7 +41,7 @@ describe.skip("Non-functional Requirements Tests", function () {
 
     it("should have per request latency of < 400ms", async () => {
         const tokens = await getTokens(1);
-        var numRequests = 400;
+        var numRequests = 200;
         var startTime = performance.now();
         for (var i = 0; i < numRequests; i++) {
             await createSession(tokens[0]);
