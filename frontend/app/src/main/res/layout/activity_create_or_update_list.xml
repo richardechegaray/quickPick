@@ -32,8 +32,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.19"
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_name_edit_text_layout"
+        app:layout_constraintVertical_bias="0.025"
         app:layout_constraintWidth_percent="0.8">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -47,15 +47,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create_or_update_list_entries_text"
-        android:textSize="18sp"
         android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.05"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_description_edit_text_layout"
+        app:layout_constraintVertical_bias="0.01" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_entries"
@@ -75,12 +75,12 @@
         android:layout_height="wrap_content"
         android:text="@string/create_or_update_list_add_entries_button_text"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_submit_list_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/create_or_update_list_submit_list_button"
