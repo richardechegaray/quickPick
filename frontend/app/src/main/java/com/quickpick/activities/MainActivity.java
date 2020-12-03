@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(R.layout.activity_main);
         setOnClickListeners();
+        setWelcomeText();
     }
 
     @Override
@@ -93,12 +95,24 @@ public class MainActivity extends AppCompatActivity {
         }
         if (joinButton != null && sessionCode != null) {
             joinButton.setOnClickListener(button -> {
-                SessionRepository.getInstance().joinSession(this::navigateToSessionActivity,
-                        RunnableUtils.showToast(this, getString(R.string.invalid_code)),
-                        sessionCode.getText().toString(), facebookAccessToken);
+                String sessionPin = sessionCode.getText().toString();
+                if (!sessionPin.isEmpty()) {
+                    SessionRepository.getInstance().joinSession(this::navigateToSessionActivity,
+                            RunnableUtils.showToast(this, getString(R.string.invalid_code)),
+                            sessionCode.getText().toString(), facebookAccessToken);
+                } else {
+                    RunnableUtils.showToast(this, getString(R.string.invalid_code)).run();
+                }
                 dialog.dismiss();
             });
         }
+    }
+
+    private void setWelcomeText() {
+        int[] welcomeTexts = {R.string.quote1, R.string.quote2, R.string.quote3};
+        int randomIndex = (int) (Math.random() * welcomeTexts.length);
+        TextView welcomeText = findViewById(R.id.welcome_text);
+        welcomeText.setText(welcomeTexts[randomIndex]);
     }
 
     private void navigateToSessionActivity() {
