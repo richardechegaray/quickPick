@@ -33,6 +33,7 @@ async function getTokens(numTokens) {
 
 describe.skip("Non-functional Requirements Tests", function () {
     it("should allow 50+ users to join the session", async () => {
+        jest.setTimeout(55000);
         var numUsers = 55;
         const tokens = await getTokens(numUsers);
         const pin = await createSession(tokens[0]);
@@ -40,6 +41,7 @@ describe.skip("Non-functional Requirements Tests", function () {
     });
 
     it("should have per request latency of < 400ms", async () => {
+        jest.setTimeout(200000);
         const tokens = await getTokens(1);
         var numRequests = 200;
         var startTime = performance.now();
