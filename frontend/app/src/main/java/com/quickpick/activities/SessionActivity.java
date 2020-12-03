@@ -142,12 +142,6 @@ public class SessionActivity extends AppCompatActivity {
                 }
         );
 
-        //        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-        //            @Override
-        //            public void onClick(DialogInterface dialog, int which) {
-        //                return;
-        //            }
-        //        });
         listViewModel.getSessionList().observe(this, newList -> {
             // Set the description only if we know that a list has been selected
             if (listEditTextLayout.getError() == null) {
