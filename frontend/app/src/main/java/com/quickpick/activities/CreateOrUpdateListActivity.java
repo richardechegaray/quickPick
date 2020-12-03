@@ -90,9 +90,16 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
         addEntriesButton.setOnClickListener(view -> adapter.addNewListEntry());
         addEntriesButton.setEnabled(canEditList);
         submitListButton.setOnClickListener(view -> {
-            ListPayload newListPayload = new ListPayload(listName.getText().toString(),
+            String name = listName.getText().toString();
+            List<IdeaPayload> entries = adapter.getListEntries();
+
+            if (!isListValid(name, entries)) {
+                return;
+            }
+
+            ListPayload newListPayload = new ListPayload(name,
                     listDescription.getText().toString(),
-                    adapter.getListEntries(),
+                    entries,
                     userId);
 
             if (isUpdateList) {
@@ -109,6 +116,19 @@ public class CreateOrUpdateListActivity extends AppCompatActivity {
             }
         });
         submitListButton.setEnabled(canEditList);
+    }
+
+    private boolean isListValid(String name, List<IdeaPayload> entries) {
+        if (name.isEmpty() || entries.stream().anyMatch(ideaPayload -> ideaPayload.getName().isEmpty())) {
+            RunnableUtils.showToast(this, "Please complete required fields").run();
+            return false;
+        }
+
+        if (entries.size() == 0) {
+            RunnableUtils.showToast(this, "Lists must contain at least one entry").run();
+            return false;
+        }
+        return true;
     }
 
     private void setUpRecyclerView(List<IdeaPayload> ideasToDisplay) {

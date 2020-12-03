@@ -8,17 +8,17 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/quickPick"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="quickPick"
-            android:textSize="24sp"
             android:layout_margin="20dp"
-            android:drawableRight="@drawable/ic_check"/>
+            android:text="@string/quickpick"
+            android:textSize="24sp"
+            app:drawableRightCompat="@drawable/ic_check" />
 
 
         <TextView
@@ -27,48 +27,48 @@
             android:layout_height="wrap_content"
             android:layout_margin="50dp"
             android:gravity="center"
-            android:text='"10x faster than slowPick"'
+            android:textSize="18sp"
             android:textStyle="italic" />
 
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:rowCount="2"
-            android:columnCount="2"
+            android:layout_gravity="center_horizontal"
             android:layout_margin="5dp"
             android:alignmentMode="alignMargins"
-            android:layout_gravity="center_horizontal"
-            android:columnOrderPreserved="false">
+            android:columnCount="2"
+            android:columnOrderPreserved="false"
+            android:rowCount="2">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/create_session_button"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
                 app:strokeColor="@color/colorPrimaryDark"
-                app:strokeWidth="2dp"
-                android:layout_margin="10dp">
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/create_session"
-                        android:layout_marginTop="12dp"/>
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/create_session" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
                         android:text="create a session"
-                        android:textSize="16sp"
-                        android:layout_marginTop="20dp"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -76,31 +76,31 @@
                 android:id="@+id/join_session_button"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
                 app:strokeColor="@color/colorPrimaryDark"
-                app:strokeWidth="2dp"
-                android:layout_margin="10dp">
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/join_session"
-                        android:layout_marginTop="12dp"/>
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/join_session" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
                         android:text="join a session"
-                        android:textSize="16sp"
-                        android:layout_marginTop="20dp"/>
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -108,31 +108,31 @@
                 android:id="@+id/create_new_list_button"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
                 app:strokeColor="@color/colorPrimaryDark"
-                app:strokeWidth="2dp"
-                android:layout_margin="10dp">
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:layout_marginTop="12dp"
                         android:src="@drawable/create_list" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="create a list"
-                        android:textSize="16sp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:text="@string/create_new_list_text"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -140,31 +140,31 @@
                 android:id="@+id/view_edit_lists_button"
                 android:layout_width="170dp"
                 android:layout_height="170dp"
+                android:layout_margin="10dp"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="@android:color/transparent"
                 app:strokeColor="@color/colorPrimaryDark"
-                app:strokeWidth="2dp"
-                android:layout_margin="10dp">
+                app:strokeWidth="2dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/edit_list"
-                        android:layout_marginTop="12dp"/>
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="12dp"
+                        android:src="@drawable/edit_list" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="view + edit my lists"
-                        android:textSize="16sp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:text="@string/view_edit_lists_text"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -172,12 +172,12 @@
 
         <Button
             android:id="@+id/logout_button"
-            android:textAllCaps="false"
             android:layout_width="360dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            android:text="logout" />
+            android:text="@string/logout"
+            android:textAllCaps="false" />
     </LinearLayout>
 
 
