@@ -66,6 +66,7 @@
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/create_or_update_list_add_entries_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="350dp"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_or_update_list_entries_text_view"

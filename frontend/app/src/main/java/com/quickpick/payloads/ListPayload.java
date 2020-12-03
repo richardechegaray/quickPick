@@ -24,18 +24,25 @@ public class ListPayload implements Serializable {
     private String id;
 
     @Nullable
+    @SerializedName("userID")
+    private final String userId;
+
+    @Nullable
     private final List<IdeaPayload> ideas;
 
     public ListPayload() {
         this.name = "";
         this.description = "";
         this.ideas = new ArrayList<>();
+        this.userId = "";
     }
 
-    public ListPayload(@Nullable String name, @Nullable String description, @Nullable List<IdeaPayload> ideas) {
+    public ListPayload(@Nullable String name, @Nullable String description,
+                       @Nullable List<IdeaPayload> ideas, @Nullable String userId) {
         this.name = name;
         this.description = description;
         this.ideas = ideas;
+        this.userId = userId;
     }
 
     @NonNull
@@ -56,6 +63,11 @@ public class ListPayload implements Serializable {
     @NonNull
     public String getDescription() {
         return Optional.ofNullable(description).orElse("");
+    }
+
+    @NonNull
+    public String getUserId() {
+        return Optional.ofNullable(userId).orElse("");
     }
 
 }
