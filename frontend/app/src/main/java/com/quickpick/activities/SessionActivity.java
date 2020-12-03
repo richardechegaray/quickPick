@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -122,7 +123,8 @@ public class SessionActivity extends AppCompatActivity {
                     String[] listNames = lists.stream().map(ListPayload::getName).toArray(String[]::new);
                     List<String> listIds = lists.stream().map(ListPayload::getId).collect(Collectors.toList());
                     final int[] selectedItem = new int[1];
-                    new MaterialAlertDialogBuilder(this)
+
+                    AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
                             .setTitle(getString(R.string.session_list_text))
                             .setNeutralButton(getString(R.string.dialog_cancel_button_text),
                                     (dialog, which) -> {})
@@ -135,8 +137,17 @@ public class SessionActivity extends AppCompatActivity {
                                     0,
                                     (dialog, which) -> selectedItem[0] = which)
                             .show();
+                    alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setAllCaps(false);
+                    alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setAllCaps(false);
                 }
         );
+
+        //        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        //            @Override
+        //            public void onClick(DialogInterface dialog, int which) {
+        //                return;
+        //            }
+        //        });
         listViewModel.getSessionList().observe(this, newList -> {
             // Set the description only if we know that a list has been selected
             if (listEditTextLayout.getError() == null) {

@@ -6,11 +6,11 @@
     <string name="facebook_app_id">822865601801621</string>
     <string name="fb_login_protocol_scheme">fb822865601801621</string>
     <string name="session_id_edit_text_hint">Session ID</string>
-    <string name="dialog_join_button_text">join</string>
-    <string name="dialog_cancel_button_text">cancel</string>
+    <string name="dialog_join_button_text">Join</string>
+    <string name="dialog_cancel_button_text">Cancel</string>
     <string name="dialog_select_button_text">Select</string>
     <string name="session_list_text">Select a list</string>
-    <string name="start_swiping_button">begin swiping</string>
+    <string name="start_swiping_button">Begin Swiping</string>
     <string name="session_code_string_format"><![CDATA[<b>session code: </b>%s]]></string>
     <string name="session_user_count_format"><![CDATA[<b>user count: </b>%d]]></string>
     <string name="dislike_button_attribute_text">dislike button</string>
@@ -30,9 +30,9 @@
     <string name="invalid_code">Invalid code</string>
     <string name="create_or_update_list_name_prompt">List Name:</string>
     <string name="create_or_update_list_description_name_prompt">List Description:</string>
-    <string name="create_or_update_list_add_entries_button_text">add entries</string>
-    <string name="create_or_update_list_create_button_text">create list</string>
-    <string name="create_or_update_list_update_button_text">update list</string>
+    <string name="create_or_update_list_add_entries_button_text">Add Entries</string>
+    <string name="create_or_update_list_create_button_text">Create List</string>
+    <string name="create_or_update_list_update_button_text">Update List</string>
     <string name="create_or_update_list_entries_text">list entries:</string>
     <string name="logout">Logout</string>
     <string name="missing_list">Select a list first!</string>
